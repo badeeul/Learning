@@ -1,0 +1,1022 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: CAClaimSummary
+  load_strategy: overwrite
+  key_columns:
+    - claimnum
+    - calyrmo_end
+  unknown_record: False
+  identity: False
+
+source:
+  - name: massive_claims
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: massive_claims
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcclaim
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claimant
+
+  - name: reserves
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: reserves
+
+  - name: claims_catastrophe
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_catastrophe
+
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_coverage
+
+  - name: cl_occurrence
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_occurrence
+
+  - name: wclocnam
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wclocnam
+
+  - name: claims_caextra
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_caextra
+
+  - name: payments
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: payments
+
+  - name: claims_catcodes
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_catcodes
+
+  - name: claims_cavehicles
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_cavehicles
+
+  - name: transaction_uwcoverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: transaction_uwcoverage
+
+  - name: pc_coverage_reporting
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_coverage_reporting
+
+  - name: wcinfo
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcinfo
+
+  - name: pc_products
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_products
+
+  - name: uwvehicles
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: uwvehicles
+
+query:
+  - name: Reserving_MassiveClaims_DF
+    sql: select
+          claimnum as claim_number
+          ,asofdate
+        from massive_claims
+        where dl_iscurrent = 1
+        and claimnum <> 'claimnum'
+
+  - name: CAIncrLossReserves_DF1
+    sql: select
+         to_timestamp('01/01/2008 0:00:00', 'M/d/yyyy H:m:s') as startdate
+        ,to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate
+        ,last_day(to_date(r.updateon, 'M/d/yyyy')) as cal_yr_mo_end
+        ,cast(round(year(to_date(r.updateon, 'M/d/yyyy')) + month(to_date(r.updateon, 'M/d/yyyy'))/100.0,2) as decimal(10,2)) as calyr_mo
+        ,to_date(w.dol, 'M/d/yyyy') as dol
+        ,year(w.dol) as accyr
+        ,to_date(c.closed, 'M/d/yyyy') as closed
+        ,to_date(c.reopened, 'M/d/yyyy') as reopened
+        ,to_date(c.received, 'M/d/yyyy') as received
+        ,nvl(c.legalreferral, 'N') as legal
+        ,case when c.suitfiled = 'Y' then 'Y' else 'N' end as suitfiled
+        ,case when c.tpataxid = '521487364-0000' then 'G' when nvl(c.tpataxid, '') = '' then 'N' else 'Y' end as tpa
+        ,case when cl.locationoflosslocnum = '' then cl.locationoflossstate else wc.state end as state
+        ,w.wcclaimid
+        ,concat_ws('-', r.code, w.occurrencenumber, r.claim, c.claimantnumber) as claim_number
+        ,concat(r.code, '-', w.occurrenceNumber) as occnum
+        ,r.code
+        ,w.occurrencenumber
+        ,r.claim
+        ,c.claimantnumber
+        ,i.lob
+        ,case when i.renewof='NEW' then 'New' else 'Renewal' end as newrenew 
+        ,sum(r.medical) + sum(r.indemnity) as lossreserves
+        ,sum(r.expense) as expensereserves
+        ,ct.catastrophecode as catcode
+        ,case when nvl(ca.catastrophecodeid,'N') = 'N' then 'N' else 'Y' end as catind
+        ,case when mc.claim_number is not null then 'Y' else 'N' end as massind
+        ,i.carrier
+        ,i.markettype
+        ,i.productionsrc
+        ,i.agency
+        ,to_date(i.pobegin, 'M/d/yyyy') as pobegin
+        ,nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir) as expir
+        ,cast(null as string) as causeofloss
+        ,cast(null as string) as lossdescrip
+        ,r.claimantid
+        ,case 
+            when cc.commonname='BABFE' then 
+              case 
+                when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                when x.typecoverage = 'UMUIM' then 194
+                when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                else 0 
+              end
+            else
+              nvl(pcr.aslob_code, 
+                case 
+                  when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                  when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                  when x.typecoverage = 'UMUIM' then 194
+                  when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                  when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                  when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                else 0 
+                end
+              )
+        end as aslob
+        ,cast('' as string) as reserve_segment_code
+        ,case(case when cc.commonname='BABFE' then  
+                    (case 
+                      when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                      when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                      when x.typecoverage = 'UMUIM' then 194
+                      when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                      when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                      when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                      else 0 
+                    end)
+                  else
+                  nvl(pcr.aslob_code, 
+                      (case 
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                        when x.typecoverage = 'UMUIM' then 194
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                        when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                        else 0 
+                      end) )
+                end )
+          when '193' then 'CANF'
+          when '194' then
+            case when cc.commonname in ('!UI','!UM','!UMPD','!HAACLIA','!HAUI','!HAUIEL','!HAUIPL','!HAUMEL','!HAUMPL','!NOUI','!NOUM','DUI','DUM','GLOBALUM') then 'CAUM'
+                when x.typecoverage in ('PD', 'COLL', 'COMP') then 'CAPD'
+                when x.typecoverage in ('UMUIM', 'PIP', 'LIAB') then 'CABI'
+                else 'ERROR'
+            end
+          when '212' then 
+            case when cc.commonname in ('COL','DCOL') then 'CACOLL'
+                when cc.commonname in ('OTC','DOTC') then 'CACOMP'
+                when x.typecoverage = 'COMP' then 'CACOMP'
+                else 'CACOLL'
+            end
+          else 'ERROR' 
+          end as reserve_detailed_segment_code
+        ,replace(p.description, ',', '') as productid
+        ,cv.vehicleid as exposureid
+        ,cast('' as string) as exposuregroup
+        ,uw.classCode as exposureclass
+        ,cast('' as string) as industry
+        ,case when nvl(uw.secondaryclass, '')='' then 'NA' else uw.secondaryclass end as autosecondaryclass
+        ,case when nvl(uw.vehiclesize, '')='' then 'NA' else uw.vehiclesize end as autovehiclesize
+        from 
+        wcclaim as w
+        left join insured as i on i.code = w.code and i.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid = c.wcclaimid and c.dl_iscurrent = 1
+        left join reserves r on r.code = w.code and r.claim = w.claim and r.claimantid = c.claimantid and r.dl_iscurrent = 1 
+        left join claims_catastrophe ca on ca.sqlfieldvalue = w.occid and ca.sqlfield = 'OCCID' and ca.dl_iscurrent = 1
+        left join claims_catcodes ct on ca.catastrophecodeid=ct.catastrophecodeid
+        left join cl_occurrence cl on cl.code = w.code and cl.occurrencenumber=w.occurrencenumber and cl.dl_iscurrent = 1
+        left join wclocnam wc on w.code = wc.code and wc.loctypenum = cl.locationoflosslocnum and wc.dl_iscurrent = 1
+        left join claims_caextra as x on c.claimantid = x.claimantid and x.dl_iscurrent = 1 
+        left outer join cl_coverage cc on r.claimantid=cc.claimantid and r.cvgid=cc.cvgid and cc.dl_iscurrent = 1
+        left join claims_cavehicles cv on cv.cavehicleid = cc.cavehicleid and cv.dl_iscurrent = 1
+        left join transaction_uwcoverage v on v.code=w.code 
+            and v.commonname=cc.commonname 
+            and v.state=cc.coveragestate 
+            and (v.itemid=cv.vehicleid  or (nvl(v.itemid,0)=0 and v.code<>'ECAU548820')) 
+            and v.trancnt=0 and v.after=1
+            and v.dl_iscurrent = 1
+        left join pc_coverage_reporting pcr on pcr.coverageid = v.coverageid and pcr.dl_iscurrent = 1
+        left join wcinfo wi on wi.code=w.code and wi.dl_iscurrent = 1
+        left join pc_products p on p.productID=wi.productID and p.dl_iscurrent = 1
+        left join uwvehicles uw on cv.vehicleid=uw.vehicleid and uw.dl_iscurrent = 1
+        left join Reserving_MassiveClaims_DF mc on mc.claim_number = concat_ws('-', r.code, w.occurrencenumber, r.claim, c.claimantnumber)
+        where 
+          r.updateon between to_timestamp('01/01/2008 0:00:00', 'M/d/yyyy H:m:s') 
+          and to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+          and w.lob = 'CA'
+          and nvl(c.voidortransfer, '') not in ('T', 'V') 
+          and w.dl_iscurrent = 1   
+        group by
+          last_day(to_date(r.updateon, 'M/d/yyyy'))
+          ,cast(round(year(to_date(r.updateon, 'M/d/yyyy')) + month(to_date(r.updateon, 'M/d/yyyy'))/100.0,2) as decimal(10,2))
+          ,r.code
+          ,concat(r.code, '-', w.occurrencenumber, '-', r.claim, '-', c.claimantnumber)
+          ,concat(r.code, '-', w.occurrencenumber)
+          ,w.occurrencenumber
+          ,r.claim
+          ,c.claimantnumber
+          ,i.lob
+          ,(case when i.renewof='NEW' then 'New' else 'Renewal' end)
+          ,c.adjustorclosed
+          ,c.adjustorreopened
+          ,c.received
+          ,nvl(c.legalreferral, 'N')
+          ,case when c.suitfiled='Y' then 'Y' else 'N' end
+          ,case when c.tpataxid = '521487364-0000' then 'G' when nvl(c.tpataxid, '') = '' then 'N' else 'Y' end
+          ,(case when cl.locationoflosslocnum='' then cl.locationoflossstate else wc.state end)
+          ,w.wcclaimid
+          ,ct.catastrophecode
+          ,case when nvl(ca.catastrophecodeid,'N') = 'N' then 'N' else 'Y' end
+          ,i.carrier
+          ,i.markettype
+          ,i.productionsrc
+          ,i.agency
+          ,i.pobegin
+          ,nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir)
+          ,r.claimantid
+          ,w.dol
+          ,year(w.dol)
+          ,to_date(c.closed, 'M/d/yyyy')
+          ,to_date(c.reopened, 'M/d/yyyy')
+          ,to_date(c.received, 'M/d/yyyy')
+          ,replace(p.description, ',', '')
+          ,case when cc.commonname='BABFE' then
+                (case 
+                  when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                  when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                  when x.typecoverage = 'UMUIM' then 194
+                  when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                  when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                  when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                  else 0 
+                end)
+              else
+
+              nvl(pcr.aslob_code, 
+                  (case 
+                    when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                    when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                    when x.typecoverage = 'UMUIM' then 194
+                    when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                    when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                    when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                    else 0 
+                  end) )
+              end
+          ,case(case when cc.commonname='BABFE' then 
+                      (case 
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                        when x.typecoverage = 'UMUIM' then 194
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                        when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                        else 0 
+                      end)
+                    else
+                    nvl(pcr.aslob_code, 
+                        (case 
+                          when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                          when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                          when x.typecoverage = 'UMUIM' then 194
+                          when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                          when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                          when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                          else 0 
+                        end) )
+                  end )
+            when '193' then 'CANF'
+            when '194' then
+              case when cc.commonname in ('!UI','!UM','!UMPD','!HAACLIA','!HAUI','!HAUIEL','!HAUIPL','!HAUMEL','!HAUMPL','!NOUI','!NOUM','DUI','DUM','GLOBALUM') then 'CAUM'
+                  when x.typecoverage in ('PD', 'COLL', 'COMP') then 'CAPD'
+                  when x.typecoverage in ('UMUIM', 'PIP', 'LIAB') then 'CABI'
+                  else 'ERROR'
+              end
+            when '212' then 
+              case when cc.commonname in ('COL','DCOL') then 'CACOLL'
+                  when cc.commonname in ('OTC','DOTC') then 'CACOMP'
+                  when x.typecoverage = 'COMP' then 'CACOMP'
+                  else 'CACOLL'
+              end
+            else 'ERROR' 
+            end
+        ,cv.vehicleid
+        ,uw.classCode
+        ,case when nvl(uw.secondaryclass, '')='' then 'NA' else uw.secondaryclass end
+        ,case when nvl(uw.vehiclesize, '')='' then 'NA' else uw.vehiclesize end
+        ,mc.claim_number
+
+
+  - name: CAIncrLossReserves_DF
+    sql: with cte as (
+          select 
+             b.*
+            , case aslob
+                when '193' then 'Auto - No Fault'
+                when '194' then 'Auto - Liab'
+                when '212' then 'Auto - PhysDam'
+                else 'ERROR'
+              end as transmittal_segment_code
+            , case when massind='N' then reserve_detailed_segment_code
+                when aslob='194' then 'CA_LIAB_MASS'
+                when aslob='193' then 'CANF_MASS'
+                when aslob='212' and CATInd='Y' then 'CA_PHYSDAM_MASSCAT'
+                when aslob='212' then 'CA_PHYSDAM_MASS'
+                else 'ERROR'
+              end  as resseg_new
+          from CAIncrLossReserves_DF1 b
+      ),
+      cte2 as (
+          select 
+             l.*
+            ,case when l.resseg_new='CACOMP' 
+              then (case when CATInd='Y' then 'CACOMP_CAT' else 'CACOMP_NET' end) 
+              else resseg_new 
+              end as resseg_final
+          from cte l
+        )
+      SELECT 
+         l.startdate
+        ,l.asofdate
+        ,l.cal_yr_mo_end
+        ,l.calyr_mo
+        ,l.dol
+        ,l.accyr
+        ,l.closed
+        ,l.reopened
+        ,l.received
+        ,l.legal
+        ,l.suitfiled
+        ,l.tpa
+        ,l.state
+        ,l.wcclaimid
+        ,l.claim_number
+        ,l.occnum
+        ,l.code
+        ,l.occurrencenumber
+        ,l.claim
+        ,l.claimantnumber
+        ,l.lob
+        ,l.newrenew
+        ,l.lossreserves
+        ,l.expensereserves
+        ,l.catcode
+        ,l.catind
+        ,l.massind
+        ,l.carrier
+        ,l.markettype
+        ,l.productionsrc
+        ,l.agency
+        ,l.pobegin
+        ,l.expir
+        ,l.causeofloss
+        ,l.lossdescrip
+        ,l.claimantid
+        ,l.aslob
+        ,l.transmittal_segment_code
+        ,l.resseg_final as reserve_segment_code
+        ,case 
+          when carrier='PAAZGU10' then concat(reserve_detailed_segment_code, '_ES')
+          else reserve_detailed_segment_code
+         end as reserve_detailed_segment_code
+        ,l.productid
+        ,l.exposureid
+        ,l.exposuregroup
+        ,l.exposureclass
+        ,l.industry    
+        ,autosecondaryclass
+        ,autovehiclesize
+      FROM cte2 l
+
+  - name: CAIncrPayments_DF
+    sql: select
+        to_date(w.dol, 'M/d/yyyy') as DOL
+        ,w.wcclaimid as wcclaimid
+        ,concat_ws('-', p.code, w.occurrencenumber, p.claim, c.claimantnumber) as claim_number
+        ,p.code
+        ,cc.commonname
+        ,case when cc.commonname='BABFE' then 
+          (case 
+            when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+            when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+            when x.typecoverage = 'UMUIM' then 194
+            when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+            when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+            when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+            else 0 
+          end)
+        else
+        nvl(pcr.aslob_code, 
+            (case 
+              when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+              when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+              when x.typecoverage = 'UMUIM' then 194
+              when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+              when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+              when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+              else 0 
+            end) ) 
+        end as aslob
+
+        ,case  (case when cc.commonname='BABFE' then 
+                    (case 
+                      when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                      when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                      when x.typecoverage = 'UMUIM' then 194
+                      when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                      when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                      when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                      else 0 
+                    end)
+                  else
+                  nvl(pcr.aslob_code, 
+                      (case 
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                        when x.typecoverage = 'UMUIM' then 194
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                        when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                        else 0 
+                      end) ) 
+                end )
+          when '193' then 'CANF'
+          when '194' then
+            case when cc.commonname in ('!UI','!UM','!UMPD','!HAACLIA','!HAUI','!HAUIEL','!HAUIPL','!HAUMEL','!HAUMPL','!NOUI','!NOUM','DUI','DUM','GLOBALUM') then 'CAUM'
+                when x.typecoverage in ('PD', 'COLL', 'COMP') then 'CAPD'
+                when x.typecoverage in ('UMUIM', 'PIP', 'LIAB') then 'CABI'
+                else 'ERROR'
+            end
+          when '212' then 
+            case when cc.commonname in ('COL','DCOL') then 'CACOLL'
+                when cc.commonname in ('OTC','DOTC') then 'CACOMP'
+                when x.typecoverage = 'COMP' then 'CACOMP'
+                else 'CACOLL'
+            end
+          else 'ERROR' 
+          end as reserve_detailed_segment_code
+
+        ,last_day(to_date(p.chkdate, 'M/d/yyyy')) as cal_yr_mo_end
+        ,cast(round(year(to_date(p.chkdate, 'M/d/yyyy'))+month(to_date(p.chkdate, 'M/d/yyyy'))/100.0,2) as decimal(10,2)) as calyr_mo
+        ,c.claimantid
+        ,sum(case
+              when p.typprefix='0' and (p.typepmt='M' or (p.typepmt='L' and p.typcode not in ('35', '38'))) then p.amount 
+              else 0 
+            end) as GrossPaidLoss
+        ,sum(case 
+              when p.typepmt<>'X' and p.typprefix in ('A', 'B', 'D') then p.amount 
+              else 0 
+            end) as PaidSUB
+        ,sum(case 
+              when p.typepmt='L' and p.typprefix='0' and p.typcode in ('35', '38') then p.amount 
+              else 0 
+            end) as PaidSalvage
+        ,sum(case when p.typepmt='X' then p.amount 
+              else 0 
+            end) as paiddcc
+
+      from 
+        wcclaim w 
+        left join claimant c on w.wcclaimid=c.wcclaimid and c.dl_iscurrent = 1
+        left join insured i on i.code=w.code and i.dl_iscurrent = 1
+        left join payments p on (p.code=w.code) and (p.claim=w.claim) and p.claimantID=c.claimantID and p.dl_iscurrent = 1
+        left outer join claims_caextra x on c.claimantid=x.claimantid and x.dl_iscurrent = 1
+        left outer join cl_coverage cc on c.claimantID=cc.claimantID and p.cvgid=cc.cvgid and cc.dl_iscurrent = 1
+        left join claims_cavehicles cv on cv.cavehicleid = cc.cavehicleid and cv.dl_iscurrent = 1
+        left join transaction_uwcoverage v on v.code=w.code and v.commonname=cc.commonname and v.state=cc.coveragestate and (v.itemid=cv.vehicleid or (nvl(v.itemid,0)=0 and v.code<>'ECAU548820')) and v.trancnt=0 and v.after=1 and v.dl_iscurrent = 1
+        left join pc_coverage_reporting pcr on pcr.coverageid = v.coverageid and pcr.dl_iscurrent = 1
+
+      where 
+        p.chkdate between to_timestamp('01/01/2008 0:00:00', 'M/d/yyyy H:m:s') and to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+        and w.lob = 'CA'
+        and nvl(c.voidortransfer, '') not in ('T', 'V')
+        and w.dl_iscurrent = 1
+
+      group by 
+        concat_ws('-', p.code, w.occurrencenumber, p.claim, c.claimantnumber)
+        ,p.code 
+        ,cc.commonname
+        ,last_day(to_date(p.chkdate, 'M/d/yyyy'))
+        ,to_date(w.dol, 'M/d/yyyy')
+
+        ,last_day(to_date(p.chkdate, 'M/d/yyyy'))
+        ,cast(round(year(to_date(p.chkdate, 'M/d/yyyy'))+month(to_date(p.chkdate, 'M/d/yyyy'))/100.0,2) as decimal(10,2))
+
+        ,w.wcclaimid
+        ,c.claimantid
+        ,case when cc.commonname='BABFE' then 
+          (case 
+            when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+            when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+            when x.typecoverage = 'UMUIM' then 194
+            when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+            when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+            when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+            else 0 
+          end)
+        else
+        nvl(pcr.aslob_code, 
+            (case 
+              when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+              when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+              when x.typecoverage = 'UMUIM' then 194
+              when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+              when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+              when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+              else 0 
+            end) ) 
+        end
+        ,case(case when cc.commonname='BABFE' then 
+                    (case 
+                      when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                      when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                      when x.typecoverage = 'UMUIM' then 194
+                      when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                      when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                      when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                      else 0 
+                    end)
+                  else
+                  nvl(pcr.aslob_code, 
+                      (case 
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '1I' then 193
+                        when x.typecoverage = 'PIP' and x.typeclaimant = '3C' then 193
+                        when x.typecoverage = 'UMUIM' then 194
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '1I' then 212
+                        when w.coveragecategory in ('AP', 'PD') and x.typeclaimant = '3C' then 194
+                        when w.coveragecategory = 'BI' and x.typeclaimant = '3C' then 194
+                        else 0 
+                      end) )
+                end )
+          when '193' then 'CANF'
+          when '194' then
+            case when cc.commonname in ('!UI','!UM','!UMPD','!HAACLIA','!HAUI','!HAUIEL','!HAUIPL','!HAUMEL','!HAUMPL','!NOUI','!NOUM','DUI','DUM','GLOBALUM') then 'CAUM'
+                when x.typecoverage in ('PD', 'COLL', 'COMP') then 'CAPD'
+                when x.typecoverage in ('UMUIM', 'PIP', 'LIAB') then 'CABI'
+                else 'ERROR'
+            end
+          when '212' then 
+            case when cc.commonname in ('COL','DCOL') then 'CACOLL'
+                when cc.commonname in ('OTC','DOTC') then 'CACOMP'
+                when x.typecoverage = 'COMP' then 'CACOMP'
+                else 'CACOLL'
+            end
+          else 'ERROR' 
+          end
+
+  - name: date_key
+    sql: with init as 
+        (
+            SELECT sequence(to_date('2008-01-01'), last_day(add_months(current_timestamp, -1))) as date
+        )
+        ,exploded_date as
+        (
+            select 
+            explode(date) as `date`
+            from init
+        )
+        select distinct
+            last_day(date) as cal_yr_mo_end,
+            cast(concat(year(date), '.', date_format(date, 'MM')) as decimal(6,2)) as calyr_mo
+        from exploded_date
+
+  - name: CACumulativeReserves_DF
+    sql: select
+         asofdate
+        ,d.calyr_mo
+        ,d.cal_yr_mo_end
+        ,dol
+        ,accyr
+        ,closed
+        ,reopened
+        ,received
+        ,min(r.cal_yr_mo_end) as firstentered
+        ,wcclaimid
+        ,state
+        ,claim_number
+        ,occnum
+        ,code
+        ,lob
+        ,carrier
+        ,markettype
+        ,productionsrc
+        ,agency
+        ,newrenew
+        ,pobegin
+        ,expir
+        ,causeofloss
+        ,lossdescrip
+        ,catcode
+        ,catind
+        ,massind
+        ,legal
+        ,suitfiled
+        ,tpa
+        ,sum(lossreserves) as cmllossreserves
+        ,sum(expensereserves) as cmlexpensereserves
+        ,claimantid
+        ,aslob
+        ,transmittal_segment_code
+        ,reserve_segment_code
+        ,reserve_detailed_segment_code
+        ,0 as rptdind
+        ,productid
+        ,exposureid
+        ,exposuregroup
+        ,exposureclass
+        ,industry
+        ,autosecondaryclass 
+        ,autovehiclesize
+
+        from CAIncrLossReserves_DF r 
+        inner join date_key d on r.calyr_mo <= d.calyr_mo
+        group by
+         asofdate
+        ,d.calyr_mo
+        ,d.cal_yr_mo_end
+        ,dol
+        ,accyr
+        ,closed
+        ,reopened
+        ,received
+        ,wcclaimid
+        ,state
+        ,claim_number
+        ,occnum
+        ,code
+        ,lob
+        ,carrier
+        ,markettype
+        ,productionsrc
+        ,agency
+        ,newrenew
+        ,pobegin
+        ,expir
+        ,causeofloss
+        ,lossdescrip
+        ,catcode
+        ,catind
+        ,massind
+        ,legal
+        ,suitfiled
+        ,tpa
+        ,claimantid
+        ,aslob
+        ,transmittal_segment_code
+        ,reserve_segment_code
+        ,reserve_detailed_segment_code
+        ,productid
+        ,exposureid
+        ,exposuregroup
+        ,exposureclass
+        ,industry
+        ,autosecondaryclass 
+        ,autovehiclesize
+
+
+  - name: CACumulativePaid_DF
+    sql: select
+        d.calyr_mo
+        ,d.cal_yr_mo_end
+        ,dol
+        ,wcclaimid
+        ,claim_number
+        ,code
+        ,claimantid
+        ,aslob
+        ,sum(GrossPaidLoss) as claim_paid_loss
+        ,sum(PaidSUB) as claim_paid_subrogation
+        ,sum(PaidSalvage) as claim_paid_salvage
+        ,sum(PaidDCC) as claim_paid_dcc
+        ,reserve_detailed_segment_code
+
+        from CAIncrPayments_DF r
+        inner join date_key d on r.calyr_mo <= d.calyr_mo
+        group by
+        d.calyr_mo
+        ,d.cal_yr_mo_end
+        ,dol
+        ,wcclaimid
+        ,claim_number
+        ,code
+        ,claimantid
+        ,aslob
+        ,reserve_detailed_segment_code
+
+  - name: CACumulativeClaimSummary_DF
+    sql: SELECT
+          l.claim_number
+          ,l.occnum
+          ,l.code as policynumber
+          ,l.state
+          ,l.lob
+          ,l.carrier
+          ,l.agency
+          ,l.markettype
+          ,l.productionsrc
+          ,l.newrenew
+          ,l.pobegin as policyeffectivedate
+          ,l.expir as policyexpirationdate
+          ,l.dol as lossdate
+          ,l.closed as closeddate
+          ,l.reopened as reopeneddate
+          ,l.received as receiveddate
+          ,l.firstentered as firstentereddate
+          ,l.cal_yr_mo_end
+          ,(year(l.cal_yr_mo_end)-year(l.dol))*12+month(l.cal_yr_mo_end) as maturity
+          ,l.wcclaimid
+          ,l.claimantid
+          ,productid
+          ,exposureid
+          ,exposuregroup
+          ,exposureclass
+          ,l.industry
+          ,replace(l.causeofloss, ',', '') as causeofloss
+          ,replace(l.lossdescrip, ',', '') as lossdescrip
+          ,l.catcode as catcode
+          ,l.legal as handledbylegalind
+          ,l.suitfiled as suitfiledind
+          ,l.tpa as tpaind
+          ,'' as cwpfinalind
+          ,l.massind
+          ,l.catind
+          ,l.aslob as aslob_code
+          ,l.transmittal_segment_code
+          ,l.reserve_segment_code
+          ,l.reserve_detailed_segment_code
+          ,cast(null as string) as medonlyind
+          ,(case when round(cmllossreserves,2)=round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) and round(cmlexpensereserves,2)=round(nvl(p.claim_paid_dcc, 0),2) and round(nvl(p.claim_paid_loss, 0)+nvl(p.claim_paid_dcc, 0)+nvl(p.claim_paid_subrogation, 0)+nvl(p.claim_paid_salvage,0),2)<>0 then 1 else 0 end) as cwp_count
+          ,(case when round(cmllossreserves,2)=round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) and round(cmlexpensereserves,2)=round(nvl(p.claim_paid_dcc, 0),2) then 1 else 0 end) as closed_count
+          ,0 as reopenedcount
+          ,(case when round(cmllossreserves,2)<>round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) or round(cmlexpensereserves,2)<>round(nvl(p.claim_paid_dcc, 0),2) then 1 else 0 end) as pending_count
+          ,case when l.cal_yr_mo_end=l.firstentered then 1 else 0 end as reportedcount
+          ,(case when round(cmllossreserves,2)=round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) and round(cmlexpensereserves,2)=round(nvl(p.claim_paid_dcc, 0),2) and round(cmllossreserves,2)=0 and round(cmlexpensereserves, 2)>0 then 1 else 0 end) as dcc_only_count
+          ,nvl(l.cmllossreserves, 0.0) as claim_net_incurred_loss_amount
+          ,nvl(l.cmllossreserves, 0.0)-nvl(p.claim_paid_subrogation, 0.0)-nvl(p.claim_paid_salvage, 0.0) as claim_gross_incurred_loss_amount
+          ,nvl(l.cmlexpensereserves, 0.0) as claim_incurred_dcc_amount
+          ,nvl(p.claim_paid_loss, 0.0) as claim_gross_paid_loss_amount
+          ,cast(p.claim_paid_salvage as decimal(10,2)) as claim_paid_salvage_amount
+          ,nvl(p.claim_paid_subrogation, 0.0) as claim_paid_subrogation_amount
+          ,nvl(p.claim_paid_dcc, 0.0) as claim_paid_dcc_amount
+          ,datediff(day, l.dol, l.received) as timetoreport
+          ,datediff(day, l.received, l.closed) as timetoclose
+          ,l.accyr
+          ,l.autosecondaryclass
+          ,l.autovehiclesize
+          ,cast('na' as string) as WC_CTFlag
+      from CACumulativeReserves_DF l
+      left outer join CACumulativePaid_DF p 
+        on l.cal_yr_mo_end = p.cal_yr_mo_end 
+        and l.claim_number = p.claim_number
+        and l.aslob = p.aslob 
+        and l.reserve_detailed_segment_code = p.reserve_detailed_segment_code
+
+  - name: CWPFinalInd_DF
+    sql: WITH cte as (
+        SELECT
+        closed_count as latest_closed_indicator
+        ,claim_gross_paid_loss_amount + claim_paid_dcc_amount + claim_paid_subrogation_amount + claim_paid_salvage_amount as latest_total_paid
+        ,claim_number
+        ,transmittal_segment_code
+        ,row_number() over (partition by claim_number, transmittal_segment_code order by cal_yr_mo_end desc) as RN
+        FROM CACumulativeClaimSummary_DF
+        )
+        SELECT
+          latest_closed_indicator
+          ,latest_total_paid
+          ,claim_number
+          ,transmittal_segment_code
+        FROM cte
+        WHERE RN = 1
+
+  - name: ReopenedCount_DF
+    sql: SELECT
+        closed_count as Prior_Closed_Indicator
+        ,claim_number
+        ,cal_yr_mo_end
+        ,transmittal_segment_code
+        FROM CACumulativeClaimSummary_DF
+
+  - name: CACumulativeClaimSummary_DF
+    sql: with cte as (
+        SELECT
+        t.*
+        ,case when l.latest_closed_indicator=1 and l.latest_total_paid > 0 then 1 else 0 end as cwp_final_indicator
+        ,row_number() over (partition by t.claim_number, t.transmittal_segment_code, t.cal_yr_mo_end order by r.cal_yr_mo_end desc) as RN
+        ,case when nvl(r.Prior_Closed_Indicator,0)=1 and (round(t.claim_gross_paid_loss_amount + t.claim_paid_dcc_amount + t.claim_paid_subrogation_amount + t.claim_paid_salvage_amount,2) <> round(t.claim_net_incurred_loss_amount + t.claim_incurred_dcc_amount,2)) then 1 else 0 end as reopened_count
+        FROM CACumulativeClaimSummary_DF t
+        left join CWPFinalInd_DF l ON l.claim_number = t.claim_number and l.transmittal_segment_code = t.transmittal_segment_code
+        left join ReopenedCount_DF r ON r.cal_yr_mo_end < t.cal_yr_mo_end and r.claim_number = t.claim_number and r.transmittal_segment_code = t.transmittal_segment_code
+        )
+        select
+        *
+        from cte
+        where RN = 1
+
+  - name: Dates_DF
+    sql: with cte as (
+            select
+              claim_number
+              ,cal_yr_mo_end
+              ,aslob
+            from CAIncrLossReserves_DF
+            union
+            SELECT
+              claim_number
+              ,cal_yr_mo_end
+              ,aslob
+            from CAIncrPayments_DF
+        ), cte2 (
+            select
+            claim_number
+            ,cal_yr_mo_end
+            ,aslob
+            ,row_number() over (partition by claim_number, cal_yr_mo_end, aslob order by claim_number) as RN
+            from cte
+        )
+        select
+          claim_number
+          ,cal_yr_mo_end
+          ,aslob
+        from cte2
+        where RN = 1
+
+  - name: CAIncrementalClaimSummary_DF
+    sql: SELECT
+         d.claim_number as claimnum
+        ,s.policynumber as policynumber
+        ,s.state
+        ,s.lob as lob
+        ,s.carrier
+        ,s.agency
+        ,s.markettype as markettype
+        ,s.productionsrc
+        ,s.newrenew as newrenew
+        ,s.policyeffectivedate as policyeffectivedate
+        ,s.policyexpirationdate as policyexpirationdate
+        ,s.lossdate as lossdate
+        ,s.closeddate as closeddate
+        ,s.reopeneddate as reopeneddate
+        ,s.receiveddate as receiveddate
+        ,s.firstentereddate as firstentereddate
+        ,d.cal_yr_mo_end as calyrmo_end
+        ,s.maturity as maturity
+        ,s.wcclaimid
+        ,l.claimantid as claimantid
+        ,s.productid as productid
+        ,l.exposureid as exposureid
+        ,l.exposureclass as exposureclass
+        ,l.exposuregroup as exposuregroup
+        ,s.industry as industry
+        ,s.causeofloss as causeofloss
+        ,s.lossdescrip as lossdescrip
+        ,s.catcode as catcode
+        ,s.handledbylegalind as handledbylegalind
+        ,s.suitfiledind as suitfiledind
+        ,s.tpaind as tpaind
+        ,s.cwp_final_indicator as cwpfinalind
+        ,s.massind as massind
+        ,s.catind as catind
+        ,s.aslob_code as aslob
+        ,l.transmittal_segment_code as transmittalseg
+        ,l.reserve_segment_code as resseg
+        ,l.reserve_detailed_segment_code as detailedresseg
+        ,s.medonlyind as medonlyind
+        ,s.reopened_count as reopenedcount
+        ,s.reportedcount as reportedcount
+        ,s.occnum as occnum
+        ,nvl(l.lossreserves,0.0) as incrnetincurredloss
+        ,nvl(l.lossreserves,0.0)-nvl(p.paidsub, 0.0)-nvl(p.paidsalvage, 0.0) as incrgrossincurredloss
+        ,nvl(l.expensereserves,0.0) as incrincurreddcc
+        ,nvl(p.grosspaidloss, 0.0) as incrgrosspaidloss
+        ,nvl(p.paidsalvage, 0.0) as incrpaidsalvage
+        ,nvl(p.paidsub, 0.0) as incrpaidsubrogation
+        ,nvl(p.paiddcc, 0.0) as incrpaiddcc
+        ,nvl(l.lossreserves,0.0)-nvl(p.grosspaidloss, 0.0)-nvl(p.paidsub, 0.0)-nvl(p.paidsalvage, 0.0) as caselossreserveonopen
+        ,nvl(l.expensereserves,0.0)-nvl(p.paiddcc, 0.0) as casedccreserveonopen
+        ,datediff(day, s.lossdate, s.receiveddate) as timetoreport
+        ,datediff(day, s.receiveddate, s.closeddate) as timetoclose
+        ,s.WC_CTFlag as wc_ctflag
+        ,l.asofdate
+        ,l.startdate
+        ,s.accyr as accyr
+        ,s.autosecondaryclass as autosecondaryclass
+        ,s.autovehiclesize as autovehiclesize
+        FROM Dates_DF d
+        left join CAIncrLossReserves_DF l on d.claim_number=l.claim_number and d.cal_yr_mo_end=l.cal_yr_mo_end and d.aslob=l.aslob 
+        left join CAIncrPayments_DF p on p.claim_number = d.claim_number and p.cal_yr_mo_end = d.cal_yr_mo_end and p.aslob = d.aslob
+        left join CACumulativeClaimSummary_DF s on s.claim_number = d.claim_number and s.cal_yr_mo_end = d.cal_yr_mo_end and s.aslob_code = d.aslob
+
+
+  - name: Counts_DF
+    sql: select
+           cwp_count as previous_cwp_count
+          ,closed_count as previous_closed_count
+          ,pending_count as previous_pending_count
+          ,dcc_only_count as previous_dcc_only_count
+          ,claim_number
+          ,cal_yr_mo_end
+          ,reserve_detailed_segment_code
+        from CACumulativeClaimSummary_DF
+
+  - name: CAIncrementalClaimSummary_DF
+    sql: with cte as (
+          SELECT
+            s.*
+            ,row_number() over (partition by t.claim_number, t.reserve_detailed_segment_code, t.cal_yr_mo_end order by r.cal_yr_mo_end desc) as RN
+            ,case when nvl(t.cwp_count,0)==nvl(r.previous_cwp_count,0) then 0 when nvl(t.cwp_count,0)==1 and nvl(r.previous_cwp_count,0)==0 then 1 else -1 end as cwpcount
+            ,case when nvl(t.closed_count,0)==nvl(r.previous_closed_count,0) then 0 when nvl(t.closed_count,0)==1 and nvl(r.previous_closed_count,0)==0 then 1 else -1 end as closedcount
+            ,case when nvl(t.pending_count,0)==nvl(r.previous_pending_count,0) then 0 when nvl(t.pending_count,0)==1 and nvl(r.previous_pending_count,0)==0 then 1 else -1 end as pendingcount
+            ,case when nvl(t.dcc_only_count,0)==nvl(r.previous_dcc_only_count,0) then 0 when nvl(t.dcc_only_count,0)==1 and nvl(r.previous_dcc_only_count,0)==0 then 1 else -1 end as dcconlycount
+          from CAIncrementalClaimSummary_DF s
+          inner join CACumulativeClaimSummary_DF t
+            on s.CalYrMo_End = t.cal_yr_mo_end and s.ClaimNum = t.claim_number and s.DetailedResSeg = t.reserve_detailed_segment_code
+          left join Counts_DF r
+            on r.cal_yr_mo_end < t.cal_yr_mo_end and r.claim_number = t.claim_number and r.reserve_detailed_segment_code = t.reserve_detailed_segment_code
+          )
+          select *
+          from cte
+          where RN = 1
+
+  - name: CAIncrementalClaimSummary_DF
+    sql: select
+        s.*
+        ,case when s.PendingCount = -1 then s.IncrNetIncurredLoss - t.claim_net_incurred_loss_amount
+              when t.reopened_count = 1 then t.claim_net_incurred_loss_amount
+              when t.pending_count = 1 then s.IncrNetIncurredLoss
+              else 0 
+        end as incrnetincurredlossonopen
+        ,case when s.PendingCount = -1 then s.IncrGrossIncurredLoss - t.claim_gross_incurred_loss_amount
+              when t.reopened_count = 1 then t.claim_gross_incurred_loss_amount
+              when t.pending_count = 1 then s.IncrGrossIncurredLoss
+              else 0
+        end as  incrgrossincurredlossonopen
+        ,case when s.PendingCount = -1 then s.IncrIncurredDCC - t.claim_incurred_dcc_amount
+              when t.reopened_count = 1 then t.claim_incurred_dcc_amount
+              when t.pending_count = 1 then s.IncrIncurredDCC
+              else 0
+        end as incrincurreddcconopen
+        ,case when s.CWPCount = 0 and round(s.IncrGrossPaidLoss,2) = 0 then 0
+              when s.CWPCount = 0 and t.cwp_count = 1 then s.IncrGrossPaidLoss
+              when s.CWPCount = 1 then t.claim_gross_paid_loss_amount
+              when s.CWPCount = -1 then s.IncrGrossPaidLoss - t.claim_gross_paid_loss_amount
+        end as incrgrosspaidlossonclosed
+        ,case when s.CWPCount = 0 and round(s.IncrPaidSalvage,2) = 0 then 0
+              when s.CWPCount = 0 and t.cwp_count = 1 then s.IncrPaidSalvage
+              when s.CWPCount = 1 then t.claim_paid_salvage_amount
+              when s.CWPCount = -1 then s.IncrPaidSalvage - t.claim_paid_salvage_amount
+        end as incrpaidsalvageonclosed
+        ,case when s.CWPCount = 0 and round(s.IncrPaidSubrogation,2) = 0 then 0
+              when s.CWPCount = 0 and t.cwp_count = 1 then s.IncrPaidSubrogation
+              when s.CWPCount = 1 then t.claim_paid_subrogation_amount
+              when s.CWPCount = -1 then s.IncrPaidSubrogation - t.claim_paid_subrogation_amount
+        end as incrpaidsubrogationonclosed
+        ,case when s.CWPCount = 0 and round(s.IncrPaidDCC,2) = 0 then 0
+              when s.CWPCount = 0 and t.cwp_count = 1 then s.IncrPaidDCC
+              when s.CWPCount = 1 then t.claim_paid_dcc_amount
+              when s.CWPCount = -1 then s.IncrPaidDCC - t.claim_paid_dcc_amount
+        end as incrpaiddcconclosed
+
+        from CAIncrementalClaimSummary_DF s
+        inner join CACumulativeClaimSummary_DF t on t.claim_number = s.claimnum and t.cal_yr_mo_end=s.calyrmo_end and t.reserve_detailed_segment_code = s.detailedresseg and s.aslob = t.aslob_code
+    drop:
+      - RN

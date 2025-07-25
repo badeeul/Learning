@@ -1,0 +1,121 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: stage
+  table: ca_reserves_stg
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_coverage
+
+  - name: claims_caextra
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_caextra
+
+  - name: claims_cavehicles
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_cavehicles
+
+  - name: transaction_uwcoverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: transaction_uwcoverage
+
+  - name: pc_coverage_names
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_coverage_names
+
+  - name: pc_coverage_reporting
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_coverage_reporting
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claimant
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcclaim
+
+  - name: payments
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: payments
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: cl_occurrence
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_occurrence
+
+  - name: reserves
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: reserves
+
+
+query:
+  - name: ca_reserves
+    sql: |
+      select distinct 	
+        i.code,
+        i.carrier,
+        p.aslob_code,
+        r.medical,
+        r.indemnity,
+        r.expense,
+        r.effdate,
+        r.enteredon,
+        cast(year(w.dol) as string) as dolyear,
+        cl.cvgid, 
+        r.reservesid,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate
+      from cl_coverage cl	
+      left join Claims_CAExtra x on x.claimantid = cl.claimantid and x.dl_iscurrent = 1
+      left join claims_cavehicles cv on cv.cavehicleid = cl.cavehicleid	and cv.dl_iscurrent = 1
+      left join transaction_uwcoverage v on v.code = cl.code and v.commonname = cl.commonname 
+        and (((v.itemid = cv.vehicleid and v.state = cl.coveragestate) or nvl(v.itemid,0) = 0) or (v.buildingid = cl.buildingid or nvl(v.buildingid,0) = 0))
+        and v.trancnt = 0 and v.after = 1	
+        and v.dl_iscurrent = 1
+      left join pc_coverage_names n on n.coverageid = v.coverageid 	and n.dl_iscurrent = 1
+      left join pc_coverage_reporting p on p.coverageid = v.coverageid	and p.dl_iscurrent = 1
+      join claimant c on c.claimantid = cl.claimantid	and c.dl_iscurrent = 1
+      join wcclaim w on w.wcclaimid = c.wcclaimid	and w.dl_iscurrent = 1
+      join reserves r on r.claimantid = cl.claimantid and r.cvgid= cl.cvgid	and r.dl_iscurrent = 1
+      join insured i on i.code = c.code	and i.dl_iscurrent = 1
+      join cl_occurrence o on o.occid = w.occid and o.dl_iscurrent = 1
+      where	
+      ((i.MarketType in ('E', 'V', 'C')))	
+      AND ((i.PRODUCTIONSRC in ('G', 'A', 'L', 'C', 'W', 'E', 'F', 'I', 'P', 'R', 'V')))
+      and i.lob = 'CA'
+      and cl.dl_iscurrent = 1
+      and r.effdate <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+      and r.enteredon <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+
+  - name: ca_reserves_stg
+    sql: |
+      select 	
+        carrier,
+        aslob_code,
+        cast(dolyear as string) as dolyear,
+        sum(medical) as medical,
+        sum(indemnity) as loss,
+        sum(expense) as expense,
+        sum(medical + indemnity + expense) as total
+      from ca_reserves	
+      group by carrier, aslob_code, dolyear

@@ -1,0 +1,11 @@
+{
+    "subject": "Exception Report Result",
+    "body": {
+        "contentType": "text/html",
+        "content": "<div><div>The Exception Report Results has been generated. Please find attached the Exception Report Result Excel:</div></div><div>&nbsp;</div><p>&nbsp;</p>"
+    },
+    "emailRecipient": "distribution.list@guard.com", 
+    "emailCc": "",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

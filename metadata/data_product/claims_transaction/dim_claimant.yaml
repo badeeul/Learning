@@ -1,0 +1,82 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_claimant
+  load_strategy: type_two
+  key_columns:
+    - claimant_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: claimant_key
+
+source:
+  - name: claimant
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claimant
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: wcclaim
+
+  - name: claims_accidentdescriptionnarrative
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_accidentdescriptionnarrative
+    
+  - name: claims_dbextra
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_dbextra
+
+query:
+  - name: dim_claimant
+    sql: |
+      with cte AS (
+        SELECT  DISTINCT
+          c.claimantid as claimant_bus_key,
+          fullclaimnumber as claimant_full_num,
+          c.claim as claim_num,
+          claimantfirst as claimant_nm_first,
+          claimantlast as claimant_nm_last,
+          concat(claimantfirst,' ',claimantlast) as claimant_nm_full,
+          complexity as complexity,
+          w.business_unit as bus_unit,
+          w.jurisstate as claim_state,
+          claimantnumber as claimant_num,
+          CASE 
+            WHEN UPPER(TRIM(w.lob)) = 'WC' THEN regexp_replace(regexp_replace(ca_wc.narrative, '\r', ''), '\n', '') 
+            WHEN UPPER(TRIM(w.lob)) IN ('BP','CA','HO') THEN regexp_replace(regexp_replace(ca.narrative, '\r', ''), '\n', '')
+            WHEN UPPER(TRIM(w.lob)) = 'DB' THEN regexp_replace(regexp_replace(cdb.usernotes, '\r', ''), '\n', '')
+          END as claim_info,
+          CASE 
+            WHEN UPPER(TRIM(w.lob)) IN ('WC','DB') THEN 0
+            WHEN UPPER(TRIM(claimantlast)) = 'INSURED' THEN 1
+            ELSE 0 
+          END as insured_flg,
+          tpaclaimnum as tpa_claim_num,
+          tpaclaimpartynumber as tpa_claim_seq,
+          c.updateon as source_updated_date,
+          c.closurereviewdate as closure_review_date,
+          c.closurereviewer as closure_reviewer,
+          c.voidortransfer as void_or_transfer,
+
+          row_number() over (partition by c.fullclaimnumber order by c.updateon desc) as rn
+        FROM claimant c
+        INNER JOIN wcclaim w ON c.wcclaimid = w.wcclaimid
+        LEFT OUTER JOIN claims_accidentdescriptionnarrative ca_wc 
+          ON UPPER(TRIM(ca_wc.sqlfieldvalue)) = c.claimantid AND UPPER(TRIM(ca_wc.sqlfieldtype)) = 'CLAIMANTID'
+        LEFT OUTER JOIN claims_accidentdescriptionnarrative ca 
+          ON UPPER(TRIM(ca.sqlfieldvalue)) = w.occid AND UPPER(TRIM(ca.sqlfieldtype)) = 'OCCID' AND ca.dl_iscurrent = 1
+        LEFT OUTER JOIN claims_dbextra cdb ON cdb.claimantid = c.claimantid AND cdb.dl_iscurrent = 1
+        WHERE c.dl_iscurrent = 1
+      )
+      select *
+      from cte
+      where rn = 1
+    drop:
+      - rn
+
+    description: "This query creates a dimension table for claimants, combining data from multiple source tables to provide claimant information (names, claim details, business unit, state, and flags) across different lines of business (WC, DB, BP, CA, HO)."
+    

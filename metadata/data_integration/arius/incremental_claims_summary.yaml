@@ -1,0 +1,215 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: arius
+  table: incremental_claims_summary
+  load_strategy: overwrite
+  key_columns:
+    - lob
+    - claimnum
+    - calyrmoend
+  unknown_record: False
+  identity: False
+
+source:
+  - name: fact_claim_loss_reserve_payment_monthly_snapshot
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: fact_claim_loss_reserve_payment_monthly_snapshot
+
+  - name: dim_line_of_business
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_line_of_business
+
+  - name: dim_carrier
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_carrier
+
+  - name: dim_aslob
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_aslob
+
+  - name: dim_state
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_state
+
+  - name: dim_market_type
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_market_type
+
+  - name: dim_production_source
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_production_source
+
+  - name: dim_agency
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_agency
+
+  - name: dim_claim_cause_detail
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_claim_cause_detail    
+
+  - name: dim_catastrophe
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_catastrophe 
+
+  - name: dim_transmittal_segment
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_transmittal_segment 
+
+  - name: dim_reserve_detailed_segment
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_reserve_detailed_segment 
+
+  - name: dim_exposure_group
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_exposure_group
+
+  - name: dim_exposure_class
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_exposure_class
+
+  - name: dim_industry
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_industry
+
+  - name: dim_auto_vehicle_size
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_auto_vehicle_size
+
+  - name: dim_auto_secondary_class
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_auto_secondary_class
+  
+  - name: dim_product
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_product
+
+query:
+  - name: incremental_claims_summary
+    sql: SELECT 
+        fct.claim_number as claimnum
+        ,fct.policy_number as policynumber
+        ,case when fct.state_key = -1 then '' else st.state_code end as state
+        ,case when fct.line_of_business_key = -1 then '' else lob.line_of_business_code end as lob
+        ,case when fct.carrier_key = -1 then '' else car.carrier_code end as carrier
+        ,case when fct.agency_key = 1 then '' else ag.agency_code end as agency
+        ,case when fct.market_type_key = -1 then '' else mt.market_type_code end as markettype
+        ,case when fct.production_source_key = -1 then '' else ps.production_source_code end as productionsrc
+        ,cast(fct.policy_effective_date as date) as policyeffectivedate
+        ,cast(fct.policy_expiration_date as date) as policyexpirationdate
+        ,fct.loss_date as lossdate
+        ,fct.closed_date as closedate
+        ,fct.reopened_date as reopeneddate
+        ,fct.received_date as receiveddate
+        ,fct.first_entered_date as firstentereddate
+        ,fct.cal_yr_mo_end as calyrmoend
+        ,fct.wcclaimid
+        ,case when fct.claim_cause_detail_key = -1 then '' else replace(ccd.claim_cause_loss_description, ',', '') end as causeofloss
+        ,case when fct.claim_cause_detail_key = -1 then '' else replace(ccd.claim_cause_loss_detail_description, ',', '') end as lossdescrip
+        ,case when fct.catastrophe_key = -1 then '' else cat.catastrophe_code end as catcode
+        ,case when fct.handled_by_legal_indicator = 1 then 'Y' else 'N' end as handledbylegalind
+        ,case when fct.suit_filed_indicator = 1 then 'Y' else 'N' end as suitfiledind
+        ,case when fct.tpa_indicator = 1 then 'Y' else 'N' end as tpaind
+        ,case when fct.cwp_final_indicator = 1 then 'Y' else 'N' end as cwpfinalind
+        ,case when fct.mass_indicator = 1 then 'Y' else 'N' end as masdind
+        ,case when fct.cat_indicator = 1 then 'Y' else 'N' end as catind
+        ,case when fct.aslob_key = -1 then '' else asl.aslob_code end as aslob
+        ,case when fct.transmittal_segment_key = -1 then '' else trs.transmittal_segment_code end as transmittalseg
+        ,case when fct.reserve_detailed_segment_key = -1 then '' else rsv.reserve_segment_code end as resseg
+        ,case when fct.reserve_detailed_segment_key = -1 then '' else rsv.reserve_detailed_segment_code end as detailedresseg
+        ,cast(fct.medical_only_indicator as boolean) as medonlyind
+        ,COALESCE(fct.cwp_count,0) as cwpcount
+        ,COALESCE(fct.closed_count,0) as closedcount
+        ,COALESCE(fct.reopened_count,0) as reopenedcount
+        ,COALESCE(fct.pending_count,0) as pendingcount
+        ,COALESCE(fct.reported_count,0) as reportedcount
+        ,COALESCE(fct.dcc_only_count,0) as dcconlycount
+        ,COALESCE(fct.claim_net_incurred_loss_amount,0.0) as incrnetincurredloss
+        ,COALESCE(fct.claim_net_incurred_loss_on_open_amount,0.0) as incrnetincurredlossonopen
+        ,COALESCE(fct.claim_gross_incurred_loss_amount,0.0) as incrgrossincurredloss
+        ,COALESCE(fct.claim_gross_incurred_loss_on_open_amount,0.0) as incrgrossincurredlossonopen
+        ,COALESCE(fct.claim_incurred_dcc_amount,0.0) as incrincurreddcc
+        ,COALESCE(fct.claim_incurred_dcc_on_open_amount,0.0) as incrincurreddcconopen
+        ,COALESCE(fct.claim_gross_paid_loss_amount,0.0) as incrgrosspaidloss
+        ,COALESCE(fct.claim_gross_paid_loss_on_closed_amount,0.0) as incrgrosspaidlossonclosed
+        ,COALESCE(fct.claim_paid_salvage_amount,0.0) as incrpaidsalvage
+        ,COALESCE(fct.claim_paid_salvage_on_closed_amount,0.0) as incrpaidsalvageonclosed
+        ,COALESCE(fct.claim_paid_subrogation_amount,0.0) as incrpaidsubrogation
+        ,COALESCE(fct.claim_paid_subrogation_on_closed_amount,0.0) as incrpaidsubrogationonclosed
+        ,COALESCE(fct.claim_paid_dcc_amount,0.0) as incrpaiddcc
+        ,COALESCE(fct.claim_paid_dcc_on_closed_amount,0.0) as incrpaiddcconclosed
+        ,COALESCE(fct.case_loss_reserve_on_open_amount,0.0) as caselossreserveonopen
+        ,COALESCE(fct.case_dcc_reserve_on_open_amount,0.0) as casedccreserveonopen
+        ,COALESCE(datediff(day,fct.loss_date,fct.received_date),0.0) as timetoreport
+        ,COALESCE(datediff(day,fct.received_date,fct.closed_date),0.0) as timetoclose
+        ,fct.snapshot_timestamp as snapshottimestamp
+        ,fct.accident_year as accidentyear
+        ,case when fct.auto_vehicle_size_key = -1 then '' else av.auto_vehicle_size_code end as autovehiclesize
+        ,case when fct.auto_secondary_class_key = -1 then '' else asc.auto_secondary_class_code end as autosecondaryclass
+        ,fct.claimant_id as claimantid
+        ,case when fct.exposure_class_key = -1 then '' else ec.exposure_class_code end as exposureclass
+        ,case when fct.exposure_group_key = -1 then '' else eg.exposure_group_code end as exposuregroup
+        ,fct.exposure_id as exposureid
+        ,case when fct.industry_key = -1 then '' else i.industry_code end as industry
+        ,fct.maturity as maturity
+        ,fct.new_renew as newrenew
+        ,fct.occurrence_number as occurrencenumber
+        ,case when fct.product_key =-1 then '' else prod.product_code end as productid
+        ,fct.wc_ct_flag as wcctflag
+
+        FROM 
+          fact_claim_loss_reserve_payment_monthly_snapshot fct
+        JOIN 
+          dim_line_of_business lob on fct.line_of_business_key = lob.line_of_business_key and lob.dl_is_current_flag = 1
+        JOIN 
+          dim_carrier car on fct.carrier_key = car.carrier_key and car.dl_is_current_flag = 1
+        JOIN 
+          dim_agency ag on fct.agency_key = ag.agency_key and ag.dl_is_current_flag = 1
+        JOIN 
+          dim_market_type mt on fct.market_type_key = mt.market_type_key and mt.dl_is_current_flag = 1
+        JOIN 
+          dim_production_source ps on fct.production_source_key = ps.production_source_key and ps.dl_is_current_flag = 1
+        JOIN 
+          dim_claim_cause_detail ccd on fct.claim_cause_detail_key = ccd.claim_cause_detail_key and ccd.dl_is_current_flag = 1
+        JOIN 
+          dim_catastrophe cat on fct.catastrophe_key = cat.catastrophe_key and cat.dl_is_current_flag = 1
+        JOIN 
+          dim_aslob asl on fct.aslob_key = asl.aslob_key and asl.dl_is_current_flag = 1
+        JOIN 
+          dim_transmittal_segment trs on fct.transmittal_segment_key = trs.transmittal_segment_key and trs.dl_is_current_flag = 1
+        JOIN 
+          dim_reserve_detailed_segment rsv on fct.reserve_detailed_segment_key = rsv.reserve_detailed_segment_key and rsv.dl_is_current_flag = 1
+        JOIN 
+          dim_state st on fct.state_key = st.state_key and st.dl_is_current_flag = 1
+        JOIN 
+          dim_exposure_group eg on fct.exposure_group_key = eg.exposure_group_key and eg.dl_is_current_flag = 1
+        JOIN 
+          dim_exposure_class ec on fct.exposure_class_key = ec.exposure_class_key and ec.dl_is_current_flag = 1
+        JOIN 
+          dim_industry i on fct.industry_key = i.industry_key and i.dl_is_current_flag = 1
+        JOIN 
+          dim_auto_vehicle_size av on fct.auto_vehicle_size_key = av.auto_vehicle_size_key and av.dl_is_current_flag = 1
+        JOIN 
+          dim_auto_secondary_class asc on fct.auto_secondary_class_key = asc.auto_secondary_class_key and asc.dl_is_current_flag = 1
+         JOIN 
+          dim_product prod on fct.product_key = prod.product_key and prod.dl_is_current_flag = 1
+
+        WHERE 
+          snapshot_timestamp = (select max(snapshot_timestamp) as max_snapshot from fact_claim_loss_reserve_payment_monthly_snapshot)

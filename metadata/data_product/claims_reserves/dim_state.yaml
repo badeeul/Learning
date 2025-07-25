@@ -1,0 +1,62 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_state
+  load_strategy: type_two
+  key_columns:
+    - state_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: BOPClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: CAClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: DBClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: HOClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: WCClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_state
+    sql: SELECT DISTINCT
+            UPPER(state) as state_code
+            ,cast(null as string) as state_name
+        FROM BOPClaimSummary
+        UNION
+        SELECT DISTINCT
+            UPPER(state) as state_code
+            ,cast(null as string) as state_name
+        FROM CAClaimSummary
+        UNION
+        SELECT DISTINCT
+            UPPER(state) as state_code
+            ,cast(null as string) as state_name
+        FROM DBClaimSummary
+        UNION
+        SELECT DISTINCT
+            UPPER(state) as state_code
+            ,cast(null as string) as state_name
+        FROM HOClaimSummary
+        UNION
+        SELECT DISTINCT
+            UPPER(state) as state_code
+            ,cast(null as string) as state_name
+        FROM WCClaimSummary

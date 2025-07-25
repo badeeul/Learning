@@ -1,0 +1,210 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: HOPremiumsSummary
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: mgtrans
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: mgtrans
+
+  - name: mgtrans_coverages
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: mgtrans_coverages
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: horesseg
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: accounting
+    table: ho_resseg
+
+query:
+  - name: DateSequence_DF
+    sql: |
+      WITH date_seq AS (
+        SELECT sequence(
+          to_date('2012-01-01'),
+          to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')),
+          interval 1 month
+        ) as dates
+      )
+      SELECT 
+        explode(dates) as calc_date,
+        last_day(calc_date) as month_end_date
+      FROM date_seq
+
+  - name: BaseTransactions_DF
+    sql: |
+      SELECT 
+        m.code,
+        m.transno,
+        m.state,
+        m.transdate,
+        i.poaudit,
+        CASE WHEN (m.transdate > i.poaudit AND i.poaudit IS NOT NULL) THEN m.transdate ELSE i.poaudit END as etestdate,
+        m.effdate,
+        datediff(day, m.effdate, i.poexpir) as f_effdate,
+        m.writtenon,
+        mc.premium,
+        m.carrier,
+        i.agency,
+        m.typepol as lob,
+        mc.aslob_code,
+        mc.itemid,
+        mc.coverageid,
+        to_timestamp('2012-01-01 00:00:00') as LowDate,
+        to_timestamp('01/01/2012 0:00:00', 'M/d/yyyy H:m:s') as startdate,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate,
+        last_day(to_date(i.pobegin)) as polyrmo_end,
+        i.poexpir,
+        i.trcancel,
+        i.stat5,
+        i.typcancel,
+        i.pocancel,
+        i.markettype
+      FROM mgtrans m
+      INNER JOIN mgtrans_coverages mc ON m.transno = mc.mgtrans_transno and mc.dl_iscurrent = 1
+      INNER JOIN insured i ON i.code = m.code and i.dl_iscurrent = 1
+      WHERE 
+        m.typepol = 'HO'
+        AND COALESCE(m.skiprep, '') NOT IN ('E', 'B')
+        AND ((m.transdate <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) 
+             AND m.effdate <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))) 
+          OR (COALESCE(i.typcancel,'') = 'F' 
+            AND i.stat5 = 'C' 
+            AND i.trcancel <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+            AND i.pocancel <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+            AND m.transdate <= i.trcancel))
+        AND i.stat2 = 'i'
+        AND i.markettype <> 'M'
+        AND i.dl_iscurrent = 1
+        AND m.dl_iscurrent = 1
+        AND mc.dl_iscurrent = 1
+
+  - name: XUnearned_DF
+    sql: |
+      SELECT
+        b.*,
+        d.calc_date,
+        d.month_end_date,
+        to_timestamp(d.calc_date) as LowDate,
+        to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59') as calyrmo_end,
+        CASE 
+          WHEN (
+            ((b.transdate <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')) AND (b.effdate <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')))
+            OR (COALESCE(b.typcancel,'') = 'F' AND b.stat5 = 'C' 
+                AND b.trcancel <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')
+                AND b.pocancel <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')
+                AND b.transdate <= b.trcancel)
+          )
+          AND NOT (
+            (b.etestdate IS NOT NULL) 
+            AND (CASE WHEN b.effdate > b.etestdate THEN b.effdate ELSE b.etestdate END) < to_timestamp(d.calc_date)
+          )
+          AND NOT (
+            (b.trcancel < to_timestamp(d.calc_date))
+            AND (COALESCE(b.typcancel,'') = 'F')
+            AND (b.stat5 = 'C')
+          )
+          THEN
+            CASE 
+              WHEN ((b.transdate >= to_timestamp(d.calc_date)) OR (b.effdate >= to_timestamp(d.calc_date)))
+                THEN b.premium
+              WHEN (b.poexpir > to_timestamp(d.calc_date))
+                THEN b.premium * (datediff(day, to_timestamp(d.calc_date), b.poexpir) / b.f_effdate)
+              ELSE 0.0
+            END
+          ELSE 0.0
+        END as xunearned
+      FROM BaseTransactions_DF b
+      CROSS JOIN DateSequence_DF d
+
+  - name: Unearned_DF
+    sql: |
+      SELECT
+        x.*,
+        CASE WHEN (
+            ((x.transdate <= x.calyrmo_end) AND (x.effdate <= x.calyrmo_end))
+            OR (COALESCE(x.typcancel,'') = 'F' AND x.stat5 = 'C' 
+                AND x.trcancel <= x.calyrmo_end
+                AND x.pocancel <= x.calyrmo_end
+                AND x.transdate <= x.trcancel)
+          )
+          AND (x.poexpir > x.calyrmo_end)
+          AND (NOT ((x.etestdate IS NOT NULL) AND (x.etestdate <= x.calyrmo_end)))
+          AND (NOT ((x.trcancel <= x.calyrmo_end) AND (COALESCE(x.typcancel,'') = 'F') AND (x.stat5 = 'C')))
+          THEN x.premium * ((datediff(day, x.calyrmo_end, x.poexpir) - 1) / x.f_effdate)
+          ELSE 0.0
+        END as unearned
+      FROM XUnearned_DF x
+
+  - name: Earned_DF
+    sql: |
+      SELECT
+        u.*,
+        CASE WHEN (
+            ((u.transdate <= u.calyrmo_end) AND (u.effdate <= u.calyrmo_end))
+            OR (COALESCE(u.typcancel,'') = 'F' AND u.stat5 = 'C' 
+                AND u.trcancel <= u.calyrmo_end
+                AND u.pocancel <= u.calyrmo_end
+                AND u.transdate <= u.trcancel)
+          )
+          THEN (ROUND(u.xunearned, 2) - ROUND(u.unearned, 2))
+          WHEN (COALESCE(u.typcancel,'') = 'F' AND u.stat5 = 'C' 
+                AND u.transdate > u.trcancel 
+                AND u.effdate = u.transdate 
+                AND u.transdate BETWEEN u.calc_date AND u.calyrmo_end)
+          THEN u.premium
+          ELSE 0.0
+        END as earned,
+        CASE WHEN u.writtenon BETWEEN u.calc_date AND u.calyrmo_end
+          THEN u.premium
+          ELSE 0.0
+        END as written
+      FROM Unearned_DF u
+
+  - name: MonthlyCalculations_DF
+    sql: |
+      SELECT
+        *
+        FROM Earned_DF
+
+  - name: FinalPremiumSummary_DF
+    sql: |
+      SELECT DISTINCT
+        b.code as policynumber,
+        b.itemid as exposureid,
+        '' as commonname,
+        b.state,
+        b.carrier,
+        b.agency,
+        b.lob,
+        b.aslob_code as aslob,
+        b.polyrmo_end,
+        b.calyrmo_end,
+        SUM(b.earned) as earnedpremium,
+        SUM(b.written) as writtenpremium,
+        cast(0.00 as float) as earnedexposures,
+        cast(0.00 as float) as writtenexposures,
+        cast(0.00 as float) as exposurerollup,
+        r.resseg,
+        b.startdate,
+        b.asofdate
+      FROM MonthlyCalculations_DF b
+      LEFT JOIN horesseg r on r.lob=b.lob
+      WHERE (earned <> 0 OR written <> 0)
+      GROUP BY
+        b.code, b.state, b.carrier, b.agency, b.lob, 
+        b.aslob_code, b.polyrmo_end, b.calyrmo_end, b.itemid,
+        b.startdate, b.asofdate, r.resseg
+      

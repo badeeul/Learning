@@ -1,0 +1,19 @@
+{
+    "feedName": "claims_transaction_cdc_test",
+    "feedDescription": "This is a test feed for Claims Transaction Data Product (CDC tables)",
+    "workLoadType": "dp-spark",
+    "skipProductLoad": true,
+    "dataDeduplicationAlert": true,
+    "deduplicationAlertTemplate": "deduplication_msg_claims",
+    "datasetsConfig": [
+        {
+            "datasetType": "database",
+            "datasets": [
+                {
+                    "fileName": "dbo_transaction_uwcoverage_ct",
+                    "sourceConfigFolderName": "iis_transaction"
+                }
+            ]
+        }
+    ]
+}

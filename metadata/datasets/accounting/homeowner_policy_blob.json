@@ -1,0 +1,43 @@
+{
+    "datasetName": "homeowner_policy_blob",
+    "enable": true,
+    "datasetTypeName": "file",
+    "fileType": "json",
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "demo_file",
+        "sourceSystemType": "blob",
+        "sftpFolderList": [
+            "NA"
+        ],
+        "ingestType": "watermark",
+        "sourceWatermarkIdentifier": "LastModifiedDateTime",
+        "filesDirectoryName": "demo_file"
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_pdi_001_raw",
+        "fileType": "csv",
+        "directoryName": "demo_file"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_pdi_001_curated",
+        "schemaName": "demo",
+        "fileOptions": {
+            "encoding": "ISO-8859-1",
+            "header": true,
+            "inferColumnTypes": false,
+            "multiline": true,
+            "delimiter": ",",
+            "escape": "\"",
+            "timestampFormat": "dd/MM/yyyy"
+        },
+        "columnList": ["*"],
+        "primaryKeyList": [
+            "PolicyNumber"
+        ],
+        "duplicateCheckEnabled": false,
+        "duplicateCheckQuarantineType": "retain_one_duplicate",
+        "targetFileFormat": "delta",
+        "targetLoadType": "merge"
+    }
+}

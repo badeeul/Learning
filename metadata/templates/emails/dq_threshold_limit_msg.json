@@ -1,0 +1,11 @@
+{
+    "subject": "Action Required: Data Product Generation Failed Due to Quarantined Records",
+    "body": {
+        "contentType": "text/html",
+        "content": "<p>Dear Reserving team,</p><p>We regret to inform you that the Claims Triangle Input generation process has failed due to the total dollar value of quarantined records exceeding the $100,000 threshold.</p><p><strong>Details:</strong></p><ul><li><strong>Time of Run:</strong> {uploadedTime}</li><li><strong>Location of quarantined records:</strong> {tableName}</li></ul><p>Please review the quarantined records at the specified workspace location, address the data issues in IIS, and rerun the pipeline to generate the data product.</p>"
+    },
+    "emailRecipient": "ActuarialReserving@guard.com",
+    "emailCc": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

@@ -1,0 +1,77 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: claims_transaction_curated
+  table: transaction_uwcoverage_curated
+  load_strategy: merge
+  key_columns:
+    - transaction_uwcoverage_id
+    - cdc_deleted
+  unknown_record: False
+  identity: False
+
+source:
+  - name: transaction_uwcoverage_cdc
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction_cdc
+    table: dbo_transaction_uwcoverage_ct
+
+query:
+  - name: cte_cdc_updates
+    sql: |
+      with cteUpdates as (
+        select 
+            tc.transaction_uwcoverage_id
+          , tc.code
+          , tc.trancnt
+          , tc.recordtype
+          , tc.uwcoverageid
+          , tc.coverageid
+          , tc.buildingid
+          , tc.vehicleid
+          , tc.premium
+          , tc.fees
+          , tc.deletedon
+          , tc.state
+          , tc.lcm
+          , tc.effective
+          , tc.enddate
+          , tc.commonname
+          , tc.itemid
+          , tc.before
+          , tc.after
+          , tc.ratingkey
+          , tc.enteredby
+          , tc.enteredon
+          , tc.gigpremium
+          , tc.hasproperties
+          , tc.renewal_source_id
+          , tc.transaction_source_id
+          , tc.overridden
+          , tc.overriddenby
+          , tc.overriddenon
+          , tc.linkuwcoverageid
+          , tc.manualpremium
+                  
+          , tc.dl_rowhash
+          , tc.dl_partitionkey
+          , tc.dl_iscurrent
+          , tc.dl_recordstartdateutc
+          , tc.dl_recordenddateutc
+          , tc.dl_createddateutc
+          , tc.dl_lastmodifiedutc
+          , tc.dl_sourcefilepath
+          , tc.dl_sourcefilename
+          , tc.dl_eltid
+          , tc.dl_runid 
+                  
+          , false as cdc_deleted   
+          , ROW_NUMBER() OVER (PARTITION BY transaction_uwcoverage_id ORDER BY `__seqval` DESC) as rn
+        from transaction_uwcoverage_cdc tc
+        where `__operation` = 4
+      )
+      select *
+      from cteUpdates
+      where rn = 1
+    drop:
+      - rn
+    description: "Gathers UPDATED records from transaction_uwcoverage_cdc."

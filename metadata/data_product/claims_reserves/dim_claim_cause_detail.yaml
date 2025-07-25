@@ -1,0 +1,41 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_claim_cause_detail
+  load_strategy: type_two
+  key_columns:
+    - source_key
+  unknown_record: True
+  identity: True
+
+source:
+  - name: claims_causeofloss
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_causeofloss
+
+  - name: claims_lossdetail
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_lossdetail
+
+query:
+  - name: dim_claim_cause_detail
+    sql: SELECT DISTINCT
+            cl.lob as claim_cause_detail_lob
+            ,cl.coveragecategory as claim_cause_detail_coverage_category
+            ,replace(cl.causeoflossdesc, ',', '') as claim_cause_loss_description
+            ,replace(ld.lossdetaildesc, ',', '') as claim_cause_loss_detail_description
+            ,cl.discontinued as claim_cause_loss_description_discontinued_date
+            ,ld.discontinued as claim_cause_loss_detail_description_discontinued_date
+            ,case when cl.coveragecategory = 'LI' then '052'
+                  when cl.coveragecategory = 'PD' then '051'
+              else 'WHAT IS THIS'
+             end as aslob_code
+            ,concat(nvl(cl.causeoflossid,0),'_',nvl(ld.lossdetailid,0)) as source_key
+        FROM 
+            claims_causeofloss cl
+            left join claims_lossdetail ld on cl.causeoflossid = ld.causeoflossid and ld.dl_iscurrent = 1
+            where cl.dl_iscurrent = 1
+
+

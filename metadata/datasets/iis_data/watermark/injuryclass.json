@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM dbo.injuryclass WHERE UPDATEON > '01/01/1999'",
+    "sourceWatermarkIdentifier": "UPDATEON",
+    "watermarkValue": "1999-01-01T00:00:00Z"
+}

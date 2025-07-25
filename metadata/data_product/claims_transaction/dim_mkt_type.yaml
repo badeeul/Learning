@@ -1,0 +1,29 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_mkt_type
+  load_strategy: type_two
+  key_columns:
+    - mkt_type_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: mkt_type_key
+
+source:
+  - name: curated_lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+query:
+  - name: dim_mkt_type
+    sql: |
+      SELECT DISTINCT
+        vals AS mkt_type_cd_bus_key,
+        descrip AS mkt_type_desc
+      FROM curated_lookups
+      WHERE UPPER(TRIM(keyfield)) = 'MARKETTYPE'
+        AND UPPER(TRIM(programid)) = 'INSURED'
+        AND dl_iscurrent = 1
+    description: "This query selects unique market type codes and descriptions from the curated_lookups source table where keyfield is 'MARKETTYPE' and programid is 'INSURED'."
+    

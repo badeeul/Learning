@@ -1,0 +1,71 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_transmittal_segment
+  load_strategy: type_two
+  key_columns:
+    - transmittal_segment_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: curated_bop_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: curated_ho_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: curated_db_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: curated_wc_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_transmittal_segment
+    sql: SELECT 
+            transmittalseg as transmittal_segment_code
+        FROM curated_bop_claim_summary
+        GROUP BY
+            transmittalseg
+        UNION
+        SELECT 
+            transmittalseg as transmittal_segment_code
+        FROM curated_ca_claim_summary
+        GROUP BY
+            transmittalseg
+        UNION 
+        SELECT 
+            transmittalseg as transmittal_segment_code
+        FROM curated_ho_claim_summary
+        GROUP BY
+            transmittalseg
+        UNION
+        SELECT 
+            transmittalseg as transmittal_segment_code
+        FROM curated_db_claim_summary
+        GROUP BY
+            transmittalseg
+        UNION
+        SELECT 
+            transmittalseg as transmittal_segment_code
+        FROM curated_wc_claim_summary
+        GROUP BY
+            transmittalseg
+    description: |
+      This query retrieves distinct transmittal segment codes from various claim summary tables.
+      It combines the results from BOP, CA, HO, DB, and WC claim summaries to create a comprehensive list of transmittal segment codes.
+          

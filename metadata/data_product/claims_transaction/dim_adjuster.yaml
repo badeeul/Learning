@@ -1,0 +1,82 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_adjuster
+  load_strategy: type_two
+  key_columns:
+    - adjustr_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: adjustr_key
+  
+source:
+  - name: claimant
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claimant
+
+  - name: employee
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: employee
+
+  - name: lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+  - name: provider
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: provider
+
+  - name: provtype
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: provtype
+
+  - name: reservelimits
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: reservelimits
+
+query:
+  - name: dim_adjuster
+    sql: |
+      SELECT DISTINCT 
+        concat('EMP-', e.empcode) as adjustr_bus_key,
+        e.name as adjustr_nm,
+        e.empcode as adjustr_cd,
+        e.emptype as adjustr_type_cd,
+        l.descrip as adjustr_type_desc,
+        0 as adjustr_tpa_flg,
+        r.enteredby as reserve_entry_userid,
+        r.coveragecategory as reserve_limit_lob,
+        r.totallimit as reserve_limit_amt
+
+      FROM claimant c
+      INNER JOIN employee e ON UPPER(TRIM(c.adjustor)) = UPPER(TRIM(e.empcode)) AND e.dl_iscurrent = 1
+      INNER JOIN lookups l ON UPPER(TRIM(e.emptype)) = UPPER(TRIM(l.vals)) and UPPER(TRIM(l.keyfield)) = 'EMPTYPE' AND l.dl_iscurrent = 1
+      INNER JOIN reservelimits r ON CAST(r.userid as STRING) = e.empcode AND r.dl_iscurrent = 1
+      WHERE c.dl_iscurrent = 1
+
+      UNION ALL
+
+      SELECT DISTINCT 
+        concat('TPA-', p.provider) as adjustr_bus_key,
+        concat(TRIM(p.name), '(', TRIM(p.county), ')') as adjustr_nm,
+        p.provider as adjustr_cd,
+        pt.provtype as adjustr_type_cd,
+        pt.provtypdes as adjustr_type_desc,
+        1 as adjustr_tpa_flg,
+        0 as reserve_entry_userid,
+        'NA' as reserve_limit_lob,
+        0 as reserve_limit_amt
+      FROM claimant c
+      INNER JOIN provider p ON UPPER(TRIM(c.tpataxid)) = UPPER(TRIM(p.provider)) AND p.dl_iscurrent = 1
+      INNER JOIN provtype pt ON UPPER(TRIM(p.provtype)) = UPPER(TRIM(pt.provtype)) AND pt.dl_iscurrent = 1
+      WHERE c.dl_iscurrent = 1
+      ORDER BY adjustr_bus_key
+
+    description: "This query creates a dimension table for adjusters, combining both internal employees and third-party administrators (TPAs) into a unified dimension. It provides adjuster details (name, code, type) and distinguishes between internal staff and external TPAs using a flag. The business key prefixes ('EMP-' and 'TPA-') identify the adjuster source."
+    

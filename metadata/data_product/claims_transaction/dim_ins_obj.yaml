@@ -1,0 +1,96 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_ins_obj
+  load_strategy: type_two
+  key_columns:
+    - ins_obj_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: ins_obj_key
+
+source:
+  - name: curated_uwbuildings
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: uwbuildings
+
+  - name: curated_uwvehicles
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: uwvehicles
+
+  - name: curated_transaction_uwhomes
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: transaction_uwhomes
+
+  - name: curated_lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+  - name: curated_insured
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: insured
+
+query:
+  - name: dim_ins_obj
+    sql: |
+      with cteAll AS (
+        SELECT a.code AS policy_num,
+              CONCAT('BG-', CAST(a.buildingid AS STRING)) AS ins_obj_bus_key,
+              a.locnum AS ins_obj_num,
+              a.buildingnum AS ins_obj_sub_num,
+              CONCAT(a.buildinggroup, '-', b.descrip) AS ins_obj_type,
+              i.lob AS lob,
+              a.descrip AS ins_obj_desc,
+              a.buildingstate AS ins_obj_state
+        FROM curated_uwbuildings a
+        INNER JOIN curated_lookups b ON a.buildinggroup = b.vals AND UPPER(b.keyfield) = 'BUILDINGGROUP' 
+        AND b.dl_iscurrent = 1 
+        INNER JOIN curated_insured i ON i.code = a.code AND i.dl_iscurrent = 1
+        WHERE a.dl_iscurrent = 1
+
+        UNION ALL
+
+        SELECT a.code AS policy_num,
+              CONCAT('VH-', CAST(vehicleid AS STRING)) AS ins_obj_bus_key,
+              a.locnum AS ins_obj_num,
+              CAST(vehiclenum AS STRING) AS ins_obj_sub_num,
+              a.vehicletype AS ins_obj_type,
+              i.lob AS lob,
+              CONCAT(a.model, ' ', a.make, ' ', a.modelyear) AS ins_obj_desc,
+              i.state AS ins_obj_state
+        FROM curated_uwvehicles a
+        INNER JOIN curated_insured i ON i.code = a.code AND i.dl_iscurrent = 1
+        WHERE i.lob = 'CA'
+        AND a.dl_iscurrent = 1
+
+        UNION ALL
+
+        SELECT a.code AS policy_num,
+              CONCAT('HO-', CAST(transaction_uwhomes_id AS STRING)) AS ins_obj_bus_key,
+              loctypenum AS ins_obj_num,
+              'NA' AS ins_obj_sub_num,
+              a.occupancytype AS ins_obj_type,
+              i.lob AS lob,
+              a.dwellingtype AS ins_obj_desc,
+              xpath_string(xmldata, '/CONTEXT/*/OWNER_INFORMATION/ANSWER[@id="STATE"]/@valueCode') AS ins_obj_state
+        FROM curated_transaction_uwhomes a
+        INNER JOIN curated_insured i ON i.code = a.code AND i.dl_iscurrent = 1
+        WHERE a.trancnt = 0 AND a.after = 1
+        AND a.dl_iscurrent = 1
+      )
+      SELECT DISTINCT
+          policy_num
+        , ins_obj_bus_key
+        , ins_obj_num
+        , ins_obj_sub_num
+        , ins_obj_type
+        , lob
+        , ins_obj_desc
+        , ins_obj_state
+      FROM cteAll      
+    description: "This query builds the insured object dimension by unioning buildings, vehicles, and homes with appropriate joins and transformations."

@@ -1,0 +1,28 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_prod_src
+  load_strategy: type_two
+  key_columns:
+    - prod_src_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: prod_src_key
+
+source:
+  - name: curated_lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+query:
+  - name: dim_prod_src
+    sql: |
+      SELECT DISTINCT
+        TRIM(vals) AS prod_src_cd_bus_key,
+        TRIM(descrip) AS prod_src_desc
+      FROM curated_lookups
+      WHERE UPPER(TRIM(keyfield)) = 'PRODUCTIONSRC'
+      AND dl_iscurrent = 1
+    description: "This query selects unique production source codes and descriptions from the curated_lookups source table where keyfield is 'PRODUCTIONSRC'."
+    

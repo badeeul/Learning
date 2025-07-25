@@ -1,0 +1,68 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_agency
+  load_strategy: type_two
+  key_columns:
+    - agency_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: BOPClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: CAClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: DBClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: HOClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: WCClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_agency
+    sql: SELECT 
+            agency as agency_code
+        FROM BOPClaimSummary
+        GROUP BY
+            agency
+        UNION
+        SELECT 
+            agency as agency_code
+        FROM CAClaimSummary
+        GROUP BY
+            agency
+        UNION
+        SELECT 
+            agency as agency_code
+        FROM DBClaimSummary
+        GROUP BY
+            agency
+        UNION
+        SELECT 
+            agency as agency_code
+        FROM HOClaimSummary
+        GROUP BY
+            agency
+        UNION
+        SELECT 
+            agency as agency_code
+        FROM WCClaimSummary
+        GROUP BY
+            agency
+    description: "This table contains the list of agencies from the claims summary tables. It is used to identify the agency associated with each claim."

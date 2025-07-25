@@ -1,0 +1,1037 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: fact_claim_loss_reserve_payment_monthly_snapshot
+  load_strategy: overwrite
+  key_columns:
+    - dl_row_hash
+  unknown_record: false
+  identity: false
+
+source:
+  - name: curated_bop_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+  
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: curated_db_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: curated_ho_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: curated_wc_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+  - name: dim_catastrophe
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_catastrophe
+
+  - name: dim_line_of_business
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_line_of_business
+
+  - name: dim_carrier
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_carrier
+
+  - name: dim_state
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_state
+
+  - name: dim_market_type
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_market_type
+
+  - name: dim_production_source
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_production_source
+
+  - name: dim_agency
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_agency
+
+  - name: dim_claim_cause_detail
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_claim_cause_detail
+
+  - name: dim_aslob
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_aslob
+
+  - name: dim_reserve_detailed_segment
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_reserve_detailed_segment
+
+  - name: dim_transmittal_segment
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_transmittal_segment
+
+  - name: dim_exposure_class
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_exposure_class
+
+  - name: dim_exposure_group
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_exposure_group
+
+  - name: dim_industry
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_industry
+
+  - name: dim_product
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_product
+
+  - name: dim_auto_vehicle_size
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_auto_vehicle_size
+
+  - name: dim_auto_secondary_class
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: dim_auto_secondary_class
+
+query:
+  - name: fact_claim_loss_reserve_payment_monthly_snapshot
+    sql: 
+      with cte_all_lobs as (
+        select
+            cast(null as int) as fact_claims_transaction_monthly_snapshot_key
+            ,bop.startdate
+            ,bop.asofdate
+            ,bop.claimnum as claim_number
+            ,bop.lossdate as loss_date
+            ,bop.closeddate as closed_date
+            ,bop.reopeneddate as reopened_date
+            ,bop.receiveddate as received_date
+            ,bop.firstentereddate as first_entered_date
+            ,bop.policynumber as policy_number
+            ,bop.policyeffectivedate as policy_effective_date
+            ,bop.policyexpirationdate as policy_expiration_date
+            ,coalesce(cat.catastrophe_key, -1) as catastrophe_key
+            ,coalesce(lob.line_of_business_key, -1) as line_of_business_key
+            ,coalesce(car.carrier_key, -1) as carrier_key
+            ,coalesce(st.state_key, -1) as state_key
+            ,coalesce(mt.market_type_key, -1) as market_type_key
+            ,coalesce(ps.production_source_key, -1) as production_source_key
+            ,coalesce(a.agency_key, -1) as agency_key
+            ,coalesce(ccd.claim_cause_detail_key, -1) as claim_cause_detail_key
+            ,coalesce(asl.aslob_key, -1) as aslob_key
+            ,coalesce(rds.reserve_detailed_segment_key, -1) as reserve_detailed_segment_key
+            ,coalesce(ts.transmittal_segment_key, -1) as transmittal_segment_key
+            ,coalesce(ec.exposure_class_key, -1) as exposure_class_key
+            ,coalesce(eg.exposure_group_key, -1) as exposure_group_key
+            ,coalesce(i.industry_key, -1) as industry_key
+            ,coalesce(p.product_key, -1) as product_key
+            ,coalesce(av.auto_vehicle_size_key, -1) as auto_vehicle_size_key
+            ,coalesce(asc.auto_secondary_class_key, -1) as auto_secondary_class_key
+            ,current_timestamp() as snapshot_timestamp
+            ,bop.calyrmo_end as cal_yr_mo_end
+            ,cast(bop.wcclaimid as int) as wcclaimid
+            ,case when bop.handledbylegalind =1 then 'Y' else 'N' end as handled_by_legal_indicator
+            ,cast(bop.suitfiledind as boolean) as suit_filed_indicator
+            ,cast(bop.tpaind as boolean) as tpa_indicator
+            ,cast(bop.cwpfinalind as boolean) as cwp_final_indicator
+            ,cast(bop.catind as boolean) as cat_indicator
+            ,cast(bop.medonlyind as boolean) as medical_only_indicator
+            ,case when bop.massind =1 then 'Y' else 'N' end as mass_indicator
+            ,bop.cwpcount as cwp_count
+            ,bop.closedcount as closed_count
+            ,bop.reopenedcount as reopened_count
+            ,bop.pendingcount as pending_count
+            ,bop.reportedcount as reported_count
+            ,bop.dcconlycount as dcc_only_count
+            ,cast(bop.incrnetincurredloss as float) as claim_net_incurred_loss_amount
+            ,cast(bop.incrgrossincurredloss as float) as claim_gross_incurred_loss_amount
+            ,cast(bop.incrincurreddcc as float) as claim_incurred_dcc_amount
+            ,cast(bop.incrgrosspaidloss as float) as claim_gross_paid_loss_amount
+            ,cast(bop.incrpaidsalvage as float) as claim_paid_salvage_amount
+            ,cast(bop.incrpaidsubrogation as float) as claim_paid_subrogation_amount
+            ,cast(bop.incrpaiddcc as float) as claim_paid_dcc_amount
+            ,cast(bop.incrgrosspaidlossonclosed as float) as claim_gross_paid_loss_on_closed_amount
+            ,cast(bop.incrpaidsalvageonclosed as float) as claim_paid_salvage_on_closed_amount
+            ,cast(bop.incrpaidsubrogationonclosed as float) as claim_paid_subrogation_on_closed_amount
+            ,cast(bop.incrpaiddcconclosed as float) as claim_paid_dcc_on_closed_amount
+            ,cast(bop.incrnetincurredlossonopen as float) as claim_net_incurred_loss_on_open_amount
+            ,cast(bop.incrgrossincurredlossonopen as float) as claim_gross_incurred_loss_on_open_amount
+            ,cast(bop.incrincurreddcconopen as float) as claim_incurred_dcc_on_open_amount
+            ,cast(bop.caselossreserveonopen as float) as case_loss_reserve_on_open_amount
+            ,cast(bop.casedccreserveonopen as float) as case_dcc_reserve_on_open_amount
+            ,cast(bop.accyr as int) as accident_year
+            ,cast(bop.claimantid as int) as claimant_id 
+            ,cast(bop.exposureid as int) as exposure_id
+            ,cast(bop.maturity as int) as maturity
+            ,bop.newrenew as new_renew
+            ,bop.occnum as occurrence_number
+            ,cast(bop.timetoclose as int) as time_to_close
+            ,cast(bop.timetoreport as int) as time_to_report
+            ,bop.wc_ctflag as wc_ct_flag
+            ,cast(null as timestamp) as row_effective_date
+            ,cast(null as timestamp) as row_expiration_date
+            ,cast(null as boolean) as is_current_flag
+            ,case 
+                when bop.catind = 'Y' and cat.catastrophe_key  is not null then 1 
+                when bop.catind = 'N' and cat.catastrophe_key  is null then 1
+                else 0 
+            end as dq_claim_catastrophe_indicator_check
+            ,case 
+                when bop.casedccreserveonopen = (bop.incrincurreddcc + bop.incrpaiddcc) then 1
+                else 0
+            end as dq_claim_dcc_reserve_check
+            ,case 
+                when bop.caselossreserveonopen = (bop.incrgrossincurredloss + bop.incrgrosspaidloss) then 1
+                else 0
+            end as dq_claim_loss_reserve_check
+            ,case 
+                when bop.incrgrossincurredloss = (bop.incrnetincurredloss - bop.incrpaidsubrogation - bop.incrpaidsalvage) then 1
+                else 0
+            end as dq_claim_gross_incurred_loss_check
+            ,case 
+                when substring(bop.claimnum, 1, 10) = bop.policynumber then 1
+                else 0
+            end as dq_policy_number_check
+            ,case 
+              when (bop.closedcount + bop.pendingcount) = bop.reportedcount then 1
+              else 0
+            end as dq_reported_count_check
+          ,case 
+              when bop.firstentereddate <= bop.calyrmo_end then 1
+              else 0
+          end as dq_first_entered_date_check
+          ,case 
+              when bop.receiveddate <= bop.firstentereddate then 1
+              else 0
+          end as dq_received_date_check
+          ,case 
+              when bop.lossdate <= bop.firstentereddate then 1
+              else 0
+          end as dq_loss_date_check
+          ,case 
+            when datediff(day, bop.lossdate,  bop.receiveddate) = bop.timetoreport then 1
+            else 0
+        end as dq_time_to_report_check
+          ,case 
+                 when datediff(day, bop.receiveddate, bop.closeddate)= bop.timetoclose then 1
+                else 0
+            end as dq_time_to_close_check
+          ,case 
+                when year(bop.lossdate) = bop.accyr then 1
+                else 0
+            end as dq_accident_year_check          
+          
+        from curated_bop_claim_summary bop
+
+        left join dim_catastrophe cat 
+            on cat.catastrophe_code = bop.catcode and cat.dl_is_current_flag = 1
+
+        left join dim_line_of_business lob 
+            on lob.line_of_business_code = bop.lob and lob.dl_is_current_flag = 1
+
+        left join dim_carrier car 
+            on car.carrier_code = bop.carrier and car.dl_is_current_flag = 1
+
+        left join dim_state st 
+            on st.state_code = bop.state and st.dl_is_current_flag = 1
+
+        left join dim_market_type mt 
+            on mt.market_type_code = bop.markettype and mt.dl_is_current_flag = 1
+
+        left join dim_production_source ps 
+            on ps.production_source_code = bop.productionsrc and ps.dl_is_current_flag = 1
+
+        left join dim_agency a 
+            on a.agency_code = bop.agency and a.dl_is_current_flag = 1
+
+        left join dim_claim_cause_detail ccd 
+            on ccd.claim_cause_loss_description = bop.causeofloss 
+            and ccd.claim_cause_loss_detail_description = nvl(bop.lossdescrip, '') 
+            and ccd.aslob_code = bop.aslob 
+            and ccd.claim_cause_detail_lob = bop.lob
+            and ccd.dl_is_current_flag = 1
+
+        left join dim_aslob asl 
+            on asl.aslob_code = bop.aslob and asl.dl_is_current_flag = 1
+
+        left join dim_reserve_detailed_segment rds 
+            on rds.reserve_segment_code = bop.detailedresseg and rds.reserve_detailed_segment_code = bop.detailedresseg and rds.dl_is_current_flag = 1
+
+        left join dim_transmittal_segment ts 
+            on ts.transmittal_segment_code = bop.transmittalseg and ts.dl_is_current_flag = 1
+
+        left join dim_exposure_class ec
+            on ec.exposure_class_code = bop.ExposureClass and ec.dl_is_current_flag = 1
+
+        left join dim_exposure_group eg
+            on eg.exposure_group_code = bop.ExposureGroup and eg.dl_is_current_flag = 1
+
+        left join dim_industry i
+            on i.industry_code = bop.industry and i.dl_is_current_flag = 1
+
+        left join dim_product p
+            on p.product_code = bop.productid and p.dl_is_current_flag = 1
+
+        left join dim_auto_vehicle_size av
+            on av.auto_vehicle_size_code = bop.autovehiclesize and av.dl_is_current_flag = 1
+
+        left join dim_auto_secondary_class asc
+            on asc.auto_secondary_class_code = bop.autosecondaryclass and asc.dl_is_current_flag = 1
+
+      UNION
+        select
+            cast(null as int) as fact_claims_transaction_monthly_snapshot_key
+            ,ca.startdate
+            ,ca.asofdate
+            ,ca.claimnum as claim_number
+            ,ca.lossdate as loss_date
+            ,ca.closeddate as closed_date
+            ,ca.reopeneddate as reopened_date
+            ,ca.receiveddate as received_date
+            ,ca.firstentereddate as first_entered_date
+            ,ca.policynumber as policy_number
+            ,ca.policyeffectivedate as policy_effective_date
+            ,ca.policyexpirationdate as policy_expiration_date
+            ,coalesce(cat.catastrophe_key, -1) as catastrophe_key
+            ,coalesce(lob.line_of_business_key, -1) as line_of_business_key
+            ,coalesce(car.carrier_key, -1) as carrier_key
+            ,coalesce(st.state_key, -1) as state_key
+            ,coalesce(mt.market_type_key, -1) as market_type_key
+            ,coalesce(ps.production_source_key, -1) as production_source_key
+            ,coalesce(a.agency_key, -1) as agency_key
+            ,coalesce(ccd.claim_cause_detail_key, -1) as claim_cause_detail_key
+            ,coalesce(asl.aslob_key, -1) as aslob_key
+            ,coalesce(rds.reserve_detailed_segment_key, -1) as reserve_detailed_segment_key
+            ,coalesce(ts.transmittal_segment_key, -1) as transmittal_segment_key
+            ,coalesce(ec.exposure_class_key, -1) as exposure_class_key
+            ,coalesce(eg.exposure_group_key, -1) as exposure_group_key
+            ,coalesce(i.industry_key, -1) as industry_key
+            ,coalesce(p.product_key, -1) as product_key
+            ,coalesce(av.auto_vehicle_size_key, -1) as auto_vehicle_size_key
+            ,coalesce(asc.auto_secondary_class_key, -1) as auto_secondary_class_key
+            ,current_timestamp() as snapshot_timestamp
+            ,ca.calyrmo_end as cal_yr_mo_end
+            ,cast(ca.wcclaimid as int) as wcclaimid
+            ,case when ca.handledbylegalind =1 then 'Y' else 'N' end as handled_by_legal_indicator
+            ,cast(ca.suitfiledind as boolean) as suit_filed_indicator
+            ,cast(ca.tpaind as boolean) as tpa_indicator
+            ,cast(ca.cwpfinalind as boolean) as cwp_final_indicator
+            ,cast(ca.catind as boolean) as cat_indicator
+            ,cast(ca.medonlyind as boolean) as medical_only_indicator
+            ,case when ca.massind =1 then 'Y' else 'N' end as mass_indicator
+            ,ca.cwpcount as cwp_count
+            ,ca.closedcount as closed_count
+            ,ca.reopenedcount as reopened_count
+            ,ca.pendingcount as pending_count
+            ,ca.reportedcount as reported_count
+            ,ca.dcconlycount as dcc_only_count
+            ,cast(ca.incrnetincurredloss as float) as claim_net_incurred_loss_amount
+            ,cast(ca.incrgrossincurredloss as float) as claim_gross_incurred_loss_amount
+            ,cast(ca.incrincurreddcc as float) as claim_incurred_dcc_amount
+            ,cast(ca.incrgrosspaidloss as float) as claim_gross_paid_loss_amount
+            ,cast(ca.incrpaidsalvage as float) as claim_paid_salvage_amount
+            ,cast(ca.incrpaidsubrogation as float) as claim_paid_subrogation_amount
+            ,cast(ca.incrpaiddcc as float) as claim_paid_dcc_amount
+            ,cast(ca.incrgrosspaidlossonclosed as float) as claim_gross_paid_loss_on_closed_amount
+            ,cast(ca.incrpaidsalvageonclosed as float) as claim_paid_salvage_on_closed_amount
+            ,cast(ca.incrpaidsubrogationonclosed as float) as claim_paid_subrogation_on_closed_amount
+            ,cast(ca.incrpaiddcconclosed as float) as claim_paid_dcc_on_closed_amount
+            ,cast(ca.incrnetincurredlossonopen as float) as claim_net_incurred_loss_on_open_amount
+            ,cast(ca.incrgrossincurredlossonopen as float) as claim_gross_incurred_loss_on_open_amount
+            ,cast(ca.incrincurreddcconopen as float) as claim_incurred_dcc_on_open_amount
+            ,cast(ca.caselossreserveonopen as float) as case_loss_reserve_on_open_amount
+            ,cast(ca.casedccreserveonopen as float) as case_dcc_reserve_on_open_amount
+            ,cast(ca.accyr as int) as accident_year
+            ,cast(ca.claimantid as int) as claimant_id 
+            ,cast(ca.exposureid as int) as exposure_id
+            ,cast(ca.maturity as int) as maturity
+            ,ca.newrenew as new_renew
+            ,ca.occnum as occurrence_number
+            ,cast(ca.timetoclose as int) as time_to_close
+            ,cast(ca.timetoreport as int) as time_to_report
+            ,ca.wc_ctflag as wc_ct_flag
+            ,cast(null as timestamp) as row_effective_date
+            ,cast(null as timestamp) as row_expiration_date
+            ,cast(null as boolean) as is_current_flag
+            ,case 
+                when ca.catind = 'Y' and cat.catastrophe_key  is not null then 1 
+                when ca.catind = 'N' and cat.catastrophe_key  is null then 1
+                else 0 
+            end as dq_claim_catastrophe_indicator_check
+            ,case 
+                when ca.casedccreserveonopen = (ca.incrincurreddcc + ca.incrpaiddcc) then 1
+                else 0
+            end as dq_claim_dcc_reserve_check
+            ,case 
+                when ca.caselossreserveonopen = (ca.incrgrossincurredloss + ca.incrgrosspaidloss) then 1
+                else 0
+            end as dq_claim_loss_reserve_check
+            ,case 
+                when ca.incrgrossincurredloss = (ca.incrnetincurredloss - ca.incrpaidsubrogation - ca.incrpaidsalvage) then 1
+                else 0
+            end as dq_claim_gross_incurred_loss_check
+            ,case 
+                when substring(ca.claimnum, 1, 10) = ca.policynumber then 1
+                else 0
+            end as dq_policy_number_check
+            ,case 
+              when (ca.closedcount + ca.pendingcount) = ca.reportedcount then 1
+              else 0
+            end as dq_reported_count_check
+          ,case 
+              when ca.firstentereddate <= ca.calyrmo_end then 1
+              else 0
+          end as dq_first_entered_date_check
+          ,case 
+              when ca.receiveddate <= ca.firstentereddate then 1
+              else 0
+          end as dq_received_date_check
+          ,case 
+              when ca.lossdate <= ca.firstentereddate then 1
+              else 0
+          end as dq_loss_date_check
+          ,case 
+            when datediff(day, ca.lossdate,  ca.receiveddate) = ca.timetoreport then 1
+            else 0
+        end as dq_time_to_report_check
+          ,case 
+                 when datediff(day, ca.receiveddate, ca.closeddate)= ca.timetoclose then 1
+                else 0
+            end as dq_time_to_close_check
+          ,case 
+                when year(ca.lossdate) = ca.accyr then 1
+                else 0
+            end as dq_accident_year_check
+          
+        from curated_ca_claim_summary ca
+
+        left join dim_catastrophe cat 
+            on cat.catastrophe_code = ca.catcode and cat.dl_is_current_flag = 1
+
+        left join dim_line_of_business lob 
+            on lob.line_of_business_code = ca.lob and lob.dl_is_current_flag = 1
+
+        left join dim_carrier car 
+            on car.carrier_code = ca.carrier and car.dl_is_current_flag = 1
+
+        left join dim_state st 
+            on st.state_code = ca.state and st.dl_is_current_flag = 1
+
+        left join dim_market_type mt 
+            on mt.market_type_code = ca.markettype and mt.dl_is_current_flag = 1
+
+        left join dim_production_source ps 
+            on ps.production_source_code = ca.productionsrc and ps.dl_is_current_flag = 1
+
+        left join dim_agency a 
+            on a.agency_code = ca.agency and a.dl_is_current_flag = 1
+
+        left join dim_claim_cause_detail ccd 
+            on ccd.claim_cause_loss_description = ca.causeofloss 
+            and ccd.claim_cause_loss_detail_description = nvl(ca.lossdescrip, '') 
+            and ccd.aslob_code = ca.aslob 
+            and ccd.claim_cause_detail_lob = ca.lob
+            and ccd.dl_is_current_flag = 1
+
+        left join dim_aslob asl 
+            on asl.aslob_code = ca.aslob and asl.dl_is_current_flag = 1
+
+        left join dim_reserve_detailed_segment rds 
+            on rds.reserve_segment_code = ca.detailedresseg and rds.reserve_detailed_segment_code = ca.detailedresseg and rds.dl_is_current_flag = 1
+
+        left join dim_transmittal_segment ts 
+            on ts.transmittal_segment_code = ca.transmittalseg and rds.dl_is_current_flag = 1
+
+        left join dim_exposure_class ec
+            on ec.exposure_class_code = ca.ExposureClass and ec.dl_is_current_flag = 1
+
+        left join dim_exposure_group eg
+            on eg.exposure_group_code = ca.ExposureGroup and eg.dl_is_current_flag = 1
+
+        left join dim_industry i
+            on i.industry_code = ca.industry and i.dl_is_current_flag = 1
+
+        left join dim_product p
+            on p.product_code = ca.productid and p.dl_is_current_flag = 1
+
+        left join dim_auto_vehicle_size av
+            on av.auto_vehicle_size_code = ca.autovehiclesize and av.dl_is_current_flag = 1
+
+        left join dim_auto_secondary_class asc
+            on asc.auto_secondary_class_code = ca.autosecondaryclass and asc.dl_is_current_flag = 1
+
+        UNION
+        select
+            cast(null as int) as fact_claims_transaction_monthly_snapshot_key
+            ,db.startdate
+            ,db.asofdate
+            ,db.claimnum as claim_number
+            ,db.lossdate as loss_date
+            ,db.closeddate as closed_date
+            ,db.reopeneddate as reopened_date
+            ,db.receiveddate as received_date
+            ,db.firstentereddate as first_entered_date
+            ,db.policynumber as policy_number
+            ,db.policyeffectivedate as policy_effective_date
+            ,db.policyexpirationdate as policy_expiration_date
+            ,coalesce(cat.catastrophe_key, -1) as catastrophe_key
+            ,coalesce(lob.line_of_business_key, -1) as line_of_business_key
+            ,coalesce(car.carrier_key, -1) as carrier_key
+            ,coalesce(st.state_key, -1) as state_key
+            ,coalesce(mt.market_type_key, -1) as market_type_key
+            ,coalesce(ps.production_source_key, -1) as production_source_key
+            ,coalesce(a.agency_key, -1) as agency_key
+            ,coalesce(ccd.claim_cause_detail_key, -1) as claim_cause_detail_key
+            ,coalesce(asl.aslob_key, -1) as aslob_key
+            ,coalesce(rds.reserve_detailed_segment_key, -1) as reserve_detailed_segment_key
+            ,coalesce(ts.transmittal_segment_key, -1) as transmittal_segment_key
+            ,coalesce(ec.exposure_class_key, -1) as exposure_class_key
+            ,coalesce(eg.exposure_group_key, -1) as exposure_group_key
+            ,coalesce(i.industry_key, -1) as industry_key
+            ,coalesce(p.product_key, -1) as product_key
+            ,coalesce(av.auto_vehicle_size_key, -1) as auto_vehicle_size_key
+            ,coalesce(asc.auto_secondary_class_key, -1) as auto_secondary_class_key
+            ,current_timestamp() as snapshot_timestamp
+            ,db.calyrmo_end as cal_yr_mo_end
+            ,cast(db.wcclaimid as int) as wcclaimid
+            ,case when db.handledbylegalind =1 then 'Y' else 'N' end as handled_by_legal_indicator
+            ,cast(db.suitfiledind as boolean) as suit_filed_indicator
+            ,cast(db.tpaind as boolean) as tpa_indicator
+            ,cast(db.cwpfinalind as boolean) as cwp_final_indicator
+            ,cast(0 as boolean) as cat_indicator
+            ,cast(db.medonlyind as boolean) as medical_only_indicator
+            ,case when db.massind =1 then 'Y' else 'N' end as mass_indicator
+            ,db.cwpcount as cwp_count
+            ,db.closedcount as closed_count
+            ,db.reopenedcount as reopened_count
+            ,db.pendingcount as pending_count
+            ,db.reportedcount as reported_count
+            ,db.dcconlycount as dcc_only_count
+            ,cast(db.incrnetincurredloss as float) as claim_net_incurred_loss_amount
+            ,cast(db.incrgrossincurredloss as float) as claim_gross_incurred_loss_amount
+            ,cast(db.incrincurreddcc as float) as claim_incurred_dcc_amount
+            ,cast(db.incrgrosspaidloss as float) as claim_gross_paid_loss_amount
+            ,cast(db.incrpaidsalvage as float) as claim_paid_salvage_amount
+            ,cast(db.incrpaidsubrogation as float) as claim_paid_subrogation_amount
+            ,cast(db.incrpaiddcc as float) as claim_paid_dcc_amount
+            ,cast(db.incrgrosspaidlossonclosed as float) as claim_gross_paid_loss_on_closed_amount
+            ,cast(db.incrpaidsalvageonclosed as float) as claim_paid_salvage_on_closed_amount
+            ,cast(db.incrpaidsubrogationonclosed as float) as claim_paid_subrogation_on_closed_amount
+            ,cast(db.incrpaiddcconclosed as float) as claim_paid_dcc_on_closed_amount
+            ,cast(db.incrnetincurredlossonopen as float) as claim_net_incurred_loss_on_open_amount
+            ,cast(db.incrgrossincurredlossonopen as float) as claim_gross_incurred_loss_on_open_amount
+            ,cast(db.incrincurreddcconopen as float) as claim_incurred_dcc_on_open_amount
+            ,cast(db.caselossreserveonopen as float) as case_loss_reserve_on_open_amount
+            ,cast(db.casedccreserveonopen as float) as case_dcc_reserve_on_open_amount
+            ,cast(db.accyr as int) as accident_year
+            ,cast(db.claimantid as int) as claimant_id 
+            ,cast(db.exposureid as int) as exposure_id
+            ,cast(db.maturity as int) as maturity
+            ,db.newrenew as new_renew
+            ,db.occnum as occurrence_number
+            ,cast(db.timetoclose as int) as time_to_close
+            ,cast(db.timetoreport as int) as time_to_report
+            ,db.wc_ctflag as wc_ct_flag
+            ,cast(null as timestamp) as row_effective_date
+            ,cast(null as timestamp) as row_expiration_date
+            ,cast(null as boolean) as is_current_flag
+            ,case 
+                when db.catind = 'Y' and cat.catastrophe_key  is not null then 1 
+                when db.catind = 'N' and cat.catastrophe_key  is null then 1
+                else 0 
+            end as dq_claim_catastrophe_indicator_check
+            ,case 
+                when db.casedccreserveonopen = (db.incrincurreddcc + db.incrpaiddcc) then 1
+                else 0
+            end as dq_claim_dcc_reserve_check
+            ,case 
+                when db.caselossreserveonopen = (db.incrgrossincurredloss + db.incrgrosspaidloss) then 1
+                else 0
+            end as dq_claim_loss_reserve_check
+            ,case 
+                when db.incrgrossincurredloss = (db.incrnetincurredloss - db.incrpaidsubrogation - db.incrpaidsalvage) then 1
+                else 0
+            end as dq_claim_gross_incurred_loss_check
+            ,case 
+                when substring(db.claimnum, 1, 10) = db.policynumber then 1
+                else 0
+            end as dq_policy_number_check
+            ,case 
+              when (db.closedcount + db.pendingcount) = db.reportedcount then 1
+              else 0
+            end as dq_reported_count_check
+          ,case 
+              when db.firstentereddate <= db.calyrmo_end then 1
+              else 0
+          end as dq_first_entered_date_check
+          ,case 
+              when db.receiveddate <= db.firstentereddate then 1
+              else 0
+          end as dq_received_date_check
+          ,case 
+              when db.lossdate <= db.firstentereddate then 1
+              else 0
+          end as dq_loss_date_check
+          ,case 
+            when datediff(day, db.lossdate,  db.receiveddate) = db.timetoreport then 1
+            else 0
+        end as dq_time_to_report_check
+          ,case 
+             when datediff(day, db.receiveddate, db.closeddate)= db.timetoclose then 1
+            else 0
+        end as dq_time_to_close_check
+        ,case 
+            when year(db.lossdate) = db.accyr then 1
+            else 0
+        end as dq_accident_year_check
+          
+        from curated_db_claim_summary db
+
+        left join dim_catastrophe cat 
+            on cat.catastrophe_code = db.catcode and cat.dl_is_current_flag = 1
+
+        left join dim_line_of_business lob 
+            on lob.line_of_business_code = db.lob and lob.dl_is_current_flag = 1
+
+        left join dim_carrier car 
+            on car.carrier_code = db.carrier and car.dl_is_current_flag = 1
+
+        left join dim_state st 
+            on st.state_code = db.state and st.dl_is_current_flag = 1
+
+        left join dim_market_type mt 
+            on mt.market_type_code = db.markettype and mt.dl_is_current_flag = 1
+
+        left join dim_production_source ps 
+            on ps.production_source_code = db.productionsrc and ps.dl_is_current_flag = 1
+
+        left join dim_agency a 
+            on a.agency_code = db.agency and a.dl_is_current_flag = 1
+
+        left join dim_claim_cause_detail ccd 
+            on ccd.claim_cause_loss_description = db.causeofloss 
+            and ccd.claim_cause_loss_detail_description = nvl(db.lossdescrip, '') 
+            and ccd.aslob_code = db.aslob 
+            and ccd.claim_cause_detail_lob = db.lob
+            and ccd.dl_is_current_flag = 1
+
+        left join dim_aslob asl 
+            on asl.aslob_code = db.aslob and asl.dl_is_current_flag = 1
+
+        left join dim_reserve_detailed_segment rds 
+            on rds.reserve_segment_code = db.detailedresseg and rds.reserve_detailed_segment_code = db.detailedresseg and rds.dl_is_current_flag = 1
+
+        left join dim_transmittal_segment ts 
+            on ts.transmittal_segment_code = db.transmittalseg and rds.dl_is_current_flag = 1
+
+        left join dim_exposure_class ec
+            on ec.exposure_class_code = db.ExposureClass and ec.dl_is_current_flag = 1
+
+        left join dim_exposure_group eg
+            on eg.exposure_group_code = db.ExposureGroup and eg.dl_is_current_flag = 1
+
+        left join dim_industry i
+            on i.industry_code = db.industry and i.dl_is_current_flag = 1
+
+        left join dim_product p
+            on p.product_code = db.productid and p.dl_is_current_flag = 1
+
+        left join dim_auto_vehicle_size av
+            on av.auto_vehicle_size_code = db.autovehiclesize and av.dl_is_current_flag = 1
+
+        left join dim_auto_secondary_class asc
+            on asc.auto_secondary_class_code = db.autosecondaryclass and asc.dl_is_current_flag = 1
+
+      UNION
+        select
+            cast(null as int) as fact_claims_transaction_monthly_snapshot_key
+            ,ho.startdate
+            ,ho.asofdate
+            ,ho.claimnum as claim_number
+            ,ho.lossdate as loss_date
+            ,ho.closeddate as closed_date
+            ,ho.reopeneddate as reopened_date
+            ,ho.receiveddate as received_date
+            ,ho.firstentereddate as first_entered_date
+            ,ho.policynumber as policy_number
+            ,ho.policyeffectivedate as policy_effective_date
+            ,ho.policyexpirationdate as policy_expiration_date
+            ,coalesce(cat.catastrophe_key, -1) as catastrophe_key
+            ,coalesce(lob.line_of_business_key, -1) as line_of_business_key
+            ,coalesce(car.carrier_key, -1) as carrier_key
+            ,coalesce(st.state_key, -1) as state_key
+            ,coalesce(mt.market_type_key, -1) as market_type_key
+            ,coalesce(ps.production_source_key, -1) as production_source_key
+            ,coalesce(a.agency_key, -1) as agency_key
+            ,coalesce(ccd.claim_cause_detail_key, -1) as claim_cause_detail_key
+            ,coalesce(asl.aslob_key, -1) as aslob_key
+            ,coalesce(rds.reserve_detailed_segment_key, -1) as reserve_detailed_segment_key
+            ,coalesce(ts.transmittal_segment_key, -1) as transmittal_segment_key
+            ,coalesce(ec.exposure_class_key, -1) as exposure_class_key
+            ,coalesce(eg.exposure_group_key, -1) as exposure_group_key
+            ,coalesce(i.industry_key, -1) as industry_key
+            ,coalesce(p.product_key, -1) as product_key
+            ,coalesce(av.auto_vehicle_size_key, -1) as auto_vehicle_size_key
+            ,coalesce(asc.auto_secondary_class_key, -1) as auto_secondary_class_key
+            ,current_timestamp() as snapshot_timestamp
+            ,ho.calyrmo_end as cal_yr_mo_end
+            ,cast(ho.wcclaimid as int) as wcclaimid
+            ,case when ho.handledbylegalind =1 then 'Y' else 'N' end as handled_by_legal_indicator
+            ,cast(ho.suitfiledind as boolean) as suit_filed_indicator
+            ,cast(ho.tpaind as boolean) as tpa_indicator
+            ,cast(ho.cwpfinalind as boolean) as cwp_final_indicator
+            ,cast(ho.catind as boolean) as cat_indicator
+            ,cast(ho.medonlyind as boolean) as medical_only_indicator
+            ,case when ho.massind =1 then 'Y' else 'N' end as mass_indicator
+            ,ho.cwpcount as cwp_count
+            ,ho.closedcount as closed_count
+            ,ho.reopenedcount as reopened_count
+            ,ho.pendingcount as pending_count
+            ,ho.reportedcount as reported_count
+            ,ho.dcconlycount as dcc_only_count
+            ,cast(ho.incrnetincurredloss as float) as claim_net_incurred_loss_amount
+            ,cast(ho.incrgrossincurredloss as float) as claim_gross_incurred_loss_amount
+            ,cast(ho.incrincurreddcc as float) as claim_incurred_dcc_amount
+            ,cast(ho.incrgrosspaidloss as float) as claim_gross_paid_loss_amount
+            ,cast(ho.incrpaidsalvage as float) as claim_paid_salvage_amount
+            ,cast(ho.incrpaidsubrogation as float) as claim_paid_subrogation_amount
+            ,cast(ho.incrpaiddcc as float) as claim_paid_dcc_amount
+            ,cast(ho.incrgrosspaidlossonclosed as float) as claim_gross_paid_loss_on_closed_amount
+            ,cast(ho.incrpaidsalvageonclosed as float) as claim_paid_salvage_on_closed_amount
+            ,cast(ho.incrpaidsubrogationonclosed as float) as claim_paid_subrogation_on_closed_amount
+            ,cast(ho.incrpaiddcconclosed as float) as claim_paid_dcc_on_closed_amount
+            ,cast(ho.incrnetincurredlossonopen as float) as claim_net_incurred_loss_on_open_amount
+            ,cast(ho.incrgrossincurredlossonopen as float) as claim_gross_incurred_loss_on_open_amount
+            ,cast(ho.incrincurreddcconopen as float) as claim_incurred_dcc_on_open_amount
+            ,cast(ho.caselossreserveonopen as float) as case_loss_reserve_on_open_amount
+            ,cast(ho.casedccreserveonopen as float) as case_dcc_reserve_on_open_amount
+            ,cast(ho.accyr as int) as accident_year
+            ,cast(ho.claimantid as int) as claimant_id 
+            ,cast(ho.exposureid as int) as exposure_id
+            ,cast(ho.maturity as int) as maturity
+            ,ho.newrenew as new_renew
+            ,ho.occnum as occurrence_number
+            ,cast(ho.timetoclose as int) as time_to_close
+            ,cast(ho.timetoreport as int) as time_to_report
+            ,ho.wc_ctflag as wc_ct_flag
+            ,cast(null as timestamp) as row_effective_date
+            ,cast(null as timestamp) as row_expiration_date
+            ,cast(null as boolean) as is_current_flag
+            ,case 
+                when ho.catind = 'Y' and cat.catastrophe_key  is not null then 1 
+                when ho.catind = 'N' and cat.catastrophe_key  is null then 1
+                else 0 
+            end as dq_claim_catastrophe_indicator_check
+            ,case 
+                when ho.casedccreserveonopen = (ho.incrincurreddcc + ho.incrpaiddcc) then 1
+                else 0
+            end as dq_claim_dcc_reserve_check
+            ,case 
+                when ho.caselossreserveonopen = (ho.incrgrossincurredloss + ho.incrgrosspaidloss) then 1
+                else 0
+            end as dq_claim_loss_reserve_check
+            ,case 
+                when ho.incrgrossincurredloss = (ho.incrnetincurredloss - ho.incrpaidsubrogation - ho.incrpaidsalvage) then 1
+                else 0
+            end as dq_claim_gross_incurred_loss_check
+            ,case 
+                when substring(ho.claimnum, 1, 10) = ho.policynumber then 1
+                else 0
+            end as dq_policy_number_check
+            ,case 
+              when (ho.closedcount + ho.pendingcount) = ho.reportedcount then 1
+              else 0
+            end as dq_reported_count_check
+          ,case 
+              when ho.firstentereddate <= ho.calyrmo_end then 1
+              else 0
+          end as dq_first_entered_date_check
+          ,case 
+              when ho.receiveddate <= ho.firstentereddate then 1
+              else 0
+          end as dq_received_date_check
+          ,case 
+              when ho.lossdate <= ho.firstentereddate then 1
+              else 0
+          end as dq_loss_date_check
+          ,case 
+            when datediff(day, ho.lossdate,  ho.receiveddate) = ho.timetoreport then 1
+            else 0
+        end as dq_time_to_report_check
+          ,case 
+             when datediff(day, ho.receiveddate, ho.closeddate)= ho.timetoclose then 1
+            else 0
+           end as dq_time_to_close_check
+          ,case 
+                when year(ho.lossdate) = ho.accyr then 1
+                else 0
+            end as dq_accident_year_check
+          
+        from curated_ho_claim_summary ho
+
+        left join dim_catastrophe cat 
+            on cat.catastrophe_code = ho.catcode and cat.dl_is_current_flag = 1
+
+        left join dim_line_of_business lob 
+            on lob.line_of_business_code = ho.lob and lob.dl_is_current_flag = 1
+
+        left join dim_carrier car 
+            on car.carrier_code = ho.carrier and car.dl_is_current_flag = 1
+
+        left join dim_state st 
+            on st.state_code = ho.state and st.dl_is_current_flag = 1
+
+        left join dim_market_type mt 
+            on mt.market_type_code = ho.markettype and mt.dl_is_current_flag = 1
+
+        left join dim_production_source ps 
+            on ps.production_source_code = ho.productionsrc and ps.dl_is_current_flag = 1
+
+        left join dim_agency a 
+            on a.agency_code = ho.agency and a.dl_is_current_flag = 1
+
+        left join dim_claim_cause_detail ccd 
+            on ccd.claim_cause_loss_description = ho.causeofloss 
+            and ccd.claim_cause_loss_detail_description = nvl(ho.lossdescrip, '') 
+            and ccd.aslob_code = ho.aslob 
+            and ccd.claim_cause_detail_lob = ho.lob
+            and ccd.dl_is_current_flag = 1
+
+        left join dim_aslob asl 
+            on asl.aslob_code = ho.aslob and asl.dl_is_current_flag = 1
+
+        left join dim_reserve_detailed_segment rds 
+            on rds.reserve_segment_code = ho.detailedresseg and rds.reserve_detailed_segment_code = ho.detailedresseg and rds.dl_is_current_flag = 1
+
+        left join dim_transmittal_segment ts 
+            on ts.transmittal_segment_code = ho.transmittalseg and rds.dl_is_current_flag = 1
+
+        left join dim_exposure_class ec
+            on ec.exposure_class_code = ho.ExposureClass and ec.dl_is_current_flag = 1
+
+        left join dim_exposure_group eg
+            on eg.exposure_group_code = ho.ExposureGroup and eg.dl_is_current_flag = 1
+
+        left join dim_industry i
+            on i.industry_code = ho.industry and i.dl_is_current_flag = 1
+
+        left join dim_product p
+            on p.product_code = ho.productid and p.dl_is_current_flag = 1
+
+        left join dim_auto_vehicle_size av
+            on av.auto_vehicle_size_code = ho.autovehiclesize and av.dl_is_current_flag = 1
+
+        left join dim_auto_secondary_class asc
+            on asc.auto_secondary_class_code = ho.autosecondaryclass and asc.dl_is_current_flag = 1
+
+      UNION
+        select
+            cast(null as int) as fact_claims_transaction_monthly_snapshot_key
+            ,wc.startdate
+            ,wc.asofdate
+            ,wc.claimnum as claim_number
+            ,wc.lossdate as loss_date
+            ,wc.closeddate as closed_date
+            ,wc.reopeneddate as reopened_date
+            ,wc.receiveddate as received_date
+            ,wc.firstentereddate as first_entered_date
+            ,wc.policynumber as policy_number
+            ,wc.policyeffectivedate as policy_effective_date
+            ,wc.policyexpirationdate as policy_expiration_date
+            ,coalesce(cat.catastrophe_key, -1) as catastrophe_key
+            ,coalesce(lob.line_of_business_key, -1) as line_of_business_key
+            ,coalesce(car.carrier_key, -1) as carrier_key
+            ,coalesce(st.state_key, -1) as state_key
+            ,coalesce(mt.market_type_key, -1) as market_type_key
+            ,coalesce(ps.production_source_key, -1) as production_source_key
+            ,coalesce(a.agency_key, -1) as agency_key
+            ,coalesce(ccd.claim_cause_detail_key, -1) as claim_cause_detail_key
+            ,coalesce(asl.aslob_key, -1) as aslob_key
+            ,coalesce(rds.reserve_detailed_segment_key, -1) as reserve_detailed_segment_key
+            ,coalesce(ts.transmittal_segment_key, -1) as transmittal_segment_key
+            ,coalesce(ec.exposure_class_key, -1) as exposure_class_key
+            ,coalesce(eg.exposure_group_key, -1) as exposure_group_key
+            ,coalesce(i.industry_key, -1) as industry_key
+            ,coalesce(p.product_key, -1) as product_key
+            ,coalesce(av.auto_vehicle_size_key, -1) as auto_vehicle_size_key
+            ,coalesce(asc.auto_secondary_class_key, -1) as auto_secondary_class_key
+            ,current_timestamp() as snapshot_timestamp
+            ,wc.calyrmo_end as cal_yr_mo_end
+            ,cast(wc.wcclaimid as int) as wcclaimid
+            ,case when wc.handledbylegalind =1 then 'Y' else 'N' end as handled_by_legal_indicator
+            ,cast(wc.suitfiledind as boolean) as suit_filed_indicator
+            ,cast(wc.tpaind as boolean) as tpa_indicator
+            ,cast(wc.cwpfinalind as boolean) as cwp_final_indicator
+            ,cast(wc.catind as boolean) as cat_indicator
+            ,cast(wc.medonlyind as boolean) as medical_only_indicator
+            ,case when wc.massind =1 then 'Y' else 'N' end as mass_indicator
+            ,wc.cwpcount as cwp_count
+            ,wc.closedcount as closed_count
+            ,wc.reopenedcount as reopened_count
+            ,wc.pendingcount as pending_count
+            ,wc.reportedcount as reported_count
+            ,wc.dcconlycount as dcc_only_count
+            ,cast(wc.incrnetincurredloss as float) as claim_net_incurred_loss_amount
+            ,cast(wc.incrgrossincurredloss as float) as claim_gross_incurred_loss_amount
+            ,cast(wc.incrincurreddcc as float) as claim_incurred_dcc_amount
+            ,cast(wc.incrgrosspaidloss as float) as claim_gross_paid_loss_amount
+            ,cast(wc.incrpaidsalvage as float) as claim_paid_salvage_amount
+            ,cast(wc.incrpaidsubrogation as float) as claim_paid_subrogation_amount
+            ,cast(wc.incrpaiddcc as float) as claim_paid_dcc_amount
+            ,cast(wc.incrgrosspaidlossonclosed as float) as claim_gross_paid_loss_on_closed_amount
+            ,cast(wc.incrpaidsalvageonclosed as float) as claim_paid_salvage_on_closed_amount
+            ,cast(wc.incrpaidsubrogationonclosed as float) as claim_paid_subrogation_on_closed_amount
+            ,cast(wc.incrpaiddcconclosed as float) as claim_paid_dcc_on_closed_amount
+            ,cast(wc.incrnetincurredlossonopen as float) as claim_net_incurred_loss_on_open_amount
+            ,cast(wc.incrgrossincurredlossonopen as float) as claim_gross_incurred_loss_on_open_amount
+            ,cast(wc.incrincurreddcconopen as float) as claim_incurred_dcc_on_open_amount
+            ,cast(wc.caselossreserveonopen as float) as case_loss_reserve_on_open_amount
+            ,cast(wc.casedccreserveonopen as float) as case_dcc_reserve_on_open_amount
+            ,cast(wc.accyr as int) as accident_year
+            ,cast(wc.claimantid as int) as claimant_id 
+            ,cast(wc.exposureid as int) as exposure_id
+            ,cast(wc.maturity as int) as maturity
+            ,wc.newrenew as new_renew
+            ,wc.occnum as occurrence_number
+            ,cast(wc.timetoclose as int) as time_to_close
+            ,cast(wc.timetoreport as int) as time_to_report
+            ,wc.wc_ctflag as wc_ct_flag
+            ,cast(null as timestamp) as row_effective_date
+            ,cast(null as timestamp) as row_expiration_date
+            ,cast(null as boolean) as is_current_flag
+            ,case 
+                when wc.catind = 'Y' and cat.catastrophe_key  is not null then 1 
+                when wc.catind = 'N' and cat.catastrophe_key  is null then 1
+                else 0 
+            end as dq_claim_catastrophe_indicator_check
+            ,case 
+                when wc.casedccreserveonopen = (wc.incrincurreddcc + wc.incrpaiddcc) then 1
+                else 0
+            end as dq_claim_dcc_reserve_check
+            ,case 
+                when wc.caselossreserveonopen = (wc.incrgrossincurredloss + wc.incrgrosspaidloss) then 1
+                else 0
+            end as dq_claim_loss_reserve_check
+            ,case 
+                when wc.incrgrossincurredloss = (wc.incrnetincurredloss - wc.incrpaidsubrogation - wc.incrpaidsalvage) then 1
+                else 0
+            end as dq_claim_gross_incurred_loss_check
+            ,case 
+                when substring(wc.claimnum, 1, 10) = wc.policynumber then 1
+                else 0
+            end as dq_policy_number_check
+            ,case 
+              when (wc.closedcount + wc.pendingcount) = wc.reportedcount then 1
+              else 0
+            end as dq_reported_count_check
+          ,case 
+              when wc.firstentereddate <= wc.calyrmo_end then 1
+              else 0
+          end as dq_first_entered_date_check
+          ,case 
+              when wc.receiveddate <= wc.firstentereddate then 1
+              else 0
+          end as dq_received_date_check
+          ,case 
+              when wc.lossdate <= wc.firstentereddate then 1
+              else 0
+          end as dq_loss_date_check
+          ,case 
+            when datediff(day, wc.lossdate,  wc.receiveddate) = wc.timetoreport then 1
+            else 0
+        end as dq_time_to_report_check
+           ,case 
+            when datediff(day, wc.receiveddate, wc.closeddate)= wc.timetoclose then 1
+            else 0
+        end as dq_time_to_close_check,
+        case 
+            when year(wc.lossdate) = wc.accyr then 1
+            else 0
+        end as dq_accident_year_check
+        
+        from curated_wc_claim_summary wc
+
+        left join dim_catastrophe cat 
+            on cat.catastrophe_code = wc.catcode and cat.dl_is_current_flag = 1
+
+        left join dim_line_of_business lob 
+            on lob.line_of_business_code = wc.lob and lob.dl_is_current_flag = 1
+
+        left join dim_carrier car 
+            on car.carrier_code = wc.carrier and car.dl_is_current_flag = 1
+
+        left join dim_state st 
+            on st.state_code = wc.state and st.dl_is_current_flag = 1
+
+        left join dim_market_type mt 
+            on mt.market_type_code = wc.markettype and mt.dl_is_current_flag = 1
+
+        left join dim_production_source ps 
+            on ps.production_source_code = wc.productionsrc and ps.dl_is_current_flag = 1
+
+        left join dim_agency a 
+            on a.agency_code = wc.agency and a.dl_is_current_flag = 1
+
+        left join dim_claim_cause_detail ccd 
+            on ccd.claim_cause_loss_description = wc.causeofloss 
+            and ccd.claim_cause_loss_detail_description = nvl(wc.lossdescrip, '') 
+            and ccd.aslob_code = wc.aslob 
+            and ccd.claim_cause_detail_lob = wc.lob
+            and ccd.dl_is_current_flag = 1
+
+        left join dim_aslob asl 
+            on asl.aslob_code = wc.aslob and asl.dl_is_current_flag = 1
+
+        left join dim_reserve_detailed_segment rds 
+            on rds.reserve_segment_code = wc.detailedresseg and rds.reserve_detailed_segment_code = wc.detailedresseg and rds.dl_is_current_flag = 1
+
+        left join dim_transmittal_segment ts 
+            on ts.transmittal_segment_code = wc.transmittalseg and rds.dl_is_current_flag = 1
+
+        left join dim_exposure_class ec
+            on ec.exposure_class_code = wc.ExposureClass and ec.dl_is_current_flag = 1
+
+        left join dim_exposure_group eg
+            on eg.exposure_group_code = wc.ExposureGroup and eg.dl_is_current_flag = 1
+
+        left join dim_industry i
+            on i.industry_code = wc.industry and i.dl_is_current_flag = 1
+
+        left join dim_product p
+            on p.product_code = wc.productid and p.dl_is_current_flag = 1
+
+        left join dim_auto_vehicle_size av
+            on av.auto_vehicle_size_code = wc.autovehiclesize and av.dl_is_current_flag = 1
+
+        left join dim_auto_secondary_class asc
+            on asc.auto_secondary_class_code = wc.autosecondaryclass and asc.dl_is_current_flag = 1
+      )
+      select 
+        distinct *
+      from cte_all_lobs

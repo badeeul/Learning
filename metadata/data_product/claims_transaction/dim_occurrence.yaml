@@ -1,0 +1,196 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_occurrence
+  load_strategy: type_two
+  key_columns:
+    - occur_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: occur_key
+
+source:
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: wcclaim
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: insured
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claimant
+
+  - name: cl_occurrence
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: cl_occurrence
+
+  - name: catcode
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: catcode
+
+  - name: wclocnam
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: wclocnam
+
+  - name: counties
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: counties
+
+query:
+  - name: wclocnam_df
+    sql: |
+      SELECT 
+          *
+      FROM wclocnam 
+      WHERE dl_iscurrent = 1
+      
+  - name: lat_long_df
+    sql: |
+      SELECT 
+          wl.latitude,
+          wl.longitude,
+          wl.code,
+          wl.state,
+          wl.loctypenum
+      FROM wclocnam wl
+      INNER JOIN cl_occurrence o 
+          ON wl.code = o.code 
+          AND wl.state = o.locationoflossstate AND o.dl_iscurrent = 1
+      WHERE wl.latitude IS NOT NULL
+      AND wl.dl_iscurrent = 1
+      ORDER BY wl.locnum
+      Limit 1
+
+  - name: get_first_county
+    sql: |
+      SELECT *
+      FROM (
+        SELECT 
+          ROW_NUMBER() OVER (PARTITION BY state, city ORDER BY state, city) AS rn1,
+          name,
+          city,
+          state,
+          zipcode
+        FROM counties
+        WHERE dl_iscurrent = 1
+      ) t
+      WHERE rn1 = 1
+
+  - name: dim_occurrence
+    sql: |
+      WITH cte AS (
+        SELECT 
+          CASE 
+            WHEN UPPER(TRIM(w.lob)) IN ('WC') AND cc.code IS NOT NULL 
+            THEN concat(w.code, '-', cc.catcode)
+            ELSE concat(w.code, '-',cast(w.occid as string))
+          END AS occid,
+          CASE 
+            WHEN UPPER(TRIM(w.lob)) IN ('WC') AND cc.code IS NOT NULL 
+            THEN cc.catcode
+            ELSE o.occurrencenumber
+          END AS occurencenumber,
+          w.lob,
+          CASE 
+            WHEN UPPER(TRIM(i.lob)) IN ('BP','CA','HO') THEN w.code
+            ELSE c.code
+          END AS policycode,
+          o.locationoflosslocnum AS occur_loc_num,
+          CASE 
+            WHEN UPPER(TRIM(i.lob)) = 'WC' THEN RIGHT(w.payclass, 2)
+            WHEN UPPER(TRIM(i.lob)) = 'DB' THEN 'NY'
+            WHEN o.locationoflosslocnum = '' THEN o.locationoflossstate
+            ELSE wl_state.state
+          END AS occur_loc_state,
+          CASE 
+            WHEN UPPER(TRIM(i.lob)) NOT IN ('WC','DB') AND o.locationoflosslocnum = '' 
+            THEN o.locationoflosscity
+            ELSE wl_city.city
+          END AS occur_loc_city,
+          o.LocationOfLossZipCode AS occur_loc_zip,
+          CASE 
+            WHEN UPPER(TRIM(i.lob)) IN ('BP','HO','CA','MS') AND o.locationoflosslocnum <> '' 
+            THEN wl_lat.latitude
+            WHEN UPPER(TRIM(i.lob)) IN ('BP','HO','CA','MS') AND o.locationoflosslocnum = '' 
+            THEN wl_lat_default.latitude
+            WHEN UPPER(TRIM(i.lob)) IN ('DB','WC') THEN wl_lat_wc.latitude
+            ELSE NULL
+          END AS occur_loc_lat,
+          CASE 
+            WHEN UPPER(TRIM(i.lob)) IN ('BP','HO','CA','MS') AND o.locationoflosslocnum <> '' 
+            THEN wl_long.longitude
+            WHEN UPPER(TRIM(i.lob)) IN ('BP','HO','CA','MS') AND o.locationoflosslocnum = '' 
+            THEN wl_long_default.longitude
+            WHEN UPPER(TRIM(i.lob)) IN ('DB','WC') THEN wl_long_wc.longitude
+            ELSE NULL
+          END AS occur_loc_long
+        FROM wcclaim w
+        INNER JOIN insured i ON UPPER(TRIM(w.code)) = UPPER(TRIM(i.code))
+          AND i.dl_iscurrent = 1
+        INNER JOIN claimant c ON UPPER(TRIM(c.wcclaimid)) = UPPER(TRIM(w.wcclaimid))
+          AND c.dl_iscurrent = 1
+        LEFT JOIN cl_occurrence o ON UPPER(TRIM(w.occid)) = UPPER(TRIM(o.occid))
+          AND o.dl_iscurrent = 1
+        LEFT JOIN catcode cc ON UPPER(TRIM(cc.code)) = UPPER(TRIM(w.code)) AND UPPER(TRIM(w.claim)) = UPPER(TRIM(cc.claim))
+          AND cc.dl_iscurrent = 1
+        LEFT JOIN wclocnam_df wl_state ON UPPER(TRIM(wl_state.code)) = UPPER(TRIM(o.code)) 
+          AND UPPER(TRIM(wl_state.loctypenum)) = UPPER(TRIM(o.locationoflosslocnum))
+        LEFT JOIN wclocnam_df wl_city ON UPPER(TRIM(wl_city.code)) = UPPER(TRIM(o.code)) 
+          AND UPPER(TRIM(wl_city.loctypenum)) = UPPER(TRIM(o.locationoflosslocnum))
+        LEFT JOIN wclocnam_df wl_lat ON UPPER(TRIM(wl_lat.code)) = UPPER(TRIM(o.code)) 
+          AND UPPER(TRIM(wl_lat.loctypenum)) = UPPER(TRIM(o.locationoflosslocnum))
+        LEFT JOIN lat_long_df wl_lat_default ON UPPER(TRIM(wl_lat_default.code)) = UPPER(TRIM(o.code)) 
+          AND UPPER(TRIM(wl_lat_default.state)) = UPPER(TRIM(o.locationoflossstate))
+          AND wl_lat_default.latitude IS NOT NULL
+        LEFT JOIN wclocnam_df wl_lat_wc ON UPPER(TRIM(wl_lat_wc.code)) = UPPER(TRIM(w.code)) 
+          AND UPPER(TRIM(wl_lat_wc.loctypenum)) = UPPER(TRIM(w.acclocnum))
+        LEFT JOIN wclocnam_df wl_long ON UPPER(TRIM(wl_long.code)) = UPPER(TRIM(o.code)) 
+          AND UPPER(TRIM(wl_long.loctypenum)) = UPPER(TRIM(o.locationoflosslocnum))
+        LEFT JOIN lat_long_df wl_long_default ON UPPER(TRIM(wl_long_default.code)) = UPPER(TRIM(o.code))
+          AND UPPER(TRIM(wl_long_default.state)) = UPPER(TRIM(o.locationoflossstate))
+          AND wl_long_default.latitude IS NOT NULL
+        LEFT JOIN wclocnam_df wl_long_wc ON UPPER(TRIM(wl_long_wc.code)) = UPPER(TRIM(w.code)) 
+          AND UPPER(TRIM(wl_long_wc.loctypenum)) = UPPER(TRIM(w.acclocnum))
+        WHERE UPPER(TRIM(i.lob)) IN ('WC','DB','BP','CA','HO','MS')
+          AND UPPER(TRIM(i.markettype)) IN ('V','C','E')
+          AND UPPER(TRIM(c.voidortransfer)) IS NULL
+          AND w.dl_iscurrent = 1
+      ),
+      cte1 AS (
+        SELECT 
+         DISTINCT cte.*,
+          counties.name AS county,
+          ROW_NUMBER() OVER (
+            PARTITION BY policycode, occurencenumber 
+            ORDER BY occid
+          ) AS rn
+        FROM cte
+        LEFT JOIN get_first_county AS counties ON counties.state = cte.occur_loc_state 
+          AND counties.city = cte.occur_loc_city AND counties.zipcode = left(cte.occur_loc_zip,5)
+        WHERE occid IS NOT NULL
+          AND occurencenumber <> '**'
+      )
+      SELECT 
+        occid AS occur_bus_key,
+        occurencenumber AS occur_num,
+        occur_loc_num,
+        occur_loc_city,
+        occur_loc_zip,
+        county AS occur_loc_county,
+        occur_loc_lat,
+        occur_loc_long,
+        occur_loc_state
+      FROM cte1
+      WHERE rn = 1
+
+    description: "This query creates a dimension table for occurrences using joins instead of subqueries, combining data from multiple source tables to provide location information (city, county, state, coordinates) and occurrence identifiers for different lines of business (WC, DB, BP, CA, HO, MS)."
+    

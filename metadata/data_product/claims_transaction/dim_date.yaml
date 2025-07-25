@@ -1,0 +1,37 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_date
+  load_strategy: type_two
+  key_columns:
+    - date_key
+  unknown_record: True
+  identity: False
+
+query:
+  - name: quarantine
+    sql: with init as 
+        (
+            SELECT sequence(to_date('1983-01-01'), to_date(cast(year(now()) as varchar(4))||'-12-31'), interval 1 day) as date
+        )
+        ,exploded_date as
+        (
+            select 
+            explode(date) as `date`
+            from init
+        )
+
+        select 
+            cast(date_format(date, 'yyyyMMdd') as int) as date_key,
+            date,
+            year(date) year,
+            month(date) month,
+            day(date) day,
+            weekOfYear(date) week,
+            date_format(date, 'E') week_day,
+            date_format(date, 'MMMM') long_month,
+            date_format(date, 'MMM') short_month,
+            date_format(date, 'q') quarter,
+            date_format(date, 'yyyy-MMM') year_month_name,
+            date_format(date, 'yyyyMM') year_month_order
+        from exploded_date

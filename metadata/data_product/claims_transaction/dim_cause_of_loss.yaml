@@ -1,0 +1,126 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_cause_of_loss
+  load_strategy: type_two
+  key_columns:
+    - cause_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: cause_key
+
+source:
+  - name: claims_causeofloss
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_causeofloss
+
+  - name: claims_lossdetail
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_lossdetail
+
+  - name: claims_causedetail
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_causedetail
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: wcclaim
+
+  - name: accident
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: accident
+    
+  - name: injury
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: injury
+
+query:
+  - name: dim_cause_of_loss
+    sql: |
+      with 
+        cte1 as(
+            SELECT DISTINCT causeoflossid, lossdetailid, lossdetaildesc
+            FROM claims_lossdetail 
+            where dl_iscurrent = 1 
+          ),
+        cte2 as(
+            SELECT DISTINCT lossdetailid  
+            FROM claims_causedetail 
+            where dl_iscurrent = 1 
+          ),
+        cte3 as(
+              SELECT 
+                ccl.causeoflossdesc AS cause_desc, 
+                'NA' AS loss_detail,
+                'NA' AS cause_detail,
+                CONCAT('CAUSE-', NVL(CAST(ccl.causeoflossid AS STRING), 'NA'), '-', '0', '-', '0') AS cause_bus_key
+              FROM claims_causeofloss ccl
+              INNER join cte1 cld on ccl.causeoflossid = cld.causeoflossid
+              WHERE ccl.dl_iscurrent = 1 
+          ),
+          cte4 as(
+              SELECT 
+                ccl.causeoflossdesc AS cause_desc, 
+                NVL(cld.lossdetaildesc,'NA') AS loss_detail,
+                'NA' AS cause_detail,
+                CONCAT('CAUSE-', NVL(CAST(ccl.causeoflossid AS STRING), 'NA'), '-', 
+                        NVL(CAST(cld.lossdetailid AS STRING), '0'), '-', '0') AS cause_bus_key
+              FROM claims_causeofloss ccl
+              INNER join cte1 cld on ccl.causeoflossid = cld.causeoflossid
+              INNER join cte2 ccd on cld.lossdetailid = ccd.lossdetailid
+              WHERE ccl.dl_iscurrent = 1 
+          )
+
+      SELECT DISTINCT
+        ccl.causeoflossdesc AS cause_desc, 
+        NVL(cld.lossdetaildesc,'NA') AS loss_detail,
+        NVL(ccd.causedetaildesc, 'NA') AS cause_detail,
+        CONCAT('CAUSE-', NVL(CAST(ccl.causeoflossid AS STRING), 'NA'), '-', 
+                  NVL(CAST(cld.lossdetailid AS STRING), '0'), '-', 
+                  NVL(CAST(ccd.causedetailid AS STRING), '0')) AS cause_bus_key
+      FROM claims_causeofloss ccl
+      LEFT JOIN claims_lossdetail cld ON ccl.causeoflossid = cld.causeoflossid AND cld.dl_iscurrent = 1
+      LEFT JOIN claims_causedetail ccd ON ccd.lossdetailid = cld.lossdetailid AND ccd.dl_iscurrent = 1
+      WHERE ccl.dl_iscurrent = 1
+      
+      UNION 
+
+      SELECT DISTINCT
+         cause_desc,
+         loss_detail,
+         cause_detail,
+         cause_bus_key
+      FROM cte3
+
+      UNION 
+
+      SELECT DISTINCT
+         cause_desc,
+         loss_detail,
+         cause_detail,
+         cause_bus_key
+      FROM cte4
+
+      UNION
+      
+      SELECT DISTINCT 
+        NVL(a.accdesc, 'NA') AS cause_desc,
+        NVL(i.injdesc, 'NA') AS loss_detail,
+        'NA' AS cause_detail,
+        CONCAT('ACC-INJ-', NVL(CAST(a.accident AS STRING), '00'), '-', 
+                  NVL(CAST(i.injury AS STRING), '00')
+              ) AS cause_bus_key
+      FROM wcclaim w
+      LEFT JOIN accident a ON UPPER(TRIM(w.accident)) = UPPER(TRIM(a.accident)) AND a.dl_iscurrent = 1
+      LEFT JOIN injury i ON UPPER(TRIM(w.injury)) = UPPER(TRIM(i.injury))  AND i.dl_iscurrent = 1
+      WHERE UPPER(TRIM(w.lob)) = 'WC'
+      AND w.dl_iscurrent = 1
+
+    description: "This query creates a dimension table for cause of loss, combining data from multiple source tables to provide standardized cause of loss information across different lines of business (BP, HO, WC). It unifies two different data models (property and workers comp) into a single dimension with a consistent business key structure."
+    

@@ -1,0 +1,30 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_claim_status
+  load_strategy: type_two
+  key_columns:
+    - claim_status_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: claim_status_key
+
+source:
+  - name: lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+query:
+  - name: dim_claim_status
+    sql: |
+      SELECT  DISTINCT
+        vals AS claim_status_cd_bus_key,
+        keyorder AS claim_status_sort_order,
+        descrip AS claim_status_desc
+      FROM lookups 
+      WHERE UPPER(TRIM(keyfield)) IN ('STATUS', 'ADJUSTORSTATUS')
+      AND UPPER(TRIM(programid)) = 'NIS_WCCLAIM'
+      AND dl_iscurrent = 1
+
+    description: "This query creates a dimension table for claim statuses by combining status codes from both AdjustorStatus and ClaimStatus lookup values in the lookups table. It provides a unified view of all possible claim statuses with their descriptions and sort order."

@@ -1,0 +1,32 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_carrier
+  load_strategy: type_two
+  key_columns:
+    - carrier_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: carrier_key
+
+source:
+  - name: curated_lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+query:
+  - name: dim_carrier
+    sql: |
+      SELECT DISTINCT
+        vals AS carrier_cd_bus_key,
+        descrip AS carrier_nm,
+        CASE 
+          WHEN descrip = 'AzGUARD' THEN 'Non-admitted'
+          ELSE 'Admitted'
+        END AS carrier_type
+      FROM curated_lookups
+      WHERE UPPER(TRIM(keyfield)) = 'CARRIER'
+      AND TRIM(programid) = '*'
+      AND dl_iscurrent = 1
+    description: "Selects carrier code, name, and type from the curated_lookups source table."

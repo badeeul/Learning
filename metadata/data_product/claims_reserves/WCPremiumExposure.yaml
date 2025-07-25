@@ -1,0 +1,318 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: WCPremiumExposureSummary
+  load_strategy: overwrite
+  key_columns:
+    - policynumber
+    - calyrmo_end
+  unknown_record: False
+  identity: False
+
+source:
+  - name: mgtrans
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: mgtrans
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: transaction_wcpayrol
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: transaction_wcpayrol
+
+  - name: wcresseg
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: accounting
+    table: wc_resseg
+
+query:
+  - name: DateSequence_DF
+    sql: |
+      WITH date_seq AS (
+        SELECT sequence(
+          to_date('2025-01-01'),
+          to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')),
+          interval 1 month
+        ) as dates
+      )
+      SELECT 
+        explode(dates) as calc_date,
+        last_day(calc_date) as month_end_date
+      FROM date_seq
+
+  - name: BaseTransactions_DF
+    sql: |
+      SELECT 
+        m.code,
+        m.transno,
+        m.trancnt,
+        m.state,
+        m.transdate,
+        i.poaudit,
+        CASE WHEN (m.transdate > i.poaudit AND i.poaudit IS NOT NULL) THEN m.transdate ELSE i.poaudit END as etestdate,
+        m.effdate,
+        datediff(day, m.effdate, i.poexpir) as f_effdate,
+        m.writtenon,
+        m.amount,
+        cast(0.00 as float) as payrollamount,
+        m.carrier,
+        i.agency,
+        m.typepol as lob,
+        '160' as aslob,
+        to_timestamp('2012-01-01 00:00:00', 'yyyy-MM-dd HH:mm:ss') as LowDate,
+        to_timestamp('01/01/2012 0:00:00', 'M/d/yyyy H:m:s') as startdate,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate,
+        last_day(to_date(i.pobegin)) as polyrmo_end,
+        i.poexpir,
+        i.trcancel,
+        i.stat5,
+        i.typcancel,
+        i.pocancel,
+        i.productionsrc,
+        i.markettype
+      FROM mgtrans m
+      INNER JOIN insured i ON i.code = m.code AND i.dl_iscurrent = 1
+      WHERE 
+        i.lob = 'WC'
+        AND COALESCE(m.skiprep, '') NOT IN ('E', 'B')
+        AND (m.transdate <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) 
+             AND m.effdate <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))) 
+          OR (COALESCE(i.typcancel,'') = 'F' 
+            AND i.stat5 = 'C' 
+            AND i.trcancel <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+            AND i.pocancel <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+            AND m.transdate <= i.trcancel)
+        AND i.stat2 = 'i'
+        AND m.dl_iscurrent = 1
+
+  - name: PayrollCalculations_DF
+    sql: |
+      WITH payroll_cte AS (
+        SELECT 
+          code,
+          state,
+          trancnt,
+          SUM(CASE WHEN after = 1 THEN exposure ELSE 0 END) -
+          SUM(CASE WHEN before = 1 THEN exposure ELSE 0 END) as calculated_payroll
+        FROM transaction_wcpayrol
+        WHERE 
+          trancnt <> 0
+          AND primeseq = '1'
+          AND seqcode = '000'
+          AND dl_iscurrent = 1
+        GROUP BY code, state, trancnt
+      )
+      SELECT 
+        t.code,
+        t.transno,
+        t.trancnt,
+        t.state,
+        t.transdate,
+        t.poaudit,
+        t.etestdate,
+        t.effdate,
+        t.f_effdate,
+        t.writtenon,
+        t.amount,
+        COALESCE(p.calculated_payroll, 0) as payrollamount,
+        t.carrier,
+        t.agency,
+        t.lob,
+        t.aslob,
+        t.LowDate,
+        t.startdate,
+        t.asofdate,
+        t.polyrmo_end,
+        t.poexpir,
+        t.trcancel,
+        t.stat5,
+        t.typcancel,
+        t.pocancel,
+        t.productionsrc,
+        t.markettype
+      FROM BaseTransactions_DF t
+      LEFT JOIN payroll_cte p ON t.code = p.code AND t.trancnt = p.trancnt AND t.state = p.state
+
+  - name: XUnearned_DF
+    sql: |
+      SELECT
+        b.*,
+        d.calc_date,
+        d.month_end_date,
+        to_timestamp(d.calc_date) as LowDate,
+        to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59') as calyrmo_end,
+        CASE 
+          WHEN (
+            ((b.transdate <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')) AND (b.effdate <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')))
+            OR (COALESCE(b.typcancel,'') = 'F' AND b.stat5 = 'C' 
+                AND b.trcancel <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')
+                AND b.pocancel <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')
+                AND b.transdate <= b.trcancel)
+          )
+          AND NOT (
+            (b.etestdate IS NOT NULL) 
+            AND (CASE WHEN b.effdate > b.etestdate THEN b.effdate ELSE b.etestdate END) < to_timestamp(d.calc_date)
+          )
+          AND NOT (
+            (b.trcancel < to_timestamp(d.calc_date)) AND (COALESCE(b.typcancel,'') = 'F') AND (b.stat5 = 'C')
+          )
+          THEN
+            CASE 
+              WHEN ((b.transdate >= to_timestamp(d.calc_date)) OR (b.effdate >= to_timestamp(d.calc_date)))
+                THEN b.amount
+              WHEN (b.poexpir > to_timestamp(d.calc_date))
+                THEN b.amount * (datediff(day, to_timestamp(d.calc_date), b.poexpir) / b.f_effdate)
+              ELSE 0.0
+            END
+          ELSE 0.0
+        END as xunearned,
+        CASE 
+          WHEN (
+            ((b.transdate <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')) AND (b.effdate <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')))
+            OR (COALESCE(b.typcancel,'') = 'F' AND b.stat5 = 'C' 
+                AND b.trcancel <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')
+                AND b.pocancel <= to_timestamp(d.month_end_date, 'yyyy-MM-dd 23:59:59')
+                AND b.transdate <= b.trcancel)
+          )
+          AND NOT (
+            (b.etestdate IS NOT NULL) 
+            AND (CASE WHEN b.effdate > b.etestdate THEN b.effdate ELSE b.etestdate END) < to_timestamp(d.calc_date)
+          )
+          AND NOT (
+            (b.trcancel < to_timestamp(d.calc_date)) AND (COALESCE(b.typcancel,'') = 'F') AND (b.stat5 = 'C')
+          )
+          THEN
+            CASE 
+              WHEN ((b.transdate >= to_timestamp(d.calc_date)) OR (b.effdate >= to_timestamp(d.calc_date)))
+                THEN b.payrollamount
+              WHEN (b.poexpir > to_timestamp(d.calc_date))
+                THEN b.payrollamount * (datediff(day, to_timestamp(d.calc_date), b.poexpir) / b.f_effdate)
+              ELSE 0.0
+            END
+          ELSE 0.0
+        END as payrollxunearned
+      FROM BaseTransactions_DF b
+      CROSS JOIN DateSequence_DF d
+
+  - name: Unearned_DF
+    sql: |
+      SELECT
+        x.*,
+        CASE WHEN (
+            ((x.transdate <= x.calyrmo_end) AND (x.effdate <= x.calyrmo_end))
+            OR (COALESCE(x.typcancel,'') = 'F' AND x.stat5 = 'C' 
+                AND x.trcancel <= x.calyrmo_end
+                AND x.pocancel <= x.calyrmo_end
+                AND x.transdate <= x.trcancel)
+          )
+          AND (x.poexpir > x.calyrmo_end)
+          AND (NOT ((x.etestdate IS NOT NULL) AND (x.etestdate <= x.calyrmo_end)))
+          AND (NOT ((x.trcancel <= x.calyrmo_end) AND (COALESCE(x.typcancel,'') = 'F') AND (x.stat5 = 'C')))
+          THEN x.amount * ((datediff(day, x.calyrmo_end, x.poexpir) - 1) / x.f_effdate)
+          ELSE 0.0
+        END as unearned,
+        CASE WHEN (
+            ((x.transdate <= x.calyrmo_end) AND (x.effdate <= x.calyrmo_end))
+            OR (COALESCE(x.typcancel,'') = 'F' AND x.stat5 = 'C' 
+                AND x.trcancel <= x.calyrmo_end
+                AND x.pocancel <= x.calyrmo_end
+                AND x.transdate <= x.trcancel)
+          )
+          AND (x.poexpir > x.calyrmo_end)
+          AND (NOT ((x.etestdate IS NOT NULL) AND (x.etestdate <= x.calyrmo_end)))
+          AND (NOT ((x.trcancel <= x.calyrmo_end) AND (COALESCE(x.typcancel,'') = 'F') AND (x.stat5 = 'C')))
+          THEN x.payrollamount * ((datediff(day, x.calyrmo_end, x.poexpir) - 1) / x.f_effdate)
+          ELSE 0.0
+        END as payrollunearned
+      FROM XUnearned_DF x
+
+  - name: Earned_DF
+    sql: |
+      SELECT
+        u.*,
+        CASE WHEN (
+            ((u.transdate <= u.calyrmo_end) AND (u.effdate <= u.calyrmo_end))
+            OR (COALESCE(u.typcancel,'') = 'F' AND u.stat5 = 'C' 
+                AND u.trcancel <= u.calyrmo_end
+                AND u.pocancel <= u.calyrmo_end
+                AND u.transdate <= u.trcancel)
+          )
+          THEN (ROUND(u.xunearned, 2) - ROUND(u.unearned, 2))
+          WHEN (COALESCE(u.typcancel,'') = 'F' AND u.stat5 = 'C' 
+                AND u.transdate > u.trcancel 
+                AND u.effdate = u.transdate 
+                AND u.transdate BETWEEN u.calc_date AND u.calyrmo_end)
+          THEN u.amount
+          ELSE 0.0
+        END as earnedPrem,
+        CASE WHEN (
+            ((u.transdate <= u.calyrmo_end) AND (u.effdate <= u.calyrmo_end))
+            OR (COALESCE(u.typcancel,'') = 'F' AND u.stat5 = 'C' 
+                AND u.trcancel <= u.calyrmo_end
+                AND u.pocancel <= u.calyrmo_end
+                AND u.transdate <= u.trcancel)
+          )
+          THEN (ROUND(u.payrollxunearned, 2) - ROUND(u.payrollunearned, 2))
+          WHEN (COALESCE(u.typcancel,'') = 'F' AND u.stat5 = 'C' 
+                AND u.transdate > u.trcancel 
+                AND u.effdate = u.transdate 
+                AND u.transdate BETWEEN u.calc_date AND u.calyrmo_end)
+          THEN u.payrollamount
+          ELSE 0.0
+        END as payrollearned,
+        CASE WHEN u.writtenon BETWEEN u.calc_date AND u.calyrmo_end
+          THEN u.amount
+          ELSE 0.0
+        END as writtenPrem,
+        CASE WHEN u.writtenon BETWEEN u.calc_date AND u.calyrmo_end
+          THEN u.payrollamount
+          ELSE 0.0
+        END as payrollwritten
+      FROM Unearned_DF u
+
+  - name: MonthlyCalculations_DF
+    sql: |
+      SELECT
+        *
+      FROM Earned_DF 
+
+  - name: FinalPremiumSummary_DF
+    sql: |
+      SELECT DISTINCT
+        m.code as policynumber,
+        0 as exposureid,
+        cast(NULL as string) as commonname,
+        m.state,
+        m.carrier,
+        m.agency,
+        m.lob,
+        m.aslob,
+        m.polyrmo_end,
+        m.calyrmo_end,
+        SUM(m.earnedPrem) as earnedpremium,
+        SUM(m.writtenPrem) as writtenpremium,
+        cast(SUM(m.payrollearned) as float) as earnedexposure,
+        cast(SUM(m.payrollwritten) as float) as writtenexposure,
+        cast(1.0 as float) as exposurerollup,
+        a.resseg,
+        m.startdate,
+        m.asofdate
+      FROM MonthlyCalculations_DF m
+      left join wcresseg a 
+        on m.lob=a.lob 
+        and m.markettype=a.markettype 
+        and m.productionsrc=a.productionsrc 
+        and (case when m.markettype not in ('V', 'C') then 'ALL' 
+                when m.productionsrc='E' then 'ALL'
+                when m.state='CA' then 'CA'
+                else 'xCA'
+              end)=a.state
+      WHERE (m.earnedPrem <> 0 OR m.writtenPrem <> 0 OR m.payrollearned <> 0 OR m.payrollwritten <> 0)
+      GROUP BY
+        m.code, m.state, m.carrier, m.agency, m.polyrmo_end, m.calyrmo_end,
+        m.lob, m.aslob, a.resseg, m.startdate, m.asofdate

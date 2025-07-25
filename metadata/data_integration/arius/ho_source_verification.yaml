@@ -1,0 +1,46 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: arius
+  table: ho_source_verification
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: ho_losses_stg
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: stage
+    table: ca_losses_stg
+
+  - name: ho_reserves_stg
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: stage
+    table: ho_reserves_stg
+
+
+query:
+  - name: ca_source_verification
+    sql: |
+      select 	
+        r.carrier,
+        r.aslob_code,
+        r.dolyear,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate,
+        r.medical - nvl(l.medical, 0) as medicalOS,
+        r.loss - nvl(l.loss, 0) as indemnityOS,
+        r.medical - nvl(l.medical, 0) + r.loss - nvl(l.loss, 0) as LossOS,
+        r.expense - nvl(l.expense, 0) as expenseOS,
+        r.total - nvl(l.total, 0) as totalOS,
+        nvl(l.medical, 0.0) as medicalPaid,
+        nvl(l.loss,	0.0) as indemnityPaid,		
+        nvl(l.medical + l.loss, 0.0) as LossPaid,
+        nvl(l.expense,	0.0) as expensePaid,		
+        nvl(l.total, 0.0) as totalPaid,
+        nvl(r.medical, 0.0) as medicalIncurred,
+        nvl(r.loss, 0.0) as indemnityIncurred,
+        nvl(r.expense, 0.0) as expenseIncurred,
+        nvl(r.total, 0.0) as TotIncurred
+      from  ho_reserves_stg r	
+      left outer join ho_losses_stg l 
+        on l.carrier = r.carrier and l.aslob_code = r.aslob_code and l.dolyear = r.dolyear	

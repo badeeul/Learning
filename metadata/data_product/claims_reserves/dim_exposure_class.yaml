@@ -1,0 +1,40 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_exposure_class
+  load_strategy: type_two
+  key_columns:
+    - exposure_class_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: BOPClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: CAClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: WCClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_exposure_class
+    sql: SELECT DISTINCT
+            exposureclass as exposure_class_code
+        FROM BOPClaimSummary
+        UNION
+        SELECT DISTINCT
+            exposureclass as exposure_class_code
+        FROM CAClaimSummary
+        UNION
+        SELECT DISTINCT
+            exposureclass as exposure_class_code
+        FROM WCClaimSummary
+    description: "This table contains the list of exposure classes from the claims summary tables."

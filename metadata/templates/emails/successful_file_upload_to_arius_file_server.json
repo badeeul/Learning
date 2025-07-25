@@ -1,0 +1,11 @@
+{
+    "subject": "Success! Your files have been uploaded to Arius",
+    "body": {
+        "contentType": "text/html",
+        "content": "<p>Dear Reserving actuary,</p><p>Your files have been successfully uploaded to Arius File server and are now ready to be uploaded.</p><p><b>Upload details:</b></p><ul><li>Status - {status}</li><li>Files uploaded - {filesUploaded}</li><li>Uploaded time - {uploadedTime}</li></ul><p>If you have any questions or require assistance, please contact our support team at <a href='mailto:DnAClaims@guardinsurancegroup.onmicrosoft.com'>DnAClaims@guardinsurancegroup.onmicrosoft.com</a>.</p><p>Thank you!</p>"
+    },
+    "emailRecipient": "ActuarialReserving@guard.com",
+    "emailCc": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

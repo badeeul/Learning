@@ -1,0 +1,172 @@
+{
+    "curatedProperties": {
+        "type": "object",
+        "properties": {
+            "lakehouseName": {
+                "type": "string"
+            },
+            "schemaName": {
+                "type": "string"
+            },
+            "fileOptions": {
+                "type": "object",
+                "properties": {
+                    "encoding": {
+                        "type": "string"
+                    },
+                    "header": {
+                        "type": "boolean"
+                    },
+                    "inferColumnTypes": {
+                        "type": "boolean"
+                    },
+                    "multiline": {
+                        "type": "boolean"
+                    },
+                    "delimiter": {
+                        "type": "string"
+                    },
+                    "escape": {
+                        "type": "string"
+                    },
+                    "timestampFormat": {
+                        "type": "string"
+                    }
+                }
+            },
+            "customFileOptions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "SheetName": {
+                            "type": "string"
+                        },
+                        "SkipRows": {
+                            "type": "integer"
+                        },
+                        "Columns": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "Filter": {
+                            "type": "string"
+                        },
+                        "Pivot": {
+                            "type": "object",
+                            "properties": {
+                                "Columns": {
+                                    "type": "string"
+                                },
+                                "Values": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "SheetName",
+                        "SkipRows"
+                    ]
+                }
+            },
+            "columnList": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "minItems": 1
+            },
+            "primaryKeyList": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "minItems": 1
+            },
+            "duplicateCheckEnabled": {
+                "type": "boolean"
+            },
+            "duplicateCheckQuarantineType": {
+                "$ref": "enums.json#/definitions/duplicateCheckQuarantineType"
+            },
+            "targetFileFormat": {
+                "$ref": "enums.json#/definitions/targetFileFormat"
+            },
+            "targetLoadType": {
+                "$ref": "enums.json#/definitions/targetLoadType"
+            },
+            "quarantineStrategy": {
+                "$ref": "enums.json#/definitions/quarantineStrategy"
+            }
+        },
+        "required": [
+            "lakehouseName",
+            "schemaName",
+            "duplicateCheckEnabled",
+            "targetFileFormat",
+            "targetLoadType"
+        ],
+        "if": {
+            "properties": {
+                "duplicateCheckEnabled": {
+                    "const": true
+                }
+            }
+        },
+        "then": {
+            "required": [
+                "duplicateCheckQuarantineType"
+            ]
+        },
+        "additionalProperties": false
+    },
+    "definitions": {
+        "fileTypeCsv": {
+            "if": {
+                "properties": {
+                    "rawProperties": {
+                        "properties": {
+                            "fileType": {
+                                "const": "csv"
+                            }
+                        }
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "curatedProperties": {
+                        "required": [
+                            "fileOptions"
+                        ]
+                    }
+                }
+            }
+        },
+        "fileTypeExcel": {
+            "if": {
+                "properties": {
+                    "rawProperties": {
+                        "properties": {
+                            "fileType": {
+                                "const": "excel"
+                            }
+                        }
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "curatedProperties": {
+                        "required": [
+                            "customFileOptions"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "datasetName": "payments",
+    "enable": true,
+    "datasetTypeName": "database",
+    "databaseName": "giginsdata",
+    "datasetSchema": "dbo",
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "IIS",
+        "includeSpecificColumns": [
+            "*"
+        ],
+        "ingestType": "watermark",
+        "sourceWatermarkIdentifier": "UPDATEON",
+        "sourceDatabaseType": "sqldatabase",
+        "isDynamicQuery": true
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "fileType": "parquet",
+        "directoryName": "IIS"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_scu_001_tables_for_data_product_zone",
+        "schemaName": "iis",
+        "schemaEvolutionMode": "addNewColumns",
+        "schemaLocation": null,
+        "fileOptions": {
+            "encoding": "ISO-8859-1",
+            "header": true,
+            "inferColumnTypes": true,
+            "multiline": true,
+            "delimiter": ",",
+            "escape": "\"",
+            "timestampFormat": "dd/MM/yyyy"
+        },
+        "columnList": ["*"],
+        "primaryKeyList": [
+            "TRANSID"
+        ],
+        "partitionKeyList": [
+            "lob",
+            "typepmt"
+        ],
+        "sensitiveColumns": null,
+        "enableSensitiveFieldCheck": false,
+        "deletionCaptureEnabled": false,
+        "duplicateCheckEnabled": false,
+        "targetFileFormat": "delta",
+        "targetLoadType": "merge"
+    }
+}

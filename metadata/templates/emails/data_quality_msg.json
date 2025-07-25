@@ -1,0 +1,9 @@
+{
+    "subject": "Data Quality - Stopped Pipeline Execution",
+    "body": {
+                "contentType": "text/html",
+                "content": "<p>A data pipeline stopped based on the treshold set in the DQ master table.</p><p><b>Details:</b></p><p>data Quality Workspace : {workspace_name}</p><p>Please click on the Power BI report link below for further details.</p><p><a href= {powerbi_report_link}>Data Deduplication  Report</a></p><p style=color:red;>*Please do not reply to this email.</p><p>Thanks,<br>Support Team</p>"           },
+    "emailRecipient": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

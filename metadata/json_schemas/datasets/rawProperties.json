@@ -1,0 +1,22 @@
+{
+    "rawProperties": {
+        "type": "object",
+        "properties": {
+            "lakehouseName": {
+                "type": "string"
+            },
+            "fileType": {
+                "$ref": "enums.json#/definitions/fileType"
+            },
+            "directoryName": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "lakehouseName",
+            "fileType",
+            "directoryName"
+        ],
+        "additionalProperties": false
+    }
+}

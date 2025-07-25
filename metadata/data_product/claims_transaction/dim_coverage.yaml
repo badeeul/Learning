@@ -1,0 +1,168 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_coverage
+  load_strategy: type_two
+  key_columns:
+    - cvrg_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: cvrg_key
+
+source:
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: cl_coverage
+
+  - name: transaction_uwcoverage
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: claims_transaction_curated
+    table: transaction_uwcoverage_curated
+
+  - name: pc_coverage_names
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: pc_coverage_names
+
+  - name: lob
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lob
+
+  - name: claims_cavehicles
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_cavehicles
+
+  - name: pc_coverage_ifields
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: pc_coverage_ifields
+
+  - name: lookups
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lookups
+
+query:
+  - name: dim_coverage
+    sql: |
+      WITH bp AS (
+        SELECT DISTINCT
+          pcn.commonname AS cvrg_common_nm,
+          lob.lob,
+          pcn.coveragename AS cvrg_nm,
+          pcn.description AS cvrg_desc,
+          '' AS cvrg_desc_detail,
+          CONCAT(pcn.coveragename,'-', pcn.description) AS cvrg_bus_key
+        FROM cl_coverage cl
+        LEFT JOIN transaction_uwcoverage uw ON cl.uwcoverageid = uw.uwcoverageid 
+          AND UPPER(TRIM(cl.code)) = UPPER(TRIM(uw.code))
+          AND uw.dl_iscurrent = 1
+        LEFT JOIN pc_coverage_names pcn ON uw.coverageid = pcn.coverageid AND pcn.dl_iscurrent = 1  
+        LEFT JOIN lob lob ON pcn.lobid = lob.lobid AND lob.dl_iscurrent = 1
+        WHERE lob.lobid = 3
+        AND uw.trancnt = 0 AND uw.after = 1
+        AND cl.dl_iscurrent = 1
+      ),
+      ca AS (
+        SELECT DISTINCT
+          pcn.commonname AS cvrg_common_nm,
+          lob.lob,
+          pcn.coveragename AS cvrg_nm,
+          REPLACE(pcn.description, 'amp;','') AS cvrg_desc,
+          '' AS cvrg_desc_detail,
+          pcn.coveragename AS cvrg_bus_key
+        FROM cl_coverage cl
+        LEFT JOIN claims_cavehicles cav ON cl.cavehicleid = cav.cavehicleid AND cav.dl_iscurrent = 1 
+        LEFT JOIN transaction_uwcoverage uw ON UPPER(TRIM(uw.code)) = UPPER(TRIM(cl.code)) 
+          AND UPPER(TRIM(uw.commonname)) = UPPER(TRIM(cl.commonname)) 
+          AND ((NVL(uw.itemid,0) <> 0 AND uw.itemid = cav.vehicleid
+            AND UPPER(TRIM(uw.state)) = UPPER(TRIM(cl.coveragestate))) 
+          OR (NVL(uw.itemid,0) = 0 AND UPPER(TRIM(uw.state)) = UPPER(TRIM(cl.coveragestate))))
+          AND uw.dl_iscurrent = 1
+        LEFT JOIN pc_coverage_names pcn ON uw.coverageid = pcn.coverageid AND pcn.dl_iscurrent = 1
+        LEFT JOIN lob lob ON pcn.lobid = lob.lobid AND lob.dl_iscurrent = 1
+        WHERE lob.lobid = 4
+        AND uw.trancnt = 0 AND uw.after = 1
+        AND cl.dl_iscurrent = 1
+      ),
+      ho AS (
+        SELECT DISTINCT
+          cl.commonname AS cvrg_common_nm,
+          lob.lob,
+          pcn.coveragename AS cvrg_nm,
+          pcn.description AS cvrg_desc,
+          CASE 
+            WHEN UPPER(TRIM(cl.commonname)) = 'COVC_INCSPEC'
+              OR UPPER(TRIM(cl.commonname)) = 'HO_LIMITS_RENT'
+              OR UPPER(TRIM(cl.commonname)) = 'HO_LIMITS_CONDO'
+              OR (UPPER(TRIM(cl.commonname)) = 'HO_LIMITS_HOME' AND UPPER(TRIM(caption)) <> 'SECTION I LIMIT')
+              OR (UPPER(TRIM(cl.commonname)) = 'HOLIA' AND UPPER(TRIM(caption)) <> 'LIMIT')
+            THEN CASE
+                WHEN UPPER(TRIM(pcif.caption)) LIKE '%NAMED PERIL%'
+                THEN 'Named Perils'
+                ELSE pcif.caption END
+            ELSE '' END AS cvrg_desc_detail,
+          CONCAT(pcn.coveragename,
+          CASE 
+            WHEN UPPER(TRIM(cl.commonname)) <> UPPER(TRIM(pcn.commonname)) 
+            THEN '-1'
+            WHEN UPPER(TRIM(cl.commonname)) = 'COVC_INCSPEC'
+              OR UPPER(TRIM(cl.commonname)) = 'HO_LIMITS_RENT'
+              OR UPPER(TRIM(cl.commonname)) = 'HO_LIMITS_CONDO'
+              OR (UPPER(TRIM(cl.commonname)) = 'HO_LIMITS_HOME' AND UPPER(TRIM(caption)) <> 'SECTION I LIMIT')
+              OR (UPPER(TRIM(cl.commonname)) = 'HOLIA' AND UPPER(TRIM(caption)) <> 'LIMIT')
+            THEN CONCAT('-',cl.ifield)
+            ELSE '' END) AS cvrg_bus_key
+        FROM cl_coverage cl
+        LEFT JOIN transaction_uwcoverage uw ON cl.uwcoverageid = uw.uwcoverageid
+          AND UPPER(TRIM(cl.code)) = UPPER(TRIM(uw.code))
+          AND uw.dl_iscurrent = 1
+        LEFT JOIN pc_coverage_names pcn ON uw.coverageid = pcn.coverageid AND pcn.dl_iscurrent = 1
+        LEFT JOIN pc_coverage_ifields pcif ON uw.coverageid = pcif.coverageid
+          AND UPPER(TRIM(cl.ifield)) = UPPER(TRIM(pcif.ifield))
+          AND pcif.dl_iscurrent = 1 
+        LEFT JOIN lob lob ON pcn.lobid = lob.lobid AND lob.dl_iscurrent = 1
+        WHERE lob.lobid = 10
+        AND uw.trancnt = 0 AND uw.after = 1
+        AND cl.dl_iscurrent = 1
+      ),
+      db AS (
+        SELECT 
+          vals AS cvrg_common_nm,
+          'DB' AS lob,
+          vals AS cvrg_nm,
+          descrip AS cvrg_desc,
+          '' AS cvrg_desc_detail,
+          vals AS cvrg_bus_key
+        FROM lookups
+        WHERE UPPER(TRIM(keyfield)) = 'CLAIMTYPE' 
+          AND UPPER(TRIM(programid)) = 'DBCLAIMS'
+          AND dl_iscurrent = 1
+      ),
+      wc AS (
+        SELECT 
+          descrip AS cvrg_common_nm,
+          'WC' AS lob,
+          descrip AS cvrg_nm,
+          descrip AS cvrg_desc,
+          '' AS cvrg_desc_detail,
+          vals AS cvrg_bus_key
+        FROM lookups 
+        WHERE UPPER(TRIM(programid)) = 'NIS_WCCLAIM' AND UPPER(TRIM(keyfield)) = 'TYPOCOV'
+        AND dl_iscurrent = 1
+      )
+      SELECT * FROM bp
+      UNION
+      SELECT * FROM ca
+      UNION
+      SELECT * FROM ho
+      UNION
+      SELECT * FROM db
+      UNION
+      SELECT * FROM wc
+
+    description: "This query creates a coverage dimension table by combining coverage data from multiple lines of business (BP, CA, HO, DB, WC) with consistent case handling. It provides standardized coverage information including names, descriptions, and business keys across different insurance products, using UPPER(TRIM()) for all join and filter conditions to ensure data consistency."
+    

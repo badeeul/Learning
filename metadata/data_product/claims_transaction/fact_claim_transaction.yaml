@@ -1,0 +1,711 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: fact_claim_transaction
+  load_strategy: overwrite
+  key_columns:
+    - claimant_key
+    - claim_trans_type_key
+    - transid
+    - ins_obj_key
+    - cvrg_key
+  unknown_record: False
+  identity: False
+
+source:
+  - name: stg_claim_transaction_supporting_data
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: stg_claims_transaction
+    table: stg_claim_transaction_supporting_data
+
+  - name: reserves
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: reserves
+
+  - name: payments
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: payments
+
+  - name: pc_coverage_reporting
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: pc_coverage_reporting
+
+  - name: pc_coverage_names
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: pc_coverage_names
+
+  - name: transaction_uwcoverage
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: claims_transaction_curated
+    table: transaction_uwcoverage_curated
+
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: cl_coverage
+
+  - name: dim_claimant
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claimant
+
+  - name: dim_policy
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_policy
+
+  - name: dim_date
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_date
+
+  - name: dim_claim_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_type
+
+  - name: dim_adjuster
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_adjuster
+
+  - name: dim_occurrence
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_occurrence
+
+  - name: dim_cause_of_loss
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_cause_of_loss
+
+  - name: dim_coverage
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_coverage
+
+  - name: dim_cat
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_cat
+
+  - name: dim_prod_src
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_prod_src
+
+  - name: dim_mkt_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_mkt_type
+
+  - name: dim_ins_obj
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_ins_obj
+
+  - name: dim_carrier
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_carrier
+
+  - name: dim_dist_chnl
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_dist_chnl
+
+  - name: dim_insured
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_insured
+
+  - name: dim_payee
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_payee
+
+  - name: dim_claim_trans_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_trans_type
+
+  - name: dim_lob
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_lob
+
+  - name: dim_aslob
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_aslob
+
+query:
+  - name: reserves_temp
+    sql: |
+      SELECT 
+        reservesid,
+        UPPER(TRIM(code)) AS code,
+        UPPER(TRIM(claim)) AS claim,
+        claimantid,
+        medical,
+        indemnity,
+        expense,
+        cvgid,
+        updateon,
+        CAST(enteredon AS DATE) AS enteredon
+      FROM reserves
+      WHERE dl_iscurrent = 1
+
+  - name: reserves_unpivoted
+    sql: |
+      SELECT 
+        reservesid,
+        code,
+        claim,
+        claimantid,
+        CASE WHEN claim_trans_type = 'medical' THEN 'RMM'
+             WHEN claim_trans_type = 'expense' THEN 'REE'
+             WHEN claim_trans_type = 'indemnity' THEN 'RLL'
+             ELSE NULL END AS claim_trans_type_bus_key,
+        amt,
+        cvgid,
+        updateon,
+        enteredon
+      FROM (
+        SELECT reservesid, code, claim, claimantid, medical, indemnity, expense, cvgid, updateon,enteredon
+        FROM reserves_temp
+      ) p
+      UNPIVOT (
+        amt FOR claim_trans_type IN (medical, indemnity, expense)
+      ) AS unpvt
+      WHERE COALESCE(amt,0) <> 0
+
+  - name: payments_temp
+    sql: |
+      SELECT 
+        transid,
+        UPPER(TRIM(code)) AS code,
+        UPPER(TRIM(claim)) AS claim,
+        claimantid,
+        amount,
+        CONCAT(typepmt, typprefix, typcode) AS claim_trans_type_bus_key,
+        chkdate,
+        payee,
+        checkto,
+        cvgid,
+        typepmt,
+        CASE WHEN typepmt IN ('X','E') THEN 'REE'
+             WHEN typepmt IN ('M') THEN 'RMM'
+             ELSE 'RLL' END AS reserve_reversal_type,
+        CAST(enteredon AS DATE) AS enteredon
+      FROM payments
+      WHERE dl_iscurrent = 1
+
+  - name: uwcoverage_filtered
+    sql: |
+      SELECT *
+      FROM transaction_uwcoverage
+      WHERE uwcoverageid IN (
+        SELECT DISTINCT uwcoverageid 
+        FROM cl_coverage
+        WHERE dl_iscurrent = 1
+      )
+      AND dl_iscurrent = 1
+      AND trancnt = 0 AND after = 1
+
+  - name: fact_claim_transaction
+    sql: |
+      WITH fact_data AS (
+              SELECT
+                  c.claimantid AS claimant_id_bus_key,
+                  UPPER(TRIM(c.code)) AS policy_num_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CP') THEN CONCAT('BG-', CAST(c.buildingid AS STRING))
+                       WHEN UPPER(TRIM(c.lob)) = 'CA' THEN CONCAT('VH-', CAST(c.vehicleid AS STRING))
+                       WHEN UPPER(TRIM(c.lob)) = 'HO' THEN CONCAT('HO-', CAST(c.transaction_uwhomes_id AS STRING))
+                       ELSE 'not applicable' 
+                  END AS ins_obj_bus_key,
+                  UPPER(TRIM(c.carrier)) AS carrier_bus_key,
+                  UPPER(TRIM(c.agency)) AS agcy_cd_bus_key,
+                  UPPER(TRIM(c.code)) AS insd_bus_key,
+                  c.pobegin AS pol_eff_date_bus_key,
+                  c.poexpir AS pol_exp_date_bus_key,
+                  UPPER(TRIM(c.lob)) AS lob_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'HO' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '040')
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '160')
+                       WHEN UPPER(TRIM(c.lob)) = 'DB' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '153')
+                       ELSE UPPER(TRIM(pcr.aslob_code)) 
+                  END AS aslob_cd_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lte)) = 'Y' THEN 'LT'
+                       WHEN UPPER(TRIM(c.lte)) = 'N' THEN 'MO'
+                       ELSE UPPER(TRIM(c.coveragecategory))
+                  END AS claim_type_cd_bus_key,
+                  c.dol AS loss_date_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CA','HO') THEN c.received
+                       ELSE c.recvd
+                  END AS claim_recd_date_bus_key,
+                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
+                       ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid)))
+                  END AS adjustr_bus_key,
+                  CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'WC' AND UPPER(TRIM(c.catcode)) IS NOT NULL THEN CONCAT(UPPER(TRIM(c.code)), '-', UPPER(TRIM(c.catcode)))
+                       ELSE CONCAT(UPPER(TRIM(c.code)), '-', CAST(c.occid AS STRING))
+                  END AS occur_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','HO') THEN CONCAT('CAUSE-', COALESCE(CAST(c.causeoflossid AS STRING), 'NA'), '-', COALESCE(CAST(c.lossdetailid AS STRING), 'NA'), '-', COALESCE(CAST(c.causedetailid AS STRING),'NA'))
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN CONCAT('ACC-INJ-', COALESCE(CAST(c.accident AS STRING), 'NA'), '-', COALESCE(CAST(c.injury AS STRING), 'NA'))
+                       ELSE NULL
+                  END AS cause_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'BP' THEN CONCAT(UPPER(TRIM(pcn.coveragename)),'-', UPPER(TRIM(pcn.description)))
+                       WHEN UPPER(TRIM(c.lob)) = 'CA' THEN UPPER(TRIM(pcn.coveragename))
+                       WHEN UPPER(TRIM(c.lob)) = 'HO' THEN CONCAT(UPPER(TRIM(pcn.coveragename)), CASE WHEN UPPER(TRIM(c.commonname)) <> UPPER(TRIM(pcn.commonname)) THEN '-1'
+                                                                            WHEN UPPER(TRIM(c.commonname)) IN ('COVC_INCSPEC', 'HO_LIMITS_RENT', 'HO_LIMITS_CONDO', 'HO_LIMITS_HOME', 'HOLIA') THEN CONCAT('-',c.ifield)
+                                                                            ELSE '' END)
+                       WHEN UPPER(TRIM(c.lob)) = 'DB' THEN UPPER(TRIM(c.db_claimtype))
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN UPPER(TRIM(c.typocov))
+                       ELSE NULL END AS cvg_bus_key,
+                  c.catastrophecodeid AS cat_bus_key,
+                  UPPER(TRIM(c.productionsrc)) AS prod_src_cd_bus_key,
+                  UPPER(TRIM(c.markettype)) AS mkt_type_cd_bus_key,
+                  r.amt,
+                  r.claim_trans_type_bus_key,
+                  r.updateon AS trans_date_bus_key,
+                  'not applicable' AS payee_cd_bus_key,
+                  r.reservesid AS transid,
+                  r.enteredon AS transaction_entry_date
+              FROM 
+                  stg_claim_transaction_supporting_data c
+                  INNER JOIN reserves_unpivoted r ON 
+                      UPPER(TRIM(r.code)) = UPPER(TRIM(c.code)) AND 
+                      UPPER(TRIM(r.claim)) = UPPER(TRIM(c.claim)) AND 
+                      r.claimantid = c.claimantid
+                  LEFT JOIN uwcoverage_filtered uc ON 
+                      CASE WHEN UPPER(TRIM(c.lob)) = 'CA' AND 
+                                UPPER(TRIM(uc.code)) = UPPER(TRIM(c.code)) AND 
+                                UPPER(TRIM(uc.commonname)) = UPPER(TRIM(c.commonname)) AND 
+                                ((COALESCE(uc.itemid,0) <> 0 AND uc.itemid = c.vehicleid AND UPPER(TRIM(uc.state)) = UPPER(TRIM(c.coveragestate))) OR 
+                                (COALESCE(uc.itemid,0) = 0 AND UPPER(TRIM(uc.state)) = UPPER(TRIM(c.coveragestate)))) THEN 1
+                          WHEN UPPER(TRIM(c.lob)) <> 'CA' AND c.uwcoverageid = uc.uwcoverageid THEN 1
+                          ELSE 0
+                      END = 1
+                  LEFT JOIN pc_coverage_reporting pcr ON uc.coverageid = pcr.coverageid
+                  LEFT JOIN pc_coverage_names pcn ON uc.coverageid = pcn.coverageid
+          
+              UNION
+          
+              SELECT
+                  c.claimantid AS claimant_id_bus_key,
+                  UPPER(TRIM(c.code)) AS policy_num_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CP') THEN CONCAT('BG-', CAST(c.buildingid AS STRING))
+                       WHEN UPPER(TRIM(c.lob)) = 'CA' THEN CONCAT('VH-', CAST(c.vehicleid AS STRING))
+                       WHEN UPPER(TRIM(c.lob)) = 'HO' THEN CONCAT('HO-', CAST(c.transaction_uwhomes_id AS STRING))
+                       ELSE 'not applicable' 
+                  END AS ins_obj_bus_key,
+                  UPPER(TRIM(c.carrier)) AS carrier_bus_key,
+                  UPPER(TRIM(c.agency)) AS agcy_cd_bus_key,
+                  UPPER(TRIM(c.code)) AS insd_bus_key,
+                  c.pobegin AS pol_eff_date_bus_key,
+                  c.poexpir AS pol_exp_date_bus_key,
+                  UPPER(TRIM(c.lob)) AS lob_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'HO' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '040')
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '160')
+                       WHEN UPPER(TRIM(c.lob)) = 'DB' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '153')
+                       ELSE UPPER(TRIM(pcr.aslob_code))
+                  END AS aslob_cd_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lte)) = 'Y' THEN 'LT'
+                       WHEN UPPER(TRIM(c.lte)) = 'N' THEN 'MO'
+                       ELSE UPPER(TRIM(c.coveragecategory))
+                  END AS claim_type_cd_bus_key,
+                  c.dol AS loss_date_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CA','HO') THEN c.received
+                       ELSE c.recvd
+                  END AS claim_recd_date_bus_key,
+                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
+                       ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid))) 
+                  END AS adjustr_bus_key,
+                  CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'WC' AND UPPER(TRIM(c.catcode)) IS NOT NULL THEN CONCAT(UPPER(TRIM(c.code)), '-', UPPER(TRIM(c.catcode)))
+                       ELSE CONCAT(UPPER(TRIM(c.code)), '-', CAST(c.occid AS STRING))
+                  END AS occur_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','HO') THEN CONCAT('CAUSE-', COALESCE(CAST(c.causeoflossid AS STRING), 'NA'), '-', COALESCE(CAST(c.lossdetailid AS STRING), 'NA'), '-', COALESCE(CAST(c.causedetailid AS STRING),'NA'))
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN CONCAT('ACC-INJ-', COALESCE(CAST(c.accident AS STRING), 'NA'), '-', COALESCE(CAST(c.injury AS STRING), 'NA'))
+                       ELSE NULL
+                  END AS cause_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'BP' THEN CONCAT(UPPER(TRIM(pcn.coveragename)),'-', UPPER(TRIM(pcn.description)))
+                       WHEN UPPER(TRIM(c.lob)) = 'CA' THEN UPPER(TRIM(pcn.coveragename))
+                       WHEN UPPER(TRIM(c.lob)) = 'HO' THEN CONCAT(UPPER(TRIM(pcn.coveragename)), CASE WHEN UPPER(TRIM(c.commonname)) <> UPPER(TRIM(pcn.commonname)) THEN '-1'
+                                                                            WHEN UPPER(TRIM(c.commonname)) IN ('COVC_INCSPEC', 'HO_LIMITS_RENT', 'HO_LIMITS_CONDO', 'HO_LIMITS_HOME', 'HOLIA') THEN CONCAT('-',c.ifield)
+                                                                            ELSE '' END)
+                       WHEN UPPER(TRIM(c.lob)) = 'DB' THEN UPPER(TRIM(c.db_claimtype))
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN UPPER(TRIM(c.typocov))
+                       ELSE NULL END AS cvg_bus_key,
+                  c.catastrophecodeid AS cat_bus_key,
+                  UPPER(TRIM(c.productionsrc)) AS prod_src_cd_bus_key,
+                  UPPER(TRIM(c.markettype)) AS mkt_type_cd_bus_key,
+                  p.amount AS amt,
+                  p.claim_trans_type_bus_key,
+                  p.chkdate AS trans_date_bus_key,
+                  CASE WHEN UPPER(TRIM(p.payee)) = 'INSURED' THEN 'Insured' 
+                       WHEN UPPER(TRIM(p.payee)) = 'CLAIMANT' THEN 'Claimant'
+                       ELSE COALESCE(UPPER(TRIM(p.checkto)), UPPER(TRIM(p.payee)))  
+                  END AS payee_cd_bus_key,
+                  p.transid AS transid,
+                  p.enteredon AS transaction_entry_date
+              FROM 
+                  stg_claim_transaction_supporting_data c
+                  INNER JOIN payments_temp p ON 
+                      UPPER(TRIM(p.code)) = UPPER(TRIM(c.code)) AND 
+                      UPPER(TRIM(p.claim)) = UPPER(TRIM(c.claim)) AND 
+                      p.claimantid = c.claimantid
+                  LEFT JOIN uwcoverage_filtered uc ON 
+                      CASE WHEN UPPER(TRIM(c.lob)) = 'CA' AND 
+                                UPPER(TRIM(uc.code)) = UPPER(TRIM(c.code)) AND 
+                                UPPER(TRIM(uc.commonname)) = UPPER(TRIM(c.commonname)) AND 
+                                ((COALESCE(uc.itemid,0) <> 0 AND uc.itemid = c.vehicleid AND UPPER(TRIM(uc.state)) = UPPER(TRIM(c.coveragestate))) OR 
+                                (COALESCE(uc.itemid,0) = 0 AND UPPER(TRIM(uc.state)) = UPPER(TRIM(c.coveragestate)))) THEN 1
+                          WHEN UPPER(TRIM(c.lob)) <> 'CA' AND c.uwcoverageid = uc.uwcoverageid THEN 1
+                          ELSE 0
+                      END = 1
+                  LEFT JOIN pc_coverage_reporting pcr ON uc.coverageid = pcr.coverageid
+                  LEFT JOIN pc_coverage_names pcn ON uc.coverageid = pcn.coverageid
+          
+              UNION
+          
+              SELECT
+                  c.claimantid AS claimant_id_bus_key,
+                  UPPER(TRIM(c.code)) AS policy_num_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CP') THEN CONCAT('BG-', CAST(c.buildingid AS STRING))
+                       WHEN UPPER(TRIM(c.lob)) = 'CA' THEN CONCAT('VH-', CAST(c.vehicleid AS STRING))
+                       WHEN UPPER(TRIM(c.lob)) = 'HO' THEN CONCAT('HO-', CAST(c.transaction_uwhomes_id AS STRING))
+                       ELSE 'not applicable' 
+                  END AS ins_obj_bus_key,
+                  UPPER(TRIM(c.carrier)) AS carrier_bus_key,
+                  UPPER(TRIM(c.agency)) AS agcy_cd_bus_key,
+                  UPPER(TRIM(c.code)) AS insd_bus_key,
+                  c.pobegin AS pol_eff_date_bus_key,
+                  c.poexpir AS pol_exp_date_bus_key,
+                  UPPER(TRIM(c.lob)) AS lob_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'HO' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '040')
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '160')
+                       WHEN UPPER(TRIM(c.lob)) = 'DB' THEN COALESCE(UPPER(TRIM(pcr.aslob_code)), '153')
+                       ELSE UPPER(TRIM(pcr.aslob_code))
+                  END AS aslob_cd_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lte)) = 'Y' THEN 'LT'
+                       WHEN UPPER(TRIM(c.lte)) = 'N' THEN 'MO'
+                       ELSE UPPER(TRIM(c.coveragecategory))
+                  END AS claim_type_cd_bus_key,
+                  c.dol AS loss_date_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CA','HO') THEN c.received
+                       ELSE c.recvd
+                  END AS claim_recd_date_bus_key,
+                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
+                       ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid))) 
+                  END AS adjustr_bus_key,
+                  CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'WC' AND UPPER(TRIM(c.catcode)) IS NOT NULL THEN CONCAT(UPPER(TRIM(c.code)), '-', UPPER(TRIM(c.catcode)))
+                       ELSE CONCAT(UPPER(TRIM(c.code)), '-', CAST(c.occid AS STRING))
+                  END AS occur_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','HO') THEN CONCAT('CAUSE-', COALESCE(CAST(c.causeoflossid AS STRING), 'NA'), '-', COALESCE(CAST(c.lossdetailid AS STRING), 'NA'), '-', COALESCE(CAST(c.causedetailid AS STRING),'NA'))
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN CONCAT('ACC-INJ-', COALESCE(CAST(c.accident AS STRING), 'NA'), '-', COALESCE(CAST(c.injury AS STRING), 'NA'))
+                       ELSE NULL
+                  END AS cause_bus_key,
+                  CASE WHEN UPPER(TRIM(c.lob)) = 'BP' THEN CONCAT(UPPER(TRIM(pcn.coveragename)),'-', UPPER(TRIM(pcn.description)))
+                       WHEN UPPER(TRIM(c.lob)) = 'CA' THEN UPPER(TRIM(pcn.coveragename))
+                       WHEN UPPER(TRIM(c.lob)) = 'HO' THEN CONCAT(UPPER(TRIM(pcn.coveragename)), CASE WHEN UPPER(TRIM(c.commonname)) <> UPPER(TRIM(pcn.commonname)) THEN '-1'
+                                                                            WHEN UPPER(TRIM(c.commonname)) IN ('COVC_INCSPEC', 'HO_LIMITS_RENT', 'HO_LIMITS_CONDO', 'HO_LIMITS_HOME', 'HOLIA') THEN CONCAT('-',c.ifield)
+                                                                            ELSE '' END)
+                       WHEN UPPER(TRIM(c.lob)) = 'DB' THEN UPPER(TRIM(c.db_claimtype))
+                       WHEN UPPER(TRIM(c.lob)) = 'WC' THEN UPPER(TRIM(c.typocov))
+                       ELSE NULL END AS cvg_bus_key,
+                  c.catastrophecodeid AS cat_bus_key,
+                  UPPER(TRIM(c.productionsrc)) AS prod_src_cd_bus_key,
+                  UPPER(TRIM(c.markettype)) AS mkt_type_cd_bus_key,
+                  (p.amount * -1) AS amt,
+                  p.reserve_reversal_type AS claim_trans_type_bus_key,
+                  p.chkdate AS trans_date_bus_key,
+                  'not applicable' AS payee_cd_bus_key,
+                  p.transid AS transid,
+                  p.enteredon AS transaction_entry_date
+              FROM 
+                  stg_claim_transaction_supporting_data c
+                  INNER JOIN payments_temp p ON 
+                      UPPER(TRIM(p.code)) = UPPER(TRIM(c.code)) AND 
+                      UPPER(TRIM(p.claim)) = UPPER(TRIM(c.claim)) AND 
+                      p.claimantid = c.claimantid
+                  LEFT JOIN uwcoverage_filtered uc ON 
+                      CASE WHEN UPPER(TRIM(c.lob)) = 'CA' AND 
+                                UPPER(TRIM(uc.code)) = UPPER(TRIM(c.code)) AND 
+                                UPPER(TRIM(uc.commonname)) = UPPER(TRIM(c.commonname)) AND 
+                                ((COALESCE(uc.itemid,0) <> 0 AND uc.itemid = c.vehicleid AND UPPER(TRIM(uc.state)) = UPPER(TRIM(c.coveragestate))) OR 
+                                (COALESCE(uc.itemid,0) = 0 AND UPPER(TRIM(uc.state)) = UPPER(TRIM(c.coveragestate)))) THEN 1
+                          WHEN UPPER(TRIM(c.lob)) <> 'CA' AND c.uwcoverageid = uc.uwcoverageid THEN 1
+                          ELSE 0
+                      END = 1
+                  LEFT JOIN pc_coverage_reporting pcr ON uc.coverageid = pcr.coverageid
+                  LEFT JOIN pc_coverage_names pcn ON uc.coverageid = pcn.coverageid
+          )
+          
+          SELECT DISTINCT
+              COALESCE(d_claimant.claimant_key, -1) AS claimant_key,
+              COALESCE(d_policy.policy_key, -1) AS policy_key,
+              COALESCE(d_date.date_key, -1) AS trans_date_key,
+              COALESCE(d_claim_trans_type.claim_trans_type_key, -1) AS claim_trans_type_key,
+              COALESCE(d_ins_obj.ins_obj_key, -1) AS ins_obj_key,
+              COALESCE(d_carrier.carrier_key, -1) AS carrier_key,
+              COALESCE(d_dist_chnl.dist_chnl_key, -1) AS dist_chnl_key,
+              COALESCE(d_insured.insd_key, -1) AS insd_key,
+              COALESCE(d_date_eff.date_key, -1) AS effec_date_key,
+              COALESCE(d_date_exp.date_key, -1) AS exp_date_key,
+              COALESCE(d_lob.lob_key, -1) AS lob_key,
+              COALESCE(d_aslob.aslob_key, -1) AS aslob_key,
+              COALESCE(d_claim_type.claim_type_key, -1) AS claim_type_key,
+              COALESCE(d_date_loss.date_key, -1) AS loss_date_key,
+              COALESCE(d_date_recd.date_key, -1) AS claim_recd_date_key,
+              COALESCE(d_adjuster.adjustr_key, -1) AS adjustr_key,
+              COALESCE(d_adjuster_int.adjustr_key, -1) AS intrnl_adjustr_key,
+              COALESCE(d_occurrence.occur_key, -1) AS occur_key,
+              COALESCE(d_cause_of_loss.cause_key, -1) AS cause_key,
+              COALESCE(d_coverage.cvrg_key, -1) AS cvrg_key,
+              COALESCE(d_cat.cat_key, -1) AS cat_key,
+              COALESCE(d_prod_src.prod_src_key, -1) AS prod_src_key,
+              COALESCE(d_mkt_type.mkt_type_key, -1) AS mkt_type_key,
+              COALESCE(d_payee.payee_key, -1) AS payee_key,
+              COALESCE(trans_enteredon.date_key, -1)AS transaction_entry_date_key,
+              fd.amt AS amt,
+              fd.transid AS transid,
+              CASE 
+                WHEN d_date_loss.date > CURRENT_DATE() THEN 0
+                ELSE 1
+              END AS dq_future_loss_date_txn,
+              CASE 
+                WHEN  COALESCE(d_date_loss.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_loss_date_key,
+              CASE 
+                WHEN d_date_loss.date NOT BETWEEN d_date_eff.date AND d_date_exp.date THEN 0
+                ELSE 1
+              END AS dq_loss_period_txn,
+              CASE 
+                WHEN d_date_loss.date > d_date_recd.date THEN 0
+                ELSE 1
+              END AS dq_loss_rcvd_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND d_mkt_type.mkt_type_cd_bus_key = 'E' THEN 0
+                ELSE 1
+              END AS dq_wc_mkt_type_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND d_carrier.carrier_cd_bus_key = 'PAAZGU10' THEN 0
+                ELSE 1
+              END AS dq_wc_carrier_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND d_cat.cat_bus_key NOT IN (-1, 231, 249) THEN 0
+                ELSE 1
+              END AS dq_wc_cat_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND d_claim_trans_type.claim_trans_type_bus_key IN ('L035','L038','X035','X038','X039') THEN 0
+                ELSE 1
+              END AS dq_wc_salvage_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND d_claim_type.claim_type_cd_bus_key NOT IN ('LT', 'MO') THEN 0
+                ELSE 1
+              END AS dq_wc_claim_type_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND (d_claimant.bus_unit = 'FT' OR d_claimant.bus_unit IS NULL) THEN 0
+                ELSE 1
+              END AS dq_wc_bus_unit_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'WC' AND (
+                  -- Voluntary market business
+                  (LEFT(d_policy.policy_num_bus_key, 2) NOT IN ('A9', 'V9', 'R2') AND d_mkt_type.mkt_type_cd_bus_key NOT IN ('C', 'V'))
+                  OR
+                  -- Residual market business
+                  (LEFT(d_policy.policy_num_bus_key, 2) = 'R2' AND d_mkt_type.mkt_type_cd_bus_key NOT IN ('R', 'A'))
+                  OR
+                  -- MGUs that are not on GUARD carriers
+                  (LEFT(d_policy.policy_num_bus_key, 2) IN ('A9', 'V9') AND d_mkt_type.mkt_type_cd_bus_key != 'M')
+                ) THEN 0
+                ELSE 1
+              END AS dq_wc_pol_num_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('BP','CA','HO') AND NOT REGEXP_LIKE(d_policy.policy_num_bus_key, '^[A-Za-z]{4}[0-9]{6}$') THEN 0
+                ELSE 1
+              END AS dq_bp_ca_ho_pol_num_txn,
+              CASE 
+                WHEN d_claim_trans_type.claim_trans_type_bus_key =  'Payment' AND d_payee.payee_key in (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_pmt_payee_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('DB','WC') AND d_ins_obj.ins_obj_key in (-1) THEN 0
+                ELSE 1
+              END AS dq_db_wc_ins_obj_txn,
+              CASE 
+                WHEN  COALESCE(d_date_recd.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_claim_recd_date_key,
+              CASE 
+                WHEN  COALESCE(d_mkt_type.mkt_type_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_mkt_type_key,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('DB','WC','HO') AND d_aslob.aslob_key in (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_db_ho_wc_aslob_txn,
+              CASE 
+                WHEN  COALESCE(d_claim_type.claim_type_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_claim_type_key,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('BP','CA','HO') AND d_claimant.complexity IS NULL THEN 0
+                ELSE 1
+              END AS dq_bp_ca_ho_complexity_txn,
+              CASE 
+                WHEN  COALESCE(d_insured.insd_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_insd_key,
+              CASE 
+                WHEN  COALESCE(d_policy.policy_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_policy_key,
+              CASE 
+                WHEN  COALESCE(d_date_eff.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_effec_date_key,
+              CASE 
+                WHEN  COALESCE(d_date_exp.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_exp_date_key,
+              CASE 
+                WHEN  COALESCE(d_dist_chnl.dist_chnl_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_dist_chnl_key,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('BP','CA','HO') AND d_ins_obj.ins_obj_key in (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_bp_ca_ho_ins_obj_txn,
+              CASE 
+                WHEN  COALESCE(d_prod_src.prod_src_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_prod_src_key,
+              CASE 
+                WHEN  COALESCE(d_adjuster_int.adjustr_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_intrnl_adjustr_key,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('BP','HO') AND d_cause_of_loss.cause_key in (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_bp_ho_loss_descrip_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'CA' AND d_mkt_type.mkt_type_cd_bus_key != 'V' THEN 0
+                ELSE 1
+              END AS dq_ca_mkt_type_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key = 'CA' AND d_claim_type.claim_type_cd_bus_key NOT IN ('AP','BI') THEN 0
+                ELSE 1
+              END AS dq_ca_claim_type_txn,
+              CASE 
+                WHEN d_lob.lob_cd_bus_key in ('BP','HO') AND d_claim_type.claim_type_cd_bus_key NOT IN ('LI','PD') THEN 0
+                ELSE 1
+              END AS dq_bp_ho_claim_type_txn,
+
+              CASE
+                WHEN d_mkt_type.mkt_type_cd_bus_key = 'E' AND d_carrier.carrier_cd_bus_key != 'PAAZGU10' THEN 0
+                ELSE 1
+              END AS dq_es_carrier_txn
+
+          FROM 
+              fact_data fd
+              LEFT JOIN dim_claimant d_claimant 
+                    ON fd.claimant_id_bus_key = d_claimant.claimant_bus_key 
+                         AND d_claimant.dl_is_current_flag = 1
+
+              LEFT JOIN dim_policy d_policy 
+                    ON fd.policy_num_bus_key = d_policy.policy_num_bus_key 
+                         AND d_policy.dl_is_current_flag = 1
+                         
+              LEFT JOIN dim_date d_date 
+                    ON CAST(fd.trans_date_bus_key AS DATE) = d_date.date
+
+              LEFT JOIN dim_claim_trans_type d_claim_trans_type 
+                    ON fd.claim_trans_type_bus_key = d_claim_trans_type.claim_trans_type_bus_key 
+                         AND d_claim_trans_type.dl_is_current_flag = 1
+
+              LEFT JOIN dim_ins_obj d_ins_obj 
+                    ON fd.ins_obj_bus_key = d_ins_obj.ins_obj_bus_key 
+                         AND d_ins_obj.dl_is_current_flag = 1
+
+              LEFT JOIN dim_carrier d_carrier 
+                    ON fd.carrier_bus_key = d_carrier.carrier_cd_bus_key 
+                         AND d_carrier.dl_is_current_flag = 1
+
+              LEFT JOIN dim_dist_chnl d_dist_chnl 
+                    ON fd.agcy_cd_bus_key = d_dist_chnl.agcy_cd_bus_key 
+                         AND d_dist_chnl.dl_is_current_flag = 1
+
+              LEFT JOIN dim_insured d_insured 
+                    ON fd.insd_bus_key = d_insured.policy_num_bus_key 
+                         AND d_insured.dl_is_current_flag = 1
+
+              LEFT JOIN dim_date d_date_eff 
+                    ON CAST(fd.pol_eff_date_bus_key AS DATE) = d_date_eff.date
+
+              LEFT JOIN dim_date d_date_exp 
+                    ON CAST(fd.pol_exp_date_bus_key AS DATE) = d_date_exp.date
+
+              LEFT JOIN dim_lob d_lob 
+                    ON fd.lob_bus_key = d_lob.lob_cd_bus_key 
+                         AND d_lob.dl_is_current_flag = 1
+
+              LEFT JOIN dim_aslob d_aslob 
+                    ON fd.aslob_cd_bus_key = d_aslob.aslob_cd_bus_key 
+                         AND d_aslob.dl_is_current_flag = 1
+
+              LEFT JOIN dim_claim_type d_claim_type 
+                    ON fd.claim_type_cd_bus_key = d_claim_type.claim_type_cd_bus_key 
+                         AND d_claim_type.dl_is_current_flag = 1
+
+              LEFT JOIN dim_date d_date_loss 
+                    ON CAST(fd.loss_date_bus_key AS DATE) = d_date_loss.date
+
+              LEFT JOIN dim_date d_date_recd 
+                    ON CAST(fd.claim_recd_date_bus_key AS DATE) = d_date_recd.date
+
+              LEFT JOIN dim_adjuster d_adjuster 
+                    ON fd.adjustr_bus_key = d_adjuster.adjustr_bus_key 
+                         AND d_adjuster.dl_is_current_flag = 1
+
+              LEFT JOIN dim_adjuster d_adjuster_int 
+                    ON fd.intrnl_adjustr_bus_key = d_adjuster_int.adjustr_bus_key 
+                         AND d_adjuster_int.dl_is_current_flag = 1
+
+              LEFT JOIN dim_occurrence d_occurrence 
+                    ON fd.occur_bus_key = d_occurrence.occur_bus_key 
+                         AND d_occurrence.dl_is_current_flag = 1
+
+              LEFT JOIN dim_cause_of_loss d_cause_of_loss 
+                    ON fd.cause_bus_key = d_cause_of_loss.cause_bus_key 
+                         AND d_cause_of_loss.dl_is_current_flag = 1
+
+              LEFT JOIN dim_coverage d_coverage 
+                    ON fd.cvg_bus_key = d_coverage.cvrg_bus_key 
+                         AND d_coverage.dl_is_current_flag = 1
+
+              LEFT JOIN dim_cat d_cat 
+                    ON fd.cat_bus_key = d_cat.cat_bus_key 
+                         AND d_cat.dl_is_current_flag = 1
+
+              LEFT JOIN dim_prod_src d_prod_src 
+                    ON fd.prod_src_cd_bus_key = d_prod_src.prod_src_cd_bus_key 
+                         AND d_prod_src.dl_is_current_flag = 1
+
+              LEFT JOIN dim_mkt_type d_mkt_type 
+                    ON fd.mkt_type_cd_bus_key = d_mkt_type.mkt_type_cd_bus_key 
+                         AND d_mkt_type.dl_is_current_flag = 1
+                         
+              LEFT JOIN dim_payee d_payee 
+                    ON fd.payee_cd_bus_key = d_payee.payee_cd_bus_key 
+                         AND d_payee.dl_is_current_flag = 1
+
+             LEFT JOIN dim_date trans_enteredon
+               ON fd.transaction_entry_date = trans_enteredon.date

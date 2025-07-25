@@ -1,0 +1,84 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: stg_claims_transaction
+  table: stg_core_claim_transaction_data
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+  partition_by:
+    - lob
+
+source:
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: wcclaim
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: insured
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claimant
+
+query:
+- name: claim_policy_info
+  sql: |
+    SELECT 
+      w.wcclaimid,
+      UPPER(TRIM(w.code)) AS code,
+      UPPER(TRIM(w.claim)) AS claim,
+      UPPER(TRIM(w.lob)) AS lob,
+      UPPER(TRIM(w.coveragecategory)) AS coveragecategory,
+      UPPER(TRIM(w.lte)) AS lte,
+      w.dol,
+      w.recvd,
+      w.occid,
+      w.accident,
+      w.injury,
+      UPPER(TRIM(w.typocov)) AS typocov
+    FROM wcclaim w
+    WHERE w.lob IS NOT NULL
+      AND w.dl_iscurrent = 1
+
+- name: claim_insured_info
+  sql: |
+    SELECT 
+      UPPER(TRIM(i.code)) AS insured_code,
+      UPPER(TRIM(i.carrier)) AS carrier,
+      UPPER(TRIM(i.productionsrc)) AS productionsrc,
+      UPPER(TRIM(i.markettype)) AS markettype,
+      i.pobegin,
+      i.poexpir,
+      UPPER(TRIM(i.agency)) AS agency
+    FROM insured i
+    WHERE i.dl_iscurrent = 1
+
+- name: claim_claimant_info
+  sql: |
+    SELECT 
+      c.claimantid,
+      UPPER(TRIM(c.wcclaimid)) AS wcclaimid,
+      UPPER(TRIM(c.claimantnumber)) AS claimantnumber,
+      UPPER(TRIM(c.tpataxid)) AS tpataxid,
+      UPPER(TRIM(c.adjustor)) AS adjustor,
+      c.received
+    FROM claimant c
+    WHERE c.claimantid IS NOT NULL
+      AND c.dl_iscurrent = 1
+
+- name: stg_core_claim_transaction_data_final
+  sql: |
+    SELECT 
+      p.wcclaimid, p.code, p.claim, p.lob, p.coveragecategory, p.lte, 
+      p.dol, p.recvd, p.occid, p.accident, p.injury, p.typocov,
+      i.carrier, i.productionsrc, i.markettype, i.pobegin, i.poexpir, i.agency,
+      c.claimantid, c.claimantnumber, c.tpataxid, c.adjustor, c.received
+    FROM claim_policy_info p
+    JOIN claim_insured_info i ON p.code = i.insured_code
+    JOIN claim_claimant_info c ON p.wcclaimid = c.wcclaimid
+    WHERE p.lob IN ('BP','CP','CA','HO','WC','DB')

@@ -1,0 +1,97 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Platform Services Ingest Dataset",
+    "description": "A dataset that represents source data to be ingested",
+    "type": "object",
+    "properties": {
+        "datasetName": {
+            "type": "string"
+        },
+        "enable": {
+            "type": "boolean"
+        },
+        "datasetTypeName": {
+            "$ref": "enums.json#/definitions/datasetTypeName"
+        },
+        "databaseName": {
+            "type": "string"
+        },
+        "datasetSchema": {
+            "type": "string"
+        },
+        "skipCuratedLoad": {
+            "type": "boolean"
+        },
+        "fileType": {
+            "$ref": "enums.json#/definitions/fileType"
+        },
+        "sourceSystemProperties": {
+            "oneOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "datasetTypeName": {
+                                "const": "database"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "sourceSystemProperties.json#/definitions/database"
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "datasetTypeName": {
+                                "const": "file"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "sourceSystemProperties.json#/definitions/file"
+                    }
+                }
+            ]
+        },
+        "rawProperties": {
+            "$ref": "rawProperties.json#/rawProperties"
+        },
+        "curatedProperties": {
+            "$ref": "curatedProperties.json#/curatedProperties"
+        },
+        "customProperties": {
+            "type": "object"
+        }
+    },
+    "required": [
+        "datasetName",
+        "enable",
+        "datasetTypeName",
+        "sourceSystemProperties",
+        "rawProperties",
+        "curatedProperties"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "datasetTypeName": {
+                        "const": "database"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "databaseName",
+                    "datasetSchema"
+                ]
+            }
+        },
+        {
+            "$ref": "curatedProperties.json#/definitions/fileTypeCsv"
+        },
+        {
+            "$ref": "curatedProperties.json#/definitions/fileTypeExcel"
+        }
+    ]
+}

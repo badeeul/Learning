@@ -1,0 +1,78 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_aslob
+  load_strategy: type_two
+  key_columns:
+    - aslob_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: curated_bop_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: curated_db_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: curated_ho_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: curated_wc_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_aslob
+    sql: SELECT 
+            aslob as aslob_code
+            ,cast(null as string) as description
+        FROM 
+            curated_bop_claim_summary
+        GROUP BY
+            aslob
+        UNION
+        SELECT 
+            aslob as aslob_code
+            ,cast(null as string) as description 
+        FROM
+            curated_ca_claim_summary
+        GROUP BY
+            aslob
+        UNION
+        SELECT 
+            aslob as aslob_code
+            ,cast(null as string) as description
+        FROM
+            curated_db_claim_summary
+        GROUP BY
+            aslob
+        UNION
+        SELECT 
+            aslob as aslob_code
+            ,cast(null as string) as description
+        FROM
+            curated_ho_claim_summary
+        GROUP BY
+            aslob
+        UNION
+        SELECT 
+            aslob as aslob_code
+            ,cast(null as string) as description
+        FROM
+            curated_wc_claim_summary
+        GROUP BY
+            aslob
+    description: "This query selects distinct aslob codes from various claim summary tables and combines them into a single result set. It also includes existing records from the dim_aslob table where aslob_code is not null. The result set will be used to populate the dim_aslob table in the reserves schema."

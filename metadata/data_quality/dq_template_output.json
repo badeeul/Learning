@@ -1,0 +1,4439 @@
+[
+    {
+        "dq_rule_master_key": 1,
+        "dq_rule_id": "DP_CTI_072",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values are not null for column [claimnum]",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claimnum"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 75.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_scu_001_tables_for_data_product_zone",
+        "dq_rule_applicable_schema": "accounting_curated",
+        "dq_rule_applicable_object": "massive_claims",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 2,
+        "dq_rule_id": "DP_CTI_073",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values are not null for column [asofdate]",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "asofdate"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 75.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_scu_001_tables_for_data_product_zone",
+        "dq_rule_applicable_schema": "accounting_curated",
+        "dq_rule_applicable_object": "massive_claims",
+        "dq_rule_applicable_attribute": "asofdate",
+        "dq_rule_failure_action": "warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 3,
+        "dq_rule_id": "DP_CTI_074",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values in column [claimnum] are of data type [varchar]",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claimnum",
+                "type_": "StringType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 75.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_scu_001_tables_for_data_product_zone",
+        "dq_rule_applicable_schema": "accounting_curated",
+        "dq_rule_applicable_object": "massive_claims",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 4,
+        "dq_rule_id": "DP_CTI_075",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values in column [asofdate] are of data type [date]",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "asofdate",
+                "type_": "TimestampType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 75.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_scu_001_tables_for_data_product_zone",
+        "dq_rule_applicable_schema": "accounting_curated",
+        "dq_rule_applicable_object": "massive_claims",
+        "dq_rule_applicable_attribute": "asofdate",
+        "dq_rule_failure_action": "warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 5,
+        "dq_rule_id": "DP_CTI_076",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values are unique for column [claimnum]",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "claimnum"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 75.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_scu_001_tables_for_data_product_zone",
+        "dq_rule_applicable_schema": "accounting_curated",
+        "dq_rule_applicable_object": "massive_claims",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 8,
+        "dq_rule_id": "DP_CTI_148",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Detailed Reserving Segment Lookup:\n\nBOP_LIAB\nBOP_PROP\nERROR\nBOP_LIAB_ES\nBOP_PROP_ES\nERROR_ES",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "DetailedResSeg",
+                "value_set": [
+                    "BOP_LIAB",
+                    "BOP_PROP",
+                    "ERROR",
+                    "BOP_LIAB_ES",
+                    "BOP_PROP_ES",
+                    "ERROR_ES"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "BOPClaimSummary",
+        "dq_rule_applicable_attribute": "detailedresseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 9,
+        "dq_rule_id": "DP_CTI_149",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Detailed Reserving Segment Lookup: \n\nCANF\nCAUM\nCAPD\nCABI\nCACOLL\nCACOMP\nERROR",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "DetailedResSeg",
+                "value_set": [
+                    "CANF",
+                    "CAUM",
+                    "CAPD",
+                    "CABI",
+                    "CACOLL",
+                    "CACOMP",
+                    "ERROR"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "CAClaimSummary",
+        "dq_rule_applicable_attribute": "detailedresseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 10,
+        "dq_rule_id": "DP_CTI_150",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transmittal Segment Lookup:\n\nBOP - CAS E&S\nBOP - PROP E&S\nBOP - CAS\nBOP - PROP\nWHAT IS THIS",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "TransmittalSeg",
+                "value_set": [
+                    "BOP - CAS E&S",
+                    "BOP - PROP E&S",
+                    "BOP - CAS",
+                    "BOP - PROP",
+                    "WHAT IS THIS"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "BOPClaimSummary",
+        "dq_rule_applicable_attribute": "transmittalseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 11,
+        "dq_rule_id": "DP_CTI_151",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transmittal Segment Lookup:\n\nAuto - No Fault\nAuto - Liab\nAuto - PhysDam\nERROR",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "TransmittalSeg",
+                "value_set": [
+                    "Auto - No Fault",
+                    "Auto - Liab",
+                    "Auto - PhysDam",
+                    "ERROR"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "CAClaimSummary",
+        "dq_rule_applicable_attribute": "transmittalseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 12,
+        "dq_rule_id": "DP_CTI_152",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Number = the first 10 characters in Claim Number",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_policy_number_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_policy_number_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 13,
+        "dq_rule_id": "DP_CTI_153",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that each claim number has a single loss date",
+        "dq_rule_constraint": {
+            "type": "expect_compound_columns_to_be_unique",
+            "kwargs": {
+                "column_list": [
+                    "claim_number",
+                    "loss_date"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_number, loss_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 14,
+        "dq_rule_id": "DP_CTI_154",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Accident Year = year of the loss date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_accident_year_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "accident_year, loss_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 15,
+        "dq_rule_id": "DP_CTI_170",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column cal_yr_mo_end is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "cal_yr_mo_end",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 16,
+        "dq_rule_id": "DP_CTI_171",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for mass_indicator are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "mass_indicator"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "mass_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 18,
+        "dq_rule_id": "DP_CTI_173",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for cwp_count are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "cwp_count"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cwp_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 19,
+        "dq_rule_id": "DP_CTI_174",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column cwp_count is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "cwp_count",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cwp_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 20,
+        "dq_rule_id": "DP_CTI_175",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for pending_count are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "pending_count"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "pending_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 21,
+        "dq_rule_id": "DP_CTI_176",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column pending_count is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "pending_count",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "pending_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 23,
+        "dq_rule_id": "DP_CTI_195",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for cat_indicator are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "cat_indicator"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cat_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 24,
+        "dq_rule_id": "DP_CTI_196",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column cat_indicator is of datatype boolean",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "cat_indicator",
+                "type_": "BooleanType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cat_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 25,
+        "dq_rule_id": "DP_CTI_197",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column accident_year is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "accident_year",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "accident_year",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 29,
+        "dq_rule_id": "DP_CTI_217",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column closed_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "closed_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "closed_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 30,
+        "dq_rule_id": "DP_CTI_218",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column cwp_final_indicator is of datatype boolean",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "cwp_final_indicator",
+                "type_": "BooleanType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cwp_final_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 31,
+        "dq_rule_id": "DP_CTI_219",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column DCC_only_count is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "dcc_only_count",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dcc_only_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 35,
+        "dq_rule_id": "DP_CTI_223",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column first_entered_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "first_entered_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "first_entered_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 39,
+        "dq_rule_id": "DP_CTI_242",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column suit_filed_indicator is of datatype boolean",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "suit_filed_indicator",
+                "type_": "BooleanType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "suit_filed_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 40,
+        "dq_rule_id": "DP_CTI_243",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column time_to_close_days is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "time_to_close",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "time_to_close_days",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 41,
+        "dq_rule_id": "DP_CTI_244",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column time_to_report_days is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "time_to_report",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "time_to_report_days",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 42,
+        "dq_rule_id": "DP_CTI_245",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column TPA_indicator is of datatype boolean",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "tpa_indicator",
+                "type_": "BooleanType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "tpa_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 44,
+        "dq_rule_id": "DP_CTI_265",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for occurrence_number follow the below format:\nAAAA######-###",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "occurrence_number",
+                "regex": "^.{4}\\d{6}-\\d{3}$"
+            },
+            "meta": {
+                "description": "Confirms that the values for occurrence_number follow the format: AAAA######-###",
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "occurrence_number",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 45,
+        "dq_rule_id": "DP_CTI_266",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Case loss reserve on open amount = claim gross incurred loss amount - claim gross paid loss amount",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_loss_reserve_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_claim_loss_reserve_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 46,
+        "dq_rule_id": "DP_CTI_267",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Case dcc reserve on open amount = claim incurred dcc amount - claim paid dcc amount",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_dcc_reserve_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_claim_dcc_reserve_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 48,
+        "dq_rule_id": "DP_CTI_269",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for CWP final indicator are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "cwp_final_indicator"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cwp_final_indicator",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 49,
+        "dq_rule_id": "DP_CTI_270",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that handled by legal indicator = Y or N",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "handled_by_legal_indicator",
+                "value_set": [
+                    "Y",
+                    "N"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "handled_by_legal_indicator",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 50,
+        "dq_rule_id": "DP_CTI_271",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that massive indicator = Y or N",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "mass_indicator",
+                "value_set": [
+                    "Y",
+                    "N"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "mass_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 51,
+        "dq_rule_id": "DP_CTI_272",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that medical only indicator is null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_null",
+            "kwargs": {
+                "column": "MedOnlyInd"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "BOPClaimSummary",
+        "dq_rule_applicable_attribute": "medonlyind",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 52,
+        "dq_rule_id": "DP_CTI_305",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "WrittenExposure >= 0 for every row",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_written_exposures_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_written_exposures_check",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 53,
+        "dq_rule_id": "DP_CTI_306",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column written_exposures is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "written_exposures",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "written_exposures",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 55,
+        "dq_rule_id": "DP_CTI_307",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transmittal Segment = DB for every row",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "TransmittalSeg",
+                "value_set": [
+                    "DB"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "DBClaimSummary",
+        "dq_rule_applicable_attribute": "transmittalseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 56,
+        "dq_rule_id": "DP_CTI_308",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transmittal Segment Lookup:\n\nInland Marine\nHomeowners\nHomeowners E&S\nEarthquake\nEarthquake E&S\nERROR",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "TransmittalSeg",
+                "value_set": [
+                    "Inland Marine",
+                    "Homeowners",
+                    "Homeowners E&S",
+                    "Earthquake",
+                    "Earthquake E&S",
+                    "ERROR"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "HOClaimSummary",
+        "dq_rule_applicable_attribute": "transmittalseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 57,
+        "dq_rule_id": "DP_CTI_309",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transmittal Segment Lookup:\n\nWorkers' Compensation ELS\nWorkers' Compensation Direct Assignment\nWorkers' Compensation RISC\nWorkers' Compensation NICO\nWorkers' Compensation",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "TransmittalSeg",
+                "value_set": [
+                    "Workers Compensation ELS",
+                    "Workers Compensation Direct Assignment",
+                    "Workers Compensation RISC",
+                    "Workers Compensation NICO",
+                    "Workers Compensation"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "WCClaimSummary",
+        "dq_rule_applicable_attribute": "transmittalseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 58,
+        "dq_rule_id": "DP_CTI_310",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Reserve Segment Lookup:\n\nCOMMDISABILITY_PFL\nCOMMDISABILITY_OTH",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "ResSeg",
+                "value_set": [
+                    "COMMDISABILITY_PFL",
+                    "COMMDISABILITY_OTH"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "DBClaimSummary",
+        "dq_rule_applicable_attribute": "resseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 59,
+        "dq_rule_id": "DP_CTI_311",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Reserve Segment Lookup:\n\nPERSLIAB\nPERSPROP\nPERSPROP_MASSCAT\nPERSPROP_MASS\nPERSPROP_CAT\nPERSPROP_NET",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "ResSeg",
+                "value_set": [
+                    "PERSLIAB",
+                    "PERSPROP",
+                    "PERSPROP_MASSCAT",
+                    "PERSPROP_MASS",
+                    "PERSPROP_CAT",
+                    "PERSPROP_NET"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "HOClaimSummary",
+        "dq_rule_applicable_attribute": "resseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 60,
+        "dq_rule_id": "DP_CTI_140",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Gross Incurred Loss = Net Incurred Loss - Paid Subrogation - Paid Salvage",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_gross_incurred_loss_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_claim_gross_incurred_loss_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 61,
+        "dq_rule_id": "DP_CTI_141",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms there is a single record for each unique combination of claim number and cal yr mo end",
+        "dq_rule_constraint": {
+            "type": "expect_compound_columns_to_be_unique",
+            "kwargs": {
+                "column_list": [
+                    "claim_number",
+                    "cal_yr_mo_end"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_number, cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 0,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2025-05-29T00:00:00.000Z"
+    },
+    {
+        "dq_rule_master_key": 62,
+        "dq_rule_id": "DP_CTI_142",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Time to report = received date - date of loss",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_time_to_report_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "time_to_report, received_date, loss_date",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 63,
+        "dq_rule_id": "DP_CTI_143",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Time to close = closed date - received date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_time_to_close_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "time_to_close, closed_date, received_date",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 64,
+        "dq_rule_id": "DP_CTI_144",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Closed count + pending count = reported count",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_reported_count_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_reported_count_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 65,
+        "dq_rule_id": "DP_CTI_145",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Reserving Segment Lookup:\n\nCOMMLIAB_MASS \nCOMMLIAB_NET\nCOMMPROP_MASSCAT\nCOMMPROP_MASS\nCOMMPROP_CAT\nCOMMPROP_NET\nCOMMLIAB_AP\nCOMMLIAB_AS_CO_CS\nCOMMLIAB_OTH\nWHAT IS THIS",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "ResSeg",
+                "value_set": [
+                    "COMMLIAB_MASS",
+                    "COMMLIAB_NET",
+                    "COMMPROP_MASSCAT",
+                    "COMMPROP_MASS",
+                    "COMMPROP_CAT",
+                    "COMMPROP_NET",
+                    "COMMLIAB_AP",
+                    "COMMLIAB_AS_CO_CS",
+                    "COMMLIAB_OTH",
+                    "WHAT IS THIS"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "BOPClaimSummary",
+        "dq_rule_applicable_attribute": "resseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 66,
+        "dq_rule_id": "DP_CTI_146",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Reserving Segment Lookup:\n\nCA_LIAB_MASS\nCANF_MASS\nCA_PHYSDAM_MASSCAT\nCA_PHYSDAM_MASS\nCACOMP_CAT\nCACOMP_NET\nCABI\nCACOLL\nCANF\nCAPD\nCAUM\nERROR",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "ResSeg",
+                "value_set": [
+                    "CA_LIAB_MASS",
+                    "CANF_MASS",
+                    "CA_PHYSDAM_MASSCAT",
+                    "CA_PHYSDAM_MASS",
+                    "CACOMP_CAT",
+                    "CACOMP_NET",
+                    "CABI",
+                    "CACOLL",
+                    "CANF",
+                    "CAPD",
+                    "CAUM",
+                    "ERROR"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "CAClaimSummary",
+        "dq_rule_applicable_attribute": "resseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 69,
+        "dq_rule_id": "DP_CTI_163",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for carrier_key are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "carrier_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "carrier_key",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 71,
+        "dq_rule_id": "DP_CTI_165",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for policy_effective_date are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "policy_effective_date"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 72,
+        "dq_rule_id": "DP_CTI_166",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column policy_effective_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "policy_effective_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 73,
+        "dq_rule_id": "DP_CTI_167",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for loss_date are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "loss_date"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "loss_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 74,
+        "dq_rule_id": "DP_CTI_168",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column loss_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "loss_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "loss_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 75,
+        "dq_rule_id": "DP_CTI_169",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for cal_yr_mo_end are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "cal_yr_mo_end"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 76,
+        "dq_rule_id": "DP_CTI_185",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_paid_DCC_amount are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_paid_dcc_amount"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_dcc_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 77,
+        "dq_rule_id": "DP_CTI_186",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_paid_DCC_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_paid_dcc_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_dcc_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 82,
+        "dq_rule_id": "DP_CTI_193",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_cause_detail_key are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_cause_detail_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_cause_detail_key",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 83,
+        "dq_rule_id": "DP_CTI_210",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_paid_DCC_on_closed_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_paid_dcc_on_closed_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_dcc_on_closed_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 84,
+        "dq_rule_id": "DP_CTI_211",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_paid_salvage_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_paid_salvage_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_salvage_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 85,
+        "dq_rule_id": "DP_CTI_212",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_paid_salvage_on_closed_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_paid_salvage_on_closed_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_salvage_on_closed_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 86,
+        "dq_rule_id": "DP_CTI_213",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_paid_subrogation_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_paid_subrogation_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_subrogation_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 87,
+        "dq_rule_id": "DP_CTI_214",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_paid_subrogation_on_closed_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_paid_subrogation_on_closed_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_paid_subrogation_on_closed_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 88,
+        "dq_rule_id": "DP_CTI_215",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claimant_id is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claimant_id",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claimant_id",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 89,
+        "dq_rule_id": "DP_CTI_216",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column closed_count is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "closed_count",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "closed_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 90,
+        "dq_rule_id": "DP_CTI_232",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column policy_number is of datatype varchar",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "policy_number",
+                "type_": "StringType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_number",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 93,
+        "dq_rule_id": "DP_CTI_235",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column received_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "received_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "received_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 94,
+        "dq_rule_id": "DP_CTI_236",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column reopened_count is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "reopened_count",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "reopened_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 95,
+        "dq_rule_id": "DP_CTI_237",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column reopened_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "reopened_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "reopened_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 96,
+        "dq_rule_id": "DP_CTI_238",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column reported_count is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "reported_count",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "reported_count",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 97,
+        "dq_rule_id": "DP_CTI_255",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for earned_premium are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "earned_premiums"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "earned_premiums",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 98,
+        "dq_rule_id": "DP_CTI_256",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column earned_premium is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "earned_premiums",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "earned_premiums",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 100,
+        "dq_rule_id": "DP_CTI_260",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column written_premium is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "written_premiums",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "written_premiums",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 101,
+        "dq_rule_id": "DP_CTI_262",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column loss_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "loss_date",
+                "type_": "TimestampType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "loss_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 102,
+        "dq_rule_id": "DP_CTI_263",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column first_entered_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "first_entered_date",
+                "type_": "TimestampType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "first_entered_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 103,
+        "dq_rule_id": "DP_CTI_264",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for policy_number follow the below format:\nAAAA######",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "policy_number",
+                "regex": "^[A-Z]{4}\\d{6}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_number",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 104,
+        "dq_rule_id": "DP_CTI_298",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for line_of_business_key are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "line_of_business_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "line_of_business_key",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 105,
+        "dq_rule_id": "DP_CTI_299",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column loss_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "loss_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "loss_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 106,
+        "dq_rule_id": "DP_CTI_300",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for policy_effective_date are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "policy_effective_date"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 107,
+        "dq_rule_id": "DP_CTI_301",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column policy_effective_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "policy_effective_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 108,
+        "dq_rule_id": "DP_CTI_302",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Cal yr mo end >= Policy effective date",
+        "dq_rule_constraint": {
+            "type": "expect_column_pair_values_a_to_be_greater_than_b",
+            "kwargs": {
+                "column_A": "cal_yr_mo_end",
+                "column_B": "policy_effective_date",
+                "or_equal": "True"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date, cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 115,
+        "dq_rule_id": "DP_CTI_137",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "loss date <= first entered date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_date_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_loss_date_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 116,
+        "dq_rule_id": "DP_CTI_138",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "received date <= first entered date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_received_date_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_received_date_check",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 117,
+        "dq_rule_id": "DP_CTI_139",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "first entered date <= cal yr mo end",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_first_entered_date_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_first_entered_date_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 118,
+        "dq_rule_id": "DP_CTI_319",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_number follow the below format:\nAAAA######-###",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "claimnum",
+                "regex": "^.{4}\\d{6}-\\d{3}$"
+            },
+            "meta": {
+                "description": "Confirms that the values for claimnum follow the format: AAAA######-###",
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "DBClaimSummary",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 119,
+        "dq_rule_id": "DP_CTI_320",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_number follow the below format:\nAAAA######-###-###-###",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "claimnum",
+                "regex": "^.{4}\\d{6}-\\d{3}-\\d{3}-\\d{3}$"
+            },
+            "meta": {
+                "description": "Confirms that the values for claimnum follow the format: AAAA######-###-###-###",
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "HOClaimSummary",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 120,
+        "dq_rule_id": "DP_CTI_321",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_number follow the below format:\nAAAA######-###",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "claimnum",
+                "regex": "^.{4}\\d{6}-\\d{3}$"
+            },
+            "meta": {
+                "description": "Confirms that the values for claimnum follow the format: AAAA######-###",
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "WCClaimSummary",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 126,
+        "dq_rule_id": "DP_CTI_155",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If cat indicator = 'y' then catastrophe code is not null\nif cat indicator = 'n' then catastrophe code is null\nand vise versa",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_catastrophe_indicator_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_claim_catastrophe_indicator_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 127,
+        "dq_rule_id": "DP_CTI_156",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Cal yr mo end >= Policy effective date",
+        "dq_rule_constraint": {
+            "type": "expect_column_pair_values_a_to_be_greater_than_b",
+            "kwargs": {
+                "column_A": "cal_yr_mo_end",
+                "column_B": "policy_effective_date",
+                "or_equal": "True"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date, cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 128,
+        "dq_rule_id": "DP_CTI_157",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_number are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_number"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_number",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 129,
+        "dq_rule_id": "DP_CTI_158",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_number follow the below format:\nAAAA######-###-###-###",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "claimnum",
+                "regex": "^.{4}\\d{6}-\\d{3}-\\d{3}-\\d{3}$"
+            },
+            "meta": {
+                "description": "Confirms that the values for claimnum follow the format: AAAA######-###-###-###",
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "BOPClaimSummary",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 130,
+        "dq_rule_id": "DP_CTI_159",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_number is of datatype varchar",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_number",
+                "type_": "StringType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_number",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 131,
+        "dq_rule_id": "DP_CTI_160",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_number follow the below format:\nAAAA######-###-###-###",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "claimnum",
+                "regex": "^.{4}\\d{6}-\\d{3}-\\d{3}-\\d{3}$"
+            },
+            "meta": {
+                "description": "Confirms that the values for claimnum follow the format: AAAA######-###-###-###",
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "CAClaimSummary",
+        "dq_rule_applicable_attribute": "claimnum",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 132,
+        "dq_rule_id": "DP_CTI_161",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for line_of_business_key are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "line_of_business_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "line_of_business_key",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 133,
+        "dq_rule_id": "DP_CTI_177",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_net_incurred_loss_amount are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_net_incurred_loss_amount"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_net_incurred_loss_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 134,
+        "dq_rule_id": "DP_CTI_178",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_net_incurred_loss_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_net_incurred_loss_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_net_incurred_loss_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 135,
+        "dq_rule_id": "DP_CTI_179",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_gross_incurred_loss_amount are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_gross_incurred_loss_amount"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_gross_incurred_loss_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 136,
+        "dq_rule_id": "DP_CTI_180",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_gross_incurred_loss_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_gross_incurred_loss_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_gross_incurred_loss_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 137,
+        "dq_rule_id": "DP_CTI_181",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_incurred_DCC_amount are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_incurred_dcc_amount"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_incurred_dcc_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 138,
+        "dq_rule_id": "DP_CTI_182",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_incurred_DCC_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_incurred_dcc_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_incurred_dcc_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 139,
+        "dq_rule_id": "DP_CTI_183",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for claim_gross_paid_loss_amount are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claim_gross_paid_loss_amount"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_gross_paid_loss_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 140,
+        "dq_rule_id": "DP_CTI_184",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_gross_paid_loss_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_gross_paid_loss_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_gross_paid_loss_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 142,
+        "dq_rule_id": "DP_CTI_202",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column case_dcc_reserve_on_open_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "case_dcc_reserve_on_open_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "case_dcc_reserve_on_open_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 143,
+        "dq_rule_id": "DP_CTI_203",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column case_loss_reserve_on_open_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "case_loss_reserve_on_open_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "case_loss_reserve_on_open_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 145,
+        "dq_rule_id": "DP_CTI_206",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_gross_incurred_loss_on_open_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_gross_incurred_loss_on_open_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_gross_incurred_loss_on_open_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 146,
+        "dq_rule_id": "DP_CTI_207",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_gross_paid_loss_on_closed_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_gross_paid_loss_on_closed_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_gross_paid_loss_on_closed_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 147,
+        "dq_rule_id": "DP_CTI_208",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_incurred_DCC_on_open_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_incurred_dcc_on_open_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_incurred_dcc_on_open_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 148,
+        "dq_rule_id": "DP_CTI_209",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column claim_net_incurred_loss_on_open_amount is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "claim_net_incurred_loss_on_open_amount",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "claim_net_incurred_loss_on_open_amount",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 152,
+        "dq_rule_id": "DP_CTI_227",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column maturity is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "maturity",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "maturity",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 153,
+        "dq_rule_id": "DP_CTI_228",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column medical_only_indicator is of datatype boolean",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "medical_only_indicator",
+                "type_": "BooleanType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "medical_only_indicator",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 155,
+        "dq_rule_id": "DP_CTI_230",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column occurence_number is of datatype varchar",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "occurrence_number",
+                "type_": "StringType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "occurrence_number",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 156,
+        "dq_rule_id": "DP_CTI_231",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column policy_expiration_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "policy_expiration_date",
+                "type_": "TimestampType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_expiration_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 157,
+        "dq_rule_id": "DP_CTI_247",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column wc_ct_flag is of datatype varchar",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "wc_ct_flag",
+                "type_": "StringType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "wc_ct_flag",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 158,
+        "dq_rule_id": "DP_CTI_248",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column wcclaimid is of datatype int",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "wcclaimid",
+                "type_": "IntegerType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_claim_loss_reserve_payment_monthly_snapshot",
+        "dq_rule_applicable_attribute": "wcclaimid",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 159,
+        "dq_rule_id": "DP_CTI_249",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for line_of_business_key are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "line_of_business_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "line_of_business_key",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 160,
+        "dq_rule_id": "DP_CTI_251",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for policy_effective_date are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "policy_effective_date"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 161,
+        "dq_rule_id": "DP_CTI_252",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column policy_effective_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "policy_effective_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "policy_effective_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 162,
+        "dq_rule_id": "DP_CTI_253",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for cal_yr_mo_end are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "cal_yr_mo_end"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 163,
+        "dq_rule_id": "DP_CTI_254",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column cal_yr_mo_end is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "cal_yr_mo_end",
+                "type_": "TimestampType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_premiums_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 164,
+        "dq_rule_id": "DP_CTI_273",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that medical only indicator is null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_null",
+            "kwargs": {
+                "column": "MedOnlyInd"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "CAClaimSummary",
+        "dq_rule_applicable_attribute": "medonlyind",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 165,
+        "dq_rule_id": "DP_CTI_289",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for cal_yr_mo_end are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "cal_yr_mo_end"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 166,
+        "dq_rule_id": "DP_CTI_290",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column cal_yr_mo_end is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "cal_yr_mo_end",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "cal_yr_mo_end",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 167,
+        "dq_rule_id": "DP_CTI_291",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "EarnedExposure > 0 for every row",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_earned_exposures_check",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "dq_earned_exposures_check",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 168,
+        "dq_rule_id": "DP_CTI_292",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that the values for earned_exposures are not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "earned_exposures"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "earned_exposures",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 169,
+        "dq_rule_id": "DP_CTI_293",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column earned_exposures is of datatype float",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_of_type",
+            "kwargs": {
+                "column": "earned_exposures",
+                "type_": "FloatType"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "earned_exposures",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "100",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 170,
+        "dq_rule_id": "DP_CTI_297",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that column first_entered_date is of datatype date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_match_regex",
+            "kwargs": {
+                "column": "first_entered_date",
+                "regex": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "fact_exposures_monthly_snapshot",
+        "dq_rule_applicable_attribute": "first_entered_date",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 171,
+        "dq_rule_id": "DP_CTI_312",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Reserve Segment Lookup:\n\nWC_ELS\nWC_MedLT\nWC_MedInd_DA\nWC_MedOnly_RISC\nWC_MedLT_RISC\nWC_NONREVIEWED\nWC_NICO\nWHAT IS THIS\nWC_ELS_MASS\nWC_MedOnly_MASS\nWC_MedLT_MASS\nWC_MedInd_DA_MASS\nWC_MedOnly_RISC_MASS\nWC_MedLT_RISC_MASS\nWC_NONREVIEWED_MASS\nWC_NICO_MASS\nWHAT IS THIS_MASS\nWC_ELS_NET\nWC_MedOnly_NET\nWC_MedInd_DA_NET\nWC_MedOnly_RISC_NET\nWC_MedLT_RISC_NET\nWC_NONREVIEWED_NET\nWC_NICO_NET\nWHAT IS THIS_NET\nWC_MedLT_NET_CA\nWC_MedOnly_CA\nWC_MedLT_NET_xCA\nWC_MedOnly_xCA\nWC_Ind_NET_CA\nWC_Ind_NET_xCA\nWC_Ind_MASS\nWC_Ind\nWC_Ind_RISC",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "ResSeg",
+                "value_set": [
+                    "WC_ELS",
+                    "WC_MedLT",
+                    "WC_MedInd_DA",
+                    "WC_MedOnly_RISC",
+                    "WC_MedLT_RISC",
+                    "WC_NONREVIEWED",
+                    "WC_NICO",
+                    "WHAT IS THIS",
+                    "WC_ELS_MASS",
+                    "WC_MedOnly_MASS",
+                    "WC_MedLT_MASS",
+                    "WC_MedInd_DA_MASS",
+                    "WC_MedOnly_RISC_MASS",
+                    "WC_MedLT_RISC_MASS",
+                    "WC_NONREVIEWED_MASS",
+                    "WC_NICO_MASS",
+                    "WHAT IS THIS_MASS",
+                    "WC_ELS_NET",
+                    "WC_MedOnly_NET",
+                    "WC_MedInd_DA_NET",
+                    "WC_MedOnly_RISC_NET",
+                    "WC_MedLT_RISC_NET",
+                    "WC_NONREVIEWED_NET",
+                    "WC_NICO_NET",
+                    "WHAT IS THIS_NET",
+                    "WC_MedLT_NET_CA",
+                    "WC_MedOnly_CA",
+                    "WC_MedLT_NET_xCA",
+                    "WC_MedOnly_xCA",
+                    "WC_Ind_NET_CA",
+                    "WC_Ind_NET_xCA",
+                    "WC_Ind_MASS",
+                    "WC_Ind",
+                    "WC_Ind_RISC"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 100.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "WCClaimSummary",
+        "dq_rule_applicable_attribute": "resseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "50",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 172,
+        "dq_rule_id": "DP_CTI_313",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Detailed Reserving Segment Lookup:\n\nCOMMDISABILITY_PFL\nCOMMDISABILITY_OTH",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "DetailedResSeg",
+                "value_set": [
+                    "COMMDISABILITY_PFL",
+                    "COMMDISABILITY_OTH"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "DBClaimSummary",
+        "dq_rule_applicable_attribute": "detailedresseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 173,
+        "dq_rule_id": "DP_CTI_314",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Detailed Reserving Segment Lookup:\n\nHO_LIAB\nHO_PROP\nPERS_IM\nPERS_EQ\nERROR\nHO_LIAB_ES\nHO_PROP_ES\nPERS_EQ_ES\nERROR_ES",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "DetailedResSeg",
+                "value_set": [
+                    "HO_LIAB",
+                    "HO_PROP",
+                    "PERS_IM",
+                    "PERS_EQ",
+                    "ERROR",
+                    "HO_LIAB_ES",
+                    "HO_PROP_ES",
+                    "PERS_EQ_ES",
+                    "ERROR_ES"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "HOClaimSummary",
+        "dq_rule_applicable_attribute": "detailedresseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 174,
+        "dq_rule_id": "DP_CTI_315",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Detailed Reserving Segment Lookup:\n\nWC_ELS\nWC_MedOnly\nWC_MedLT\nWC_Ind\nWC_MedInd_DA\nWC_MedOnly_RISC\nWC_MedLT_RISC\nWC_Ind_RISC\nWC_NONREVIEWED\nWC_NICO\nWHAT IS THIS\nERROR",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "DetailedResSeg",
+                "value_set": [
+                    "WC_ELS",
+                    "WC_MedOnly",
+                    "WC_MedLT",
+                    "WC_Ind",
+                    "WC_MedInd_DA",
+                    "WC_MedOnly_RISC",
+                    "WC_MedLT_RISC",
+                    "WC_Ind_RISC",
+                    "WC_NONREVIEWED",
+                    "WC_NICO",
+                    "WHAT IS THIS",
+                    "ERROR"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 50.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "WCClaimSummary",
+        "dq_rule_applicable_attribute": "detailedresseg",
+        "dq_rule_failure_action": "Fail",
+        "dq_rule_severity_score": "37.5",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 175,
+        "dq_rule_id": "DP_CTI_316",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that medical only indicator is null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_null",
+            "kwargs": {
+                "column": "MedOnlyInd"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "DBClaimSummary",
+        "dq_rule_applicable_attribute": "medonlyind",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 176,
+        "dq_rule_id": "DP_CTI_317",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Confirms that medical only indicator is null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_null",
+            "kwargs": {
+                "column": "MedOnlyInd"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "HOClaimSummary",
+        "dq_rule_applicable_attribute": "medonlyind",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 177,
+        "dq_rule_id": "DP_CTI_318",
+        "data_product_name": "Claims Triangle Input",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Med Only Indicator Lookup:\n\nMedOnly\nMedLT",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_null",
+            "kwargs": {
+                "column": "MedOnlyInd"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 100.0,
+                    "quarantine": false
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_data_product_tables",
+        "dq_rule_applicable_schema": "reserves",
+        "dq_rule_applicable_object": "WCClaimSummary",
+        "dq_rule_applicable_attribute": "medonlyind",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "25",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-05-27T06:44:38.137Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    }
+]

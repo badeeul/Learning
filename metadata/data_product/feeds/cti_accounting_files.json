@@ -1,0 +1,53 @@
+{
+    "loadGroupA": [
+        {
+            "files": [
+                {
+                    "fileName": "accounting_curated_bop_pdos_summary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_bop_pdos_webreport",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_ca_pdos_summary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_ca_pdos_webreport",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_ho_pdos_summary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_ho_pdos_webreport",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_wc_os_summary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "accounting_curated_wc_pd_summary",
+                    "modelConfigFolderName": "claims_reserves"
+                }
+            ]
+        }
+    ],
+    "loadGroupB": [
+        {
+            "files": [
+            ]
+        }
+    ],
+    "loadGroupC": [
+        {
+            "files": [
+                
+            ]
+        }
+    ]
+}

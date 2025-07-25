@@ -1,0 +1,24 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_auto_vehicle_size
+  load_strategy: type_two
+  key_columns:
+    - auto_vehicle_size_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+query:
+  - name: dim_auto_vehicle_size
+    sql: SELECT DISTINCT
+            autovehiclesize as auto_vehicle_size_code
+        FROM curated_ca_claim_summary
+    description: |
+      This table is used to create a dimension table for auto vehicle size. The table is created
+      from the auto vehicle size codes of the curated claim summary table for CA only.

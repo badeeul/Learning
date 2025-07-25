@@ -1,0 +1,48 @@
+{
+    "datasetName": "bop_resseg",
+    "enable": true,
+    "datasetTypeName": "file",
+    "fileType": "excel",
+    "isStaticFileName": false,
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "Reserving",
+        "sourceSystemType": "lakehouse",
+        "ingestType": "watermark",
+        "sourceWatermarkIdentifier": "LastModifiedDateTime",
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "filesDirectoryName": "user_data/resseg",
+        "archiveSource": false,
+        "ingestRecursively": false
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "fileType": "excel",
+        "directoryName": "Reserving"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_scu_001_tables_for_data_product_zone",
+        "schemaName": "accounting",
+        "schemaEvolutionMode": "none",
+        "schemaLocation": null,
+        "customFileOptions": [
+            {
+                "SheetName": "BOP",
+                "SkipRows": 0,
+                "Columns": [
+                    "BuildingGroup",
+                    "aslob",
+                    "ResSeg"
+                ],
+                "Filter": ""
+            }
+        ],
+        "primaryKeyList": [],
+        "sensitiveColumns": null,
+        "enableSensitiveFieldCheck": false,
+        "deletionCaptureEnabled": false,
+        "duplicateCheckEnabled": false,
+        "targetFileFormat": "delta",
+        "targetLoadType": "overwrite"
+    }
+}

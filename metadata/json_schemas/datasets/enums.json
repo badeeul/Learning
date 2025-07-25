@@ -1,0 +1,63 @@
+{
+    "definitions": {
+        "datasetTypeName": {
+            "type": "string",
+            "enum": [
+                "database",
+                "file"
+            ]
+        },
+        "ingestType": {
+            "type": "string",
+            "enum": [
+                "watermark",
+                "full"
+            ]
+        },
+        "sourceSystemType": {
+            "type": "string",
+            "enum": [
+                "lakehouse",
+                "sftp",
+                "notebook",
+                "blob"
+            ]
+        },
+        "fileType": {
+            "type": "string",
+            "enum": [
+                "parquet",
+                "csv",
+                "excel"
+            ]
+        },
+        "targetFileFormat": {
+            "type": "string",
+            "enum": [
+                "delta"
+            ]
+        },
+        "targetLoadType": {
+            "type": "string",
+            "enum": [
+                "merge",
+                "overwrite",
+                "append"
+            ]
+        },
+        "duplicateCheckQuarantineType": {
+            "type": "string",
+            "enum": [
+                "retain_one_duplicate",
+                "retain_all_duplicate"
+            ]
+        },
+        "quarantineStrategy": {
+            "type": "string",
+            "enum": [
+                "merge",
+                "append"
+            ]
+        }
+    }
+}

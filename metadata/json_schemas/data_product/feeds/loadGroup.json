@@ -1,0 +1,33 @@
+{
+    "loadGroup": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "fileName": {
+                                "fileName": {
+                                    "type": "string"
+                                },
+                                "modelConfigFolderName": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "required": [
+                            "fileName",
+                            "modelConfigFolderName"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "files"
+            ]
+        }
+    }
+}

@@ -1,0 +1,176 @@
+{
+    "loadGroupStaging": [
+        {
+            "files": [
+                {
+                    "fileName": "BOPIncrLossReservesStg",
+                    "modelConfigFolderName": "claims_reserves"
+                }
+            ]
+        }
+    ],
+    "loadGroupLOB1": [
+        {
+            "files": [
+                {
+                    "fileName": "BOPPremiumsSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "DBPremiumSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "HOPremiumSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "CAClaimSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "DBClaimSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "WCClaimSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "HOClaimSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "BOPClaimSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                }
+            ]
+        }
+    ],
+    "loadGroupLOB2": [
+        {
+            "files": [
+                {
+                    "fileName": "BOPExposuresSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "CAExposuresSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "CAPremiumsSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "DBExposureSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "WCPremiumExposure",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "HOExposureSummary",
+                    "modelConfigFolderName": "claims_reserves"
+                }
+            ]
+        }
+    ],
+    "loadGroupDims": [
+        {
+            "files": [
+                {
+                    "fileName": "dim_date",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_agency",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_market_type",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_aslob",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_carrier",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_catastrophe",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_claim_cause_detail",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_line_of_business",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_production_source",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_reserve_detailed_segment",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_state",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_transmittal_segment",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_exposure_class",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_exposure_group",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_industry",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_product",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_auto_vehicle_size",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "dim_auto_secondary_class",
+                    "modelConfigFolderName": "claims_reserves"
+                }
+            ]
+        }
+    ],
+    "loadGroupFacts": [
+        {
+            "files": [
+                {
+                    "fileName": "fact_claim_loss_reserve_payment_monthly_snapshot",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "fact_exposures_monthly_snapshot",
+                    "modelConfigFolderName": "claims_reserves"
+                },
+                {
+                    "fileName": "fact_premiums_monthly_snapshot",
+                    "modelConfigFolderName": "claims_reserves"
+                }
+            ]
+        }
+    ]
+}

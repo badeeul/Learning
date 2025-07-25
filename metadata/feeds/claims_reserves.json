@@ -1,0 +1,160 @@
+{
+    "feedName": "claims_reserves",
+    "feedDescription": "This is a feed for Claims Handling CTI Data Product",
+    "workLoadType": "dp-spark",
+    "skipProductLoad": false,
+    "dataDeduplicationAlert": true,
+    "deduplicationAlertTemplate": "deduplication_msg_claims",
+    "datasetsConfig": [
+        {
+            "datasetType": "database",
+            "datasets": [
+                {
+                    "fileName": "cl_occurrence",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claimant",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_catastrophe",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_catcodes",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_causeofloss",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_extra",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_lossdetail",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "insured",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "mgtrans_coverages",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "mgtrans",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "payments",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "reserves",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "uwbuildings",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "wcclaim",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "wclocnam",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "cl_coverage",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_caextra",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_cavehicles",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "claims_dbextra",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "injury",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "pc_coverage_names",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "pc_products",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "transaction_uwcoverage",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "uwvehicles",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "accident",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "injuryclass",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "pc_coverage_reporting",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "lookups",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "bpclass",
+                    "sourceConfigFolderName": "iis_data"
+                },
+                {
+                    "fileName": "wcinfo",
+                    "sourceConfigFolderName": "iis_data"
+                }
+            ]
+        },
+        {
+            "datasetType": "file",
+            "datasets": [
+                {
+                    "fileName": "massive_claims",
+                    "sourceConfigFolderName": "accounting"
+                },
+                {
+                    "fileName": "bop_resseg",
+                    "sourceConfigFolderName": "accounting"
+                },
+                {
+                    "fileName": "ca_resseg",
+                    "sourceConfigFolderName": "accounting"
+                },
+                {
+                    "fileName": "ho_resseg",
+                    "sourceConfigFolderName": "accounting"
+                },
+                {
+                    "fileName": "wc_resseg",
+                    "sourceConfigFolderName": "accounting"
+                }
+            ]
+        }
+    ]
+}

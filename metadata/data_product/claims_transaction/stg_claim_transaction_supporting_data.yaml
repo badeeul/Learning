@@ -1,0 +1,213 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: stg_claims_transaction
+  table: stg_claim_transaction_supporting_data
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: stg_core_claim_transaction_data
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: stg_claims_transaction
+    table: stg_core_claim_transaction_data
+
+  - name: claims_catastrophe
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_catastrophe
+
+  - name: claims_extra
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_extra
+
+  - name: catcode
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: catcode
+
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: cl_coverage
+
+  - name: claims_cavehicles
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_cavehicles
+
+  - name: transaction_uwhomes
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: transaction_uwhomes
+
+  - name: claims_dbextra
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_dbextra
+
+query:
+  - name: transaction_uwhomes_filtered
+    sql: |
+      SELECT
+          transaction_uwhomes_id,
+          UPPER(TRIM(uh.code)) as code
+      FROM transaction_uwhomes uh
+      WHERE uh.trancnt = 0 
+        AND uh.after = 1
+        AND uh.dl_iscurrent = 1
+
+  - name: property_data
+    sql: |
+      SELECT 
+        c.claimantid,
+        cl.buildingid,
+        cl.cvgid,
+        cl.commonname,
+        cl.coveragestate,
+        cl.ifield,
+        cl.uwcoverageid,
+        NULL AS vehicleid,
+        NULL AS transaction_uwhomes_id
+      FROM stg_core_claim_transaction_data c
+      JOIN cl_coverage cl ON 
+        c.code = UPPER(TRIM(cl.code)) AND 
+        c.claim = UPPER(TRIM(cl.claim)) AND 
+        c.claimantnumber = UPPER(TRIM(cl.claimantnumber))
+      WHERE c.lob IN ('BP','CP','HO')
+        AND cl.dl_iscurrent = 1
+
+  - name: vehicle_data
+    sql: |
+      SELECT 
+        c.claimantid,
+        NULL AS buildingid,
+        cv.vehicleid,
+        cl.cvgid,
+        cl.commonname,
+        cl.coveragestate,
+        cl.uwcoverageid,
+        NULL AS ifield,
+        NULL AS transaction_uwhomes_id
+      FROM stg_core_claim_transaction_data c
+      JOIN cl_coverage cl ON 
+        c.code = UPPER(TRIM(cl.code)) AND 
+        c.claim = UPPER(TRIM(cl.claim)) AND 
+        c.claimantnumber = UPPER(TRIM(cl.claimantnumber))
+      JOIN claims_cavehicles cv ON cl.CAVehicleID = cv.CAVehicleID
+      WHERE c.lob = 'CA'
+        AND cv.dl_iscurrent = 1
+        AND cl.dl_iscurrent = 1
+
+  - name: home_data
+    sql: |
+      SELECT 
+        c.claimantid,
+        NULL AS buildingid,
+        NULL AS vehicleid,
+        cl.cvgid,
+        cl.commonname,
+        cl.coveragestate,
+        cl.uwcoverageid,
+        cl.ifield,
+        uh.transaction_uwhomes_id
+      FROM stg_core_claim_transaction_data c
+      JOIN transaction_uwhomes_filtered uh ON 
+        c.code = uh.code
+      JOIN cl_coverage cl ON 
+        c.code = UPPER(TRIM(cl.code)) AND 
+        c.claim = UPPER(TRIM(cl.claim)) AND 
+        c.claimantnumber = UPPER(TRIM(cl.claimantnumber))
+      WHERE c.lob = 'HO'
+        AND cl.dl_iscurrent = 1
+
+  - name: catastrophe_data
+    sql: |
+      with cte_occid as (
+          SELECT claimantid, occid
+          FROM stg_core_claim_transaction_data c
+          WHERE c.lob NOT IN ('DB','WC')
+      ),
+      cte_claimant as (
+          SELECT claimantid
+          FROM stg_core_claim_transaction_data c
+          WHERE c.lob IN ('DB','WC')
+      )
+      SELECT 
+          co.claimantid,
+          ca.catastrophecodeid
+      FROM cte_occid co
+      LEFT JOIN claims_catastrophe ca
+        ON UPPER(TRIM(ca.sqlfieldvalue)) = co.occid 
+        AND UPPER(TRIM(ca.sqlfield)) = 'OCCID'
+        AND ca.dl_iscurrent = 1
+      UNION
+      SELECT 
+          cc.claimantid,
+          ca.catastrophecodeid
+      FROM cte_claimant cc
+      LEFT JOIN claims_catastrophe ca
+        ON UPPER(TRIM(ca.sqlfieldvalue)) = cc.claimantid 
+        AND UPPER(TRIM(ca.sqlfield)) = 'CLAIMANTID'
+        AND ca.dl_iscurrent = 1
+
+  - name: catcode_data
+    sql: |
+      SELECT 
+        c.claimantid,
+        cc.catcode
+      FROM stg_core_claim_transaction_data c
+      LEFT JOIN catcode cc ON 
+        c.code = UPPER(TRIM(cc.code)) 
+        AND c.claim = UPPER(TRIM(cc.claim))
+        AND cc.dl_iscurrent = 1
+      WHERE c.lob = 'WC'
+
+  - name: extra_claim_data
+    sql: |
+      SELECT 
+        c.claimantid,
+        be.causeoflossid,
+        be.lossdetailid,
+        be.causedetailid
+      FROM stg_core_claim_transaction_data c
+      LEFT JOIN claims_extra be ON c.claimantid = be.claimantid
+        AND be.dl_iscurrent = 1
+      WHERE c.lob IN ('BP','HO','WC')
+
+  - name: db_extra_data
+    sql: |
+      SELECT 
+        c.claimantid,
+        db.claimtype
+      FROM stg_core_claim_transaction_data c
+      LEFT JOIN claims_dbextra db ON c.claimantid = db.claimantid
+        AND db.dl_iscurrent = 1
+      WHERE c.lob = 'DB'
+
+  - name: stg_claim_transaction_supporting_data
+    sql: |
+      SELECT 
+        c.*,
+        COALESCE(p.buildingid, v.buildingid, h.buildingid) AS buildingid,
+        COALESCE(p.vehicleid, v.vehicleid, h.vehicleid) AS vehicleid,
+        COALESCE(p.transaction_uwhomes_id, v.transaction_uwhomes_id, h.transaction_uwhomes_id) AS transaction_uwhomes_id,
+        COALESCE(p.cvgid, v.cvgid, h.cvgid) AS cvgid,
+        COALESCE(p.uwcoverageid, v.uwcoverageid, h.uwcoverageid) AS uwcoverageid,
+        COALESCE(p.commonname, v.commonname, h.commonname) AS commonname,
+        COALESCE(p.coveragestate, v.coveragestate, h.coveragestate) AS coveragestate,
+        COALESCE(p.ifield, v.ifield, h.ifield) AS ifield,
+        cd.catcode,
+        ed.causeoflossid, ed.lossdetailid, ed.causedetailid,
+        catd.catastrophecodeid,
+        dbd.claimtype AS db_claimtype
+      FROM stg_core_claim_transaction_data c
+      LEFT JOIN property_data p ON c.claimantid = p.claimantid
+      LEFT JOIN vehicle_data v ON c.claimantid = v.claimantid
+      LEFT JOIN home_data h ON c.claimantid = h.claimantid
+      LEFT JOIN catcode_data cd ON c.claimantid = cd.claimantid
+      LEFT JOIN extra_claim_data ed ON c.claimantid = ed.claimantid
+      LEFT JOIN catastrophe_data catd ON c.claimantid = catd.claimantid
+      LEFT JOIN db_extra_data dbd ON c.claimantid = dbd.claimantid

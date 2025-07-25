@@ -1,0 +1,82 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_reserve_detailed_segment
+  load_strategy: type_two
+  key_columns:
+    - reserve_segment_code
+    - reserve_detailed_segment_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: curated_bop_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: curated_db_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: curated_ho_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: curated_wc_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_reserve_detailed_segment
+    sql: SELECT 
+            resseg as reserve_segment_code
+            ,detailedresseg as reserve_detailed_segment_code
+        FROM curated_bop_claim_summary
+        GROUP BY
+            resseg
+            ,detailedresseg
+        UNION
+        SELECT 
+            resseg as reserve_segment_code
+            ,detailedresseg as reserve_detailed_segment_code
+        FROM curated_ca_claim_summary
+        GROUP BY
+            resseg
+            ,detailedresseg
+        UNION
+        SELECT 
+            resseg as reserve_segment_code
+            ,detailedresseg as reserve_detailed_segment_code
+        FROM curated_ho_claim_summary
+        GROUP BY
+            resseg
+            ,detailedresseg
+        UNION
+        SELECT 
+            resseg as reserve_segment_code
+            ,detailedresseg as reserve_detailed_segment_code
+        FROM curated_db_claim_summary
+        GROUP BY
+            resseg
+            ,detailedresseg
+        UNION
+        SELECT 
+            resseg as reserve_segment_code
+            ,detailedresseg as reserve_detailed_segment_code
+        FROM curated_wc_claim_summary
+        GROUP BY
+            resseg
+            ,detailedresseg
+    description: |
+      - This table contains the detailed reserve segments for each claim summary table.
+      - The table is used to provide a more granular view of the reserve segments.
+      - The table is used to join with other tables in the data model.

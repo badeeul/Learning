@@ -1,0 +1,71 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: claims_transaction_curated
+  table: transaction_uwcoverage_curated
+  load_strategy: merge
+  key_columns:
+    - transaction_uwcoverage_id
+    - cdc_deleted
+  unknown_record: False
+  identity: False
+
+source:
+  - name: transaction_uwcoverage_cdc
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction_cdc
+    table: dbo_transaction_uwcoverage_ct
+
+query:
+  - name: cte_cdc_deletes
+    sql: |
+      select
+          tc.transaction_uwcoverage_id
+        , tc.code
+        , tc.trancnt
+        , tc.recordtype
+        , tc.uwcoverageid
+        , tc.coverageid
+        , tc.buildingid
+        , tc.vehicleid
+        , tc.premium
+        , tc.fees
+        , tc.deletedon
+        , tc.state
+        , tc.lcm
+        , tc.effective
+        , tc.enddate
+        , tc.commonname
+        , tc.itemid
+        , tc.before
+        , tc.after
+        , tc.ratingkey
+        , tc.enteredby
+        , tc.enteredon
+        , tc.gigpremium
+        , tc.hasproperties
+        , tc.renewal_source_id
+        , tc.transaction_source_id
+        , tc.overridden
+        , tc.overriddenby
+        , tc.overriddenon
+        , tc.linkuwcoverageid
+        , tc.manualpremium
+                
+        , tc.dl_rowhash
+        , tc.dl_partitionkey
+        , false as dl_iscurrent
+        , tc.dl_recordstartdateutc
+        , current_timestamp as dl_recordenddateutc
+        , tc.dl_createddateutc
+        , tc.dl_lastmodifiedutc
+        , tc.dl_sourcefilepath
+        , tc.dl_sourcefilename
+        , tc.dl_eltid
+        , tc.dl_runid
+                
+        , true as cdc_deleted
+
+      from transaction_uwcoverage_cdc tc
+
+      where `__operation` = 1
+    description: "Gathers DELETED records from transaction_uwcoverage_cdc."

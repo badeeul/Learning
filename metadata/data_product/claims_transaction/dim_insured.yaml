@@ -1,0 +1,59 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_insured
+  load_strategy: type_two
+  key_columns:
+    - policy_num_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: insd_key
+
+source:
+  - name: curated_insured
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: insured
+
+  - name: curated_counties
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: counties
+
+
+query:
+  - name: dim_insured
+    sql: |
+      with cteRN as (
+      SELECT
+           i.code  as policy_num_bus_key
+          ,i.address1 as mail_add1
+          ,i.address2 as mail_add2
+          ,i.city as mail_city
+          ,c.name as mail_county
+          ,i.state as mail_state
+          ,i.zipcode as mail_zip
+          ,i.name as insd_nm
+          ,ROW_NUMBER() OVER (partition by i.code order by i.updateon desc) as RN
+      FROM curated_insured i
+      LEFT JOIN curated_counties c 
+        ON i.county = c.fips 
+       AND i.state = c.state 
+       AND i.city = c.city 
+       AND LEFT(i.zipcode, 5) = c.zipcode 
+       AND c.dl_iscurrent = 1  
+      WHERE i.dl_iscurrent = 1
+      )
+      select DISTINCT
+            policy_num_bus_key
+          , mail_add1
+          , mail_add2
+          , mail_city
+          , mail_county
+          , mail_state
+          , mail_zip
+          , insd_nm
+      from cteRN
+      where RN = 1
+    description: "This query selects insured details including policy number, address, and name from the curated_insured source table."
+    

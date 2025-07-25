@@ -1,0 +1,223 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dp_SysPremExpanded
+  load_strategy: merge
+  key_columns:
+    - dl_row_hash
+  unknown_record: False
+  identity: False
+
+source:
+  - name: mgtrans
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: mgtrans
+
+  - name: mgtrans_coverages
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: mgtrans_coverages
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+query:
+  - name: Premiums
+    sql: with dates as (
+              SELECT
+              to_timestamp(date_format(date_add(add_months(current_timestamp, -2),1), 'yyyy-MM-dd 00:00:00')) as lowdate,
+              to_timestamp(date_format(last_day(to_timestamp('2025-1-1', 'yyyy-M-d')), 'yyyy-MM-dd 23:59:59')) as workdate,
+              to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as highdate
+          )
+        select 
+            m.code
+          , mc.mc_id
+          , transno
+          , m.state
+          , to_timestamp(m.transdate, 'yyyy-MM-dd H:m:s') as transdate
+          , to_timestamp(i.poaudit, 'yyyy-MM-dd H:m:s') as poaudit
+          , case when (m.transdate > i.poaudit and i.poaudit is not null) then m.transdate else i.poaudit end as etestdate
+          , to_timestamp(m.effdate, 'yyyy-MM-dd H:m:s') as effdate
+          , cast(datediff(day,m.effdate,i.poexpir) as float) as f_effdate
+          , to_timestamp(writtenon, 'yyyy-MM-dd H:m:s') as writtenon
+          , amount
+          , m.carrier
+          , i.agency
+          , i.lob
+          , m.typepol
+          , mc.aslob_code
+          , mc.itemid
+          , mc.coverageid
+          , mc.premium
+          , cast(concat_ws(' ', last_day(i.pobegin), '23:59:59') as timestamp) as PolYrMo_End
+          , to_timestamp(i.poexpir, 'yyyy-MM-dd H:m:s') as poexpir
+          , to_timestamp(i.trcancel, 'yyyy-MM-dd H:m:s') as trcancel
+          , i.stat5
+          , i.typcancel
+          , to_timestamp(i.pocancel, 'yyyy-MM-dd H:m:s') as pocancel
+          , cast(0.0 as float) as xunearned
+          , cast(0.0 as float) as unearned
+          , cast(0.0 as float) as earned
+          , cast(0.0 as float) as written
+        from mgtrans m
+          join mgtrans_coverages mc on m.transno = mc.mgtrans_transno and mc.dl_iscurrent = 1
+          join insured i on i.code = m.code and i.dl_iscurrent = 1
+          cross join dates d
+        where 
+          nvl(m.skiprep, '') not in ('E', 'B')
+          and nvl(lower(i.stat2), '') = 'i'
+          and nvl(i.markettype, '') <> 'M'
+          and
+          (
+            (
+              (to_timestamp(m.transdate, 'yyyy-MM-dd H:m:s') between d.lowdate and d.highdate)
+              and (to_timestamp(m.effdate, 'yyyy-MM-dd H:m:s') between d.lowdate and d.highdate)
+            )
+            or
+            (
+              nvl(i.typcancel, '') = 'F'
+              and nvl(i.stat5, '') = 'C'
+              and to_timestamp(i.trcancel, 'yyyy-MM-dd H:m:s') <= d.highdate
+              and to_timestamp(i.pocancel, 'yyyy-MM-dd H:m:s') <= d.highdate
+              and to_timestamp(m.transdate, 'yyyy-MM-dd H:m:s') <= to_timestamp(i.trcancel, 'yyyy-MM-dd H:m:s')
+            )
+          )
+          and m.dl_iscurrent = 1
+
+  - name: date_key
+    sql: with init as 
+        (
+            SELECT sequence(to_date('2024-01-01'), last_day(add_months(current_timestamp, -1))) as date
+        )
+        ,exploded_date as
+        (
+            select 
+            explode(date) as `date`
+            from init
+        )
+        select distinct
+            to_timestamp(trunc(date, 'month')) as lowdate,
+            to_timestamp(date_format(last_day(date), 'yyyy-MM-dd 23:59:59')) as CalYrMo_End
+        from exploded_date
+
+  - name: SysPremExpanded
+    sql: with premium as (
+            SELECT
+            state,
+            carrier,
+            agency,
+            lob,
+            aslob_code,
+            code,
+            itemid,
+            coverageid,
+            transno,
+            PolYrMo_End,
+            CalYrMo_End,
+            typcancel,
+            stat5,
+            transdate,
+            trcancel,
+            effdate,
+            lowdate,
+            premium,
+            pocancel,
+            writtenon,
+            written,
+            earned,
+
+            case when ( ((transdate <= CalYrMo_End) and (effdate <= CalYrMo_End))
+                or ((nvl(typcancel,'') = 'F' and stat5 = 'C' and trcancel<=CalYrMo_End and pocancel<=CalYrMo_End and transdate<=trcancel)) )
+                and (not ((etestdate is not null) and ((case when effdate > etestdate then effdate else etestdate end) < LowDate)) and not ((trcancel < LowDate) and (nvl(typcancel,'') = 'F') and (stat5 = 'C')  ) )
+            then case when  ((transdate >= lowdate) or (effdate >= lowdate))
+                        then premium
+                    when (poexpir > lowdate)
+                        then premium * (cast(datediff(poexpir,lowdate) as float) / f_effdate)
+                    else 0.0
+                end
+            else xunearned
+            end as xunearned,
+
+            case when (
+                    ((transdate <= CalYrMo_End) and (effdate <= CalYrMo_End))
+                        or (nvl(typcancel,'') = 'F' and stat5 = 'C' and trcancel<=CalYrMo_End and pocancel<=CalYrMo_End and transdate<=trcancel) 
+                    )
+                    and 
+                    ((not ((etestdate is not null) and (etestdate <= CalYrMo_End)) ) and
+                            (not ((trcancel <= CalYrMo_End) and (nvl(typcancel,'') = 'F') and (stat5 = 'C')) ) and (poexpir > CalYrMo_End))
+            then premium * ( cast(datediff(poexpir,CalYrMo_End) -1 as float) / f_effdate)
+            else unearned
+            end as unearned
+
+            FROM Premiums p
+            cross join date_key d
+        )
+        , calc as (
+            select
+            state,
+            carrier,
+            agency,
+            lob,
+            aslob_code,
+            code,
+            itemid,
+            coverageid,
+            transno,
+            PolYrMo_End,
+            CalYrMo_End,
+            xunearned,
+            unearned,
+
+            case when (nvl(typcancel,'') = 'F' and stat5 = 'C' and transdate>trcancel and effdate=transdate and transdate between lowdate and CalYrMo_end)
+            then premium
+            else
+                case when (
+
+                            ((transdate <= CalYrMo_end) and (effdate <= CalYrMo_end))
+                                or ((nvl(typcancel,'') = 'F' and stat5 = 'C' and trcancel<=CalYrMo_end and pocancel<=CalYrMo_end
+                                    and transdate<=trcancel))
+                            )
+                then (ROUND(xunearned,2) - round(unearned, 2))
+                else earned
+                end
+            end as earned,
+
+            case when writtenon between LowDate and CalYrMo_End then premium
+            else written
+            end as written
+
+            from premium
+        )
+        select
+          state
+          ,carrier
+          ,agency
+          ,lob
+          ,aslob_code
+          ,code
+          ,itemid
+          ,coverageid
+          ,transno
+          ,PolYrMo_End
+          ,CalYrMo_End
+          ,sum(earned) as earned
+          ,sum(written) as written
+          ,sum(xunearned) as xunearned
+          ,sum(unearned) as unearned
+        from calc
+        where (earned<>0 or written<>0)
+        group by
+          state
+          ,carrier
+          ,agency
+          ,lob
+          ,aslob_code
+          ,code
+          ,itemid
+          ,coverageid
+          ,transno
+          ,PolYrMo_End
+          ,CalYrMo_End

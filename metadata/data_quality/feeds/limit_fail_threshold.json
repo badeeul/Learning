@@ -1,0 +1,29 @@
+{
+    "enable":true,
+    "tables": [
+        {
+            "tableName": "fact_claim_loss_reserve_payment_monthly_snapshot_quarantine",
+            "lakehouseName": "den_lhw_dpr_001_data_product_tables",
+            "schema": "reserves",
+            "columns": [
+                "claim_gross_incurred_loss_amount",
+                "claim_gross_paid_loss_amount",
+                "case_loss_reserve_on_open_amount",
+                "claim_incurred_dcc_amount",
+                "claim_paid_dcc_amount",
+                "case_dcc_reserve_on_open_amount",
+                "claim_paid_salvage_amount",
+                "claim_paid_subrogation_amount"
+            ]
+        },
+        {
+            "tableName": "fact_premiums_monthly_snapshot_quarantine",
+            "lakehouseName": "den_lhw_dpr_001_data_product_tables",
+            "schema": "reserves",
+            "columns": [
+                "earned_premiums",
+                "written_premiums"
+            ]
+        }
+    ]
+}

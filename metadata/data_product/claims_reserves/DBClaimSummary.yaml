@@ -1,0 +1,577 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: DBClaimSummary
+  load_strategy: overwrite
+  key_columns:
+    - claimnum
+    - calyrmo_end
+  unknown_record: False
+  identity: False
+
+source:
+  - name: massive_claims
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: massive_claims
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcclaim
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claimant
+
+  - name: reserves
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: reserves
+
+  - name: claims_dbextra
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_dbextra
+
+  - name: payments
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: payments
+
+  - name: wcinfo
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcinfo
+
+  - name: pc_products
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_products
+
+query:
+  - name: Reserving_MassiveClaims_DF
+    sql: select
+           claimnum
+          ,asofdate as AsOfDate
+        from massive_claims
+        where dl_iscurrent = 1
+        and lower(claimnum) <> 'claimnum'
+
+  - name: DBIncrLossReserves_DF
+    sql: select
+           to_timestamp('01/01/2012 0:00:00', 'M/d/yyyy H:m:s') as startdate
+          ,to_timestamp(date_format(last_day(current_timestamp), 'yyyy-MM-dd 23:59:59')) as asofdate
+          ,to_date(w.dol, 'M/d/yyyy') as DOL
+          ,year(to_date(w.dol, 'M/d/yyyy')) as AccYr
+          ,to_date(c.adjustorclosed, 'M/d/yyyy') as Closed
+          ,to_date(c.adjustorreopened, 'M/d/yyyy') as Reopened
+          ,to_date(w.recvd, 'M/d/yyyy') as Received
+          ,nvl(c.legalreferral, 'N') as Legal
+          ,case when c.suitfiled = 'Y' then 'Y' else 'N' end as SuitFiled
+          ,case when nvl(c.tpataxid,'') = '' then 'N' else 'Y' end as TPA
+          ,w.jurisstate as State
+          ,w.wcclaimid as WCCLAIMID
+          ,concat_ws('-', r.code, r.claim) as claimnum
+          ,concat_ws('-', r.code, w.occurrencenumber) as OccNum
+          ,r.code
+          ,w.lob as LOB
+          ,case when i.renewof='NEW' then 'New' else 'Renewal' end as NewRenew
+          ,sum(r.indemnity) + sum(r.medical) as lossreserves
+          ,sum(r.expense) as expensereserves
+          ,last_day(to_date(r.updateon, 'M/d/yyyy')) as calyrmo_end
+          ,cast(round(year(to_date(r.updateon, 'M/d/yyyy'))+month(to_date(r.updateon, 'M/d/yyyy'))/100.0,2) as decimal(10,2)) as CalYr_Mo
+          ,' ' as CATCode
+          ,' ' as CATInd
+          ,case when m.claimnum is not null then 'Y' else 'N' end as MASSIND
+          ,i.carrier
+          ,i.marketType
+          ,i.productionsrc as ProductionSrc
+          ,i.agency
+          ,to_date(i.pobegin, 'M/d/yyyy') as pobegin
+          ,nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir) as expir
+          ,' ' as CauseOfLoss
+          ,' ' as LossDescrip
+          ,r.claimantid as CLAIMANTID
+          ,'153' as aslob
+          ,'DB' as TransmittalSeg
+          ,case when dbe.claimtype='PFL' then 'COMMDISABILITY_PFL' else 'COMMDISABILITY_OTH' end as ResSeg
+          ,case when dbe.claimtype='PFL' then 'COMMDISABILITY_PFL' else 'COMMDISABILITY_OTH' end as DetailedResSeg
+          ,replace(p.description, ',', '') as ProductID
+          ,cast(null as string) as ExposureID
+          ,cast(null as string) as ExposureGroup
+          ,cast(null as string) as ExposureClass
+          ,cast(null as string) as Industry
+        from wcclaim as w
+        left join reserves r on r.code = w.code and r.claim = w.claim and r.dl_iscurrent = 1
+        left join insured i on i.code = r.code and i.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid = c.wcclaimid and c.dl_iscurrent = 1
+        left join wcinfo wi on wi.code=w.code
+        left join pc_products p on p.productID=wi.productID
+        inner join claims_dbextra dbe on c.claimantid = dbe.claimantid and dbe.dl_iscurrent = 1
+        left join Reserving_MassiveClaims_DF m on concat_ws('-', r.code, w.occurrenceNumber, r.claim, c.claimantNumber) = m.claimnum
+        where 
+          r.updateon between to_timestamp('01/01/2012 0:00:00', 'M/d/yyyy H:m:s') and to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+          and w.lob = 'DB'
+          and nvl(c.voidortransfer, '') not in ('T', 'V') 
+          and w.voidortransferdate is null
+          and w.dl_iscurrent = 1
+        group by
+          r.code
+          ,r.claim
+          ,concat_ws('-', r.code, w.occurrencenumber)
+          ,w.lob
+          ,to_date(c.adjustorclosed, 'M/d/yyyy')
+          ,to_date(c.adjustorreopened, 'M/d/yyyy')
+          ,to_date(w.recvd, 'M/d/yyyy')
+          ,nvl(c.legalreferral, 'N')
+          ,case when c.suitfiled='Y' then 'Y' else 'N' end
+          ,case when nvl(c.tpataxid, '') = '' then 'N' else 'Y' end
+          ,w.jurisstate
+          ,w.wcclaimid
+          ,last_day(to_date(r.updateon, 'M/d/yyyy'))
+          ,cast(round(year(to_date(r.updateon, 'M/d/yyyy'))+month(to_date(r.updateon, 'M/d/yyyy'))/100.0,2) as decimal(10,2))
+          ,i.carrier
+          ,i.marketType
+          ,i.productionsrc
+          ,i.agency
+          ,i.pobegin
+          ,nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir)
+          ,r.claimantid
+          ,to_date(w.dol, 'M/d/yyyy')
+          ,case when i.renewof='NEW' then 'New' else 'Renewal' end
+          ,case when dbe.claimtype='PFL' then 'COMMDISABILITY_PFL' else 'COMMDISABILITY_OTH' end
+          ,case when m.claimnum is not null then 'Y' else 'N' end
+          ,replace(p.description, ',', '')
+
+  - name: DBIncrPayments_DF
+    sql: select
+           to_date(w.dol, 'M/d/yyyy') as DOL
+          ,w.wcclaimid as WCCLAIMID
+          ,i.carrier
+          ,concat_ws('-', p.code, p.claim) as claimnum
+          ,p.code
+          ,sum(p.amount) as Amount
+          ,last_day(to_date(p.chkdate, 'M/d/yyyy')) as calyrmo_end
+          ,cast(round(year(to_date(p.chkdate, 'M/d/yyyy'))+month(to_date(p.chkdate, 'M/d/yyyy'))/100.0,2) as decimal(10,2)) as CalYr_Mo
+          ,c.claimantid
+          ,sum(p.amount) as GrossPaidLoss
+          ,0.0 as PaidSUB
+          ,0.0 as PaidSalvage
+          ,0.0 as PaidDCC
+        from wcclaim as w
+        left join payments p on p.code = w.code and p.claim = w.claim and p.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid = c.wcclaimid and c.dl_iscurrent = 1
+        left join insured i on i.code = w.code and i.dl_iscurrent = 1
+        where 
+          p.chkdate between to_timestamp('01/01/2012 0:00:00', 'M/d/yyyy H:m:s') and to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+          and w.lob = 'DB'
+          and nvl(c.voidortransfer, '') not in ('T', 'V')
+          and w.voidortransferdate is null
+          and w.dl_iscurrent = 1
+          group by 
+          concat_ws('-', p.code, p.claim)
+          ,p.code
+          ,last_day(to_date(p.chkdate, 'M/d/yyyy'))
+          ,cast(round(year(to_date(p.chkdate, 'M/d/yyyy'))+month(to_date(p.chkdate, 'M/d/yyyy'))/100.0,2) as decimal(10,2))
+          ,to_date(w.dol, 'M/d/yyyy')
+          ,i.carrier
+          ,w.wcclaimid
+          ,c.claimantid
+
+  - name: date_key
+    sql: with init as 
+        (
+            SELECT sequence(to_date('2012-01-01'), last_day(add_months(current_timestamp, -1))) as date
+        )
+        ,exploded_date as
+        (
+            select 
+            explode(date) as `date`
+            from init
+        )
+        select distinct
+            last_day(date) as calyrmo_end,
+            cast(concat(year(date), '.', date_format(date, 'MM')) as decimal(6,2)) as CalYr_Mo
+        from exploded_date
+
+  - name: DBCumulativeReserves_DF
+    sql: select
+          d.CalYr_Mo
+          ,d.calyrmo_end
+          ,dol
+          ,AccYr
+          ,Closed
+          ,Reopened
+          ,Received
+          ,WCCLAIMID
+          ,State
+          ,claimnum
+          ,OccNum
+          ,code
+          ,LOB
+          ,carrier
+          ,marketType
+          ,productionsrc
+          ,agency
+          ,NewRenew
+          ,pobegin
+          ,expir
+          ,CauseOfLoss
+          ,LossDescrip
+          ,CATCode
+          ,CATInd
+          ,MASSIND
+          ,Legal
+          ,SuitFiled
+          ,TPA
+          ,min(r.calyrmo_end) as FirstEntered
+          ,sum(LossReserves) as CmlLossReserve
+          ,sum(ExpenseReserves) as CmlExpenseReserve
+          ,ClaimantID
+          ,aslob
+          ,TransmittalSeg
+          ,ResSeg
+          ,DetailedResSeg
+          ,ProductID
+          ,ExposureID
+          ,ExposureGroup
+          ,ExposureClass
+          ,Industry
+        from DBIncrLossReserves_DF r
+        inner join date_key d on r.CalYr_Mo <= d.CalYr_Mo
+        group by
+          d.CalYr_Mo
+          ,d.calyrmo_end
+          ,dol
+          ,AccYr
+          ,Closed
+          ,Reopened
+          ,Received
+          ,WCCLAIMID
+          ,State
+          ,claimnum
+          ,OccNum
+          ,code
+          ,LOB
+          ,carrier
+          ,marketType
+          ,productionsrc
+          ,agency
+          ,NewRenew
+          ,pobegin
+          ,expir
+          ,CauseOfLoss
+          ,LossDescrip
+          ,CATCode
+          ,CATInd
+          ,MASSIND
+          ,Legal
+          ,SuitFiled
+          ,TPA
+          ,ClaimantID
+          ,aslob
+          ,TransmittalSeg
+          ,ResSeg
+          ,DetailedResSeg
+          ,ProductID
+          ,ExposureID
+          ,ExposureGroup
+          ,ExposureClass
+          ,Industry
+
+  - name: DBCumulativePaid_DF
+    sql: select
+           d.CalYr_Mo
+          ,d.calyrmo_end
+          ,dol
+          ,WCCLAIMID
+          ,claimnum
+          ,code
+          ,sum(GrossPaidLoss) as CmlPaidLoss
+          ,sum(PaidSUB) as CmlPaidSUB
+          ,sum(PaidSalvage) as CmlPaidSalvage
+          ,sum(PaidDCC) as CmlPaidDCC
+          ,ClaimantID
+        from DBIncrPayments_DF r
+        inner join date_key d on r.CalYr_Mo <= d.CalYr_Mo
+        group by
+          d.CalYr_Mo
+          ,d.calyrmo_end
+          ,dol
+          ,WCCLAIMID
+          ,claimnum
+          ,code
+          ,ClaimantID
+
+  - name: RptdInd_DF
+    sql: select *,
+        case when calyrmo_end=FirstEntered then 1 else 0 end as RptdInd
+        from DBCumulativeReserves_DF
+
+  - name: DBCumulativeClaimSummary_DF
+    sql: SELECT
+           l.claimnum
+          ,l.OccNum
+          ,l.code as PolicyNumber
+          ,l.state
+          ,l.LOB
+          ,l.AccYr
+          ,l.carrier
+          ,l.agency
+          ,l.marketType
+          ,l.productionsrc
+          ,l.NewRenew
+          ,l.pobegin as PolicyEffectiveDate
+          ,l.expir as PolicyExpirationDate
+          ,l.dol as LossDate
+          ,l.closed as ClosedDate
+          ,l.reopened as ReopenedDate
+          ,l.received as ReceivedDate
+          ,l.FirstEntered as FirstEnteredDate
+          ,l.calyrmo_end as calyrmo_end
+          ,(year(l.calyrmo_end)-year(l.dol))*12+month(l.calyrmo_end) as Maturity
+          ,l.wcclaimid
+          ,l.ClaimantID
+          ,replace(l.CauseOfLoss, ',', '') as CauseOfLoss
+          ,replace(l.Lossdescrip, ',', '') as LossDescrip
+          ,l.CATCode
+          ,l.Legal as HandledByLegalInd
+          ,l.Suitfiled as SuitFiledInd
+          ,l.TPA as TPAInd
+          ,l.CATInd
+          ,l.MASSIND
+          ,l.aslob
+          ,l.TransmittalSeg
+          ,l.ResSeg
+          ,l.DetailedResSeg
+          ,l.ProductID
+          ,cast(null as string) as MedOnlyInd 
+          ,(case when round(CmlLossReserve,2)=round(nvl(p.CmlPaidLoss,0)+nvl(p.CmlPaidSUB,0)+nvl(p.CmlPaidSalvage,0),2) and round(CmlExpenseReserve,2)=round(nvl(p.CmlPaidDCC, 0),2) and round(nvl(p.CmlPaidLoss, 0)+nvl(p.CmlPaidDCC, 0)+nvl(p.CmlPaidSUB, 0)+nvl(p.CmlPaidSalvage,0),2)<>0 then 1 else 0 end) as CWPCount
+          ,(case when round(CmlLossReserve,2)=round(nvl(p.CmlPaidLoss,0)+nvl(p.CmlPaidSUB,0)+nvl(p.CmlPaidSalvage,0),2) and round(CmlExpenseReserve,2)=round(nvl(p.CmlPaidDCC, 0),2) then 1 else 0 end) as ClosedCount
+          ,(case when round(CmlLossReserve,2)<>round(nvl(p.CmlPaidLoss,0)+nvl(p.CmlPaidSUB,0)+nvl(p.CmlPaidSalvage,0),2) or round(CmlExpenseReserve,2)<>round(nvl(p.CmlPaidDCC, 0),2) then 1 else 0 end) as PendingCount
+          ,l.RptdInd as ReportedCount
+          ,(case when round(CmlLossReserve,2)=round(nvl(p.CmlPaidLoss,0)+nvl(p.CmlPaidSUB,0)+nvl(p.CmlPaidSalvage,0),2) and round(CmlExpenseReserve,2)=round(nvl(p.CmlPaidDCC, 0),2) and round(CmlLossReserve,2)=0 and round(CmlExpenseReserve, 2)>0 then 1 else 0 end) as DCCOnlyCount
+          ,l.CmlLossReserve as IncrNetIncurredLoss
+          ,l.CmlLossReserve-nvl(p.CmlPaidSUB, 0.0)-nvl(p.CmlPaidSalvage, 0.0) as IncrGrossIncurredLoss
+          ,l.CmlExpenseReserve as IncrIncurredDCC
+          ,nvl(p.CmlPaidLoss, 0.0) as IncrGrossPaidLoss
+          ,cast(p.CmlPaidSalvage as decimal(10,2)) as IncrPaidSalvage
+          ,nvl(p.CmlPaidSUB, 0.0) as IncrPaidSubrogation
+          ,nvl(p.CmlPaidDCC, 0.0) as IncrPaidDCC
+          ,datediff(day, l.dol, l.received) as TimeToReport
+          ,datediff(day, l.received, l.closed) as TimeToClose
+        from RptdInd_DF l
+        left join DBCumulativePaid_DF p
+        on l.CalYr_Mo = p.CalYr_Mo and l.claimnum = p.claimnum
+
+  - name: CWPFinalInd_DF
+    sql: WITH cte as (
+          SELECT
+            ClosedCount as Latest_Closed_Indicator
+            ,IncrGrossPaidLoss + IncrPaidDCC + IncrPaidSubrogation + IncrPaidSalvage as latest_total_paid
+            ,claimnum
+            ,TransmittalSeg
+            ,row_number() over (partition by claimnum, TransmittalSeg order by calyrmo_end desc) as RN
+          FROM DBCumulativeClaimSummary_DF
+          )
+          SELECT
+            Latest_Closed_Indicator
+            ,latest_total_paid
+            ,claimnum
+            ,TransmittalSeg
+          FROM cte
+          WHERE RN = 1
+
+  - name: ReopenedCount_DF
+    sql: SELECT
+          ClosedCount as Prior_Closed_Indicator
+          ,claimnum
+          ,calyrmo_end
+          ,TransmittalSeg
+        FROM DBCumulativeClaimSummary_DF
+
+  - name: DBCumulativeClaimSummary_DF
+    sql: with cte as (
+        SELECT
+          t.*
+          ,case when l.Latest_Closed_Indicator=1 and l.latest_total_paid > 0 then 1 else 0 end as CWPFinalInd
+          ,row_number() over (partition by t.claimnum, t.TransmittalSeg, t.calyrmo_end order by r.calyrmo_end desc) as RN
+          ,case when nvl(r.Prior_Closed_Indicator,0)=1 and (round(t.IncrGrossPaidLoss + t.IncrPaidDCC + t.IncrPaidSubrogation + t.IncrPaidSalvage,2) <> round(t.IncrNetIncurredLoss + t.IncrIncurredDCC,2)) then 1 else 0 end as ReopenedCount
+        FROM DBCumulativeClaimSummary_DF t
+        left join CWPFinalInd_DF l ON l.claimnum = t.claimnum and l.TransmittalSeg = t.TransmittalSeg
+        left join ReopenedCount_DF r ON r.calyrmo_end < t.calyrmo_end and r.claimnum = t.claimnum and r.TransmittalSeg = t.TransmittalSeg
+        )
+        select
+        *
+        from cte
+        where RN = 1
+
+  - name: Dates_DF
+    sql: with cte as (
+            select
+              claimnum
+              ,calyrmo_end
+            from DBIncrLossReserves_DF
+            union
+            SELECT
+              claimnum
+              ,calyrmo_end
+            from DBIncrPayments_DF
+        ), cte2 as (
+            select
+              claimnum
+              ,calyrmo_end
+              ,row_number() over (partition by claimnum, calyrmo_end order by claimnum) as RN
+            from cte
+        )
+        select
+          claimnum
+          ,calyrmo_end
+        from cte2
+        where RN = 1
+
+  - name: DBIncrementalClaimSummary_DF
+    sql: SELECT
+          to_timestamp('01/01/2012 0:00:00', 'M/d/yyyy H:m:s') as startdate
+          ,to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate
+          ,s.AccYr as accyr
+          ,d.claimnum
+          ,s.PolicyNumber as policynumber
+          ,s.state
+          ,s.LOB as lob
+          ,s.carrier
+          ,s.agency
+          ,s.marketType as markettype
+          ,s.productionsrc
+          ,s.NewRenew as newrenew
+          ,s.PolicyEffectiveDate as policyeffectivedate
+          ,s.PolicyExpirationDate as policyexpirationdate
+          ,s.LossDate as lossdate
+          ,s.ClosedDate as closeddate
+          ,s.ReopenedDate as reopeneddate
+          ,s.ReceivedDate as receiveddate
+          ,s.FirstEnteredDate as firstentereddate
+          ,d.calyrmo_end
+          ,s.Maturity as maturity
+          ,s.wcclaimid
+          ,s.ClaimantID as claimantid
+          ,s.CauseOfLoss as causeofloss
+          ,s.LossDescrip as lossdescrip
+          ,s.CATCode as catcode
+          ,s.CATInd as catind
+          ,s.MASSIND as massind
+          ,s.HandledByLegalInd as handledbylegalind
+          ,s.SuitFiledInd as suitfiledind
+          ,s.TPAInd as tpaind
+          ,s.CWPFinalInd as cwpfinalind
+          ,s.aslob
+          ,s.TransmittalSeg as transmittalseg
+          ,s.ResSeg as resseg
+          ,s.DetailedResSeg as detailedresseg
+          ,s.MedOnlyInd as medonlyind
+          ,s.ReopenedCount as reopenedcount
+          ,s.ReportedCount as reportedcount
+          ,nvl(l.LossReserves,0.0) as incrnetincurredloss
+          ,nvl(l.LossReserves,0.0)-nvl(p.PaidSUB, 0.0)-nvl(p.PaidSalvage, 0.0) as incrgrossincurredloss
+          ,nvl(l.ExpenseReserves,0.0) as incrincurreddcc
+          ,nvl(p.GrossPaidLoss, 0.0) as incrgrosspaidloss
+          ,nvl(p.PaidSalvage, 0.0) as incrpaidsalvage
+          ,nvl(p.PaidSUB, 0.0) as incrpaidsubrogation
+          ,nvl(p.PaidDCC, 0.0) as incrpaiddcc
+          ,nvl(l.LossReserves,0.0)-nvl(p.GrossPaidLoss, 0.0)-nvl(p.PaidSUB, 0.0)-nvl(p.PaidSalvage, 0.0) as caselossreserveonopen
+          ,nvl(l.ExpenseReserves,0.0)-nvl(p.PaidDCC, 0.0) as casedccreserveonopen
+          ,s.TimeToReport as timetoreport
+          ,s.TimeToClose as timetoclose
+          ,'NA' as autosecondaryclass
+          ,'NA' as autovehiclesize
+          ,'NA' as wc_ctflag
+          ,s.ProductID as productid
+          ,l.ExposureID as exposureid
+          ,l.ExposureGroup as exposuregroup
+          ,l.ExposureClass as exposureclass
+          ,l.Industry as industry
+          ,s.OccNum as occnum
+        FROM Dates_DF d
+        left join DBIncrLossReserves_DF l on l.claimnum = d.claimnum and l.calyrmo_end = d.calyrmo_end
+        left join DBIncrPayments_DF p on p.claimnum = d.claimnum and p.calyrmo_end = d.calyrmo_end
+        left join DBCumulativeClaimSummary_DF s on s.claimnum = d.claimnum and s.calyrmo_end = d.calyrmo_end
+
+  - name: Counts_DF
+    sql: select
+           CWPCount as Previous_CWP_Count
+          ,ClosedCount as Previous_Closed_Count
+          ,PendingCount as Previous_Pending_Count
+          ,DCCOnlyCount as Previous_DCC_Only_Count
+          ,claimnum
+          ,calyrmo_end
+          ,DetailedResSeg
+        from DBCumulativeClaimSummary_DF
+
+  - name: DBIncrementalClaimSummary_DF
+    sql: with cte as (
+          SELECT
+            s.*
+            ,row_number() over (partition by t.claimnum, t.DetailedResSeg, t.calyrmo_end order by r.calyrmo_end desc) as RN
+            ,case when nvl(t.CWPCount,0)==nvl(r.Previous_CWP_Count,0) then 0 when nvl(t.CWPCount,0)==1 and nvl(r.Previous_CWP_Count,0)==0 then 1 else -1 end as cwpcount
+            ,case when nvl(t.ClosedCount,0)==nvl(r.Previous_closed_Count,0) then 0 when nvl(t.ClosedCount,0)==1 and nvl(r.Previous_closed_Count,0)==0 then 1 else -1 end as closedcount
+            ,case when nvl(t.PendingCount,0)==nvl(r.Previous_pending_Count,0) then 0 when nvl(t.PendingCount,0)==1 and nvl(r.Previous_pending_Count,0)==0 then 1 else -1 end as pendingcount
+            ,case when nvl(t.DCCOnlyCount,0)==nvl(r.Previous_DCC_Only_Count,0) then 0 when nvl(t.DCCOnlyCount,0)==1 and nvl(r.Previous_DCC_Only_Count,0)==0 then 1 else -1 end as dcconlycount
+          from DBIncrementalClaimSummary_DF s
+          inner join DBCumulativeClaimSummary_DF t
+            on s.calyrmo_end = t.calyrmo_end and s.claimnum = t.claimnum and s.DetailedResSeg = t.DetailedResSeg
+          left join Counts_DF r
+            on r.calyrmo_end < t.calyrmo_end and r.claimnum = t.claimnum and r.DetailedResSeg = t.DetailedResSeg
+        )
+        select *
+        from cte
+        where RN = 1
+
+  - name: DBIncrementalClaimSummary_DF
+    sql: select
+          s.*
+          ,case when s.PendingCount = -1 then s.IncrNetIncurredLoss - t.IncrNetIncurredLoss
+                when t.ReopenedCount = 1 then t.IncrNetIncurredLoss
+                when t.PendingCount = 1 then s.IncrNetIncurredLoss
+                else 0 
+          end as incrnetincurredlossonopen
+          ,case when s.PendingCount = -1 then s.IncrGrossIncurredLoss - t.IncrGrossIncurredLoss
+                when t.ReopenedCount = 1 then t.IncrGrossIncurredLoss
+                when t.PendingCount = 1 then s.IncrGrossIncurredLoss
+                else 0
+          end as incrgrossincurredlossonopen
+          ,case when s.PendingCount = -1 then s.IncrIncurredDCC - t.IncrIncurredDCC
+                when t.ReopenedCount = 1 then t.IncrIncurredDCC
+                when t.PendingCount = 1 then s.IncrIncurredDCC
+                else 0
+          end as incrincurreddcconopen
+          ,case when s.CWPCount = 0 and round(s.IncrGrossPaidLoss,2) = 0 then 0
+                when s.CWPCount = 0 and t.CWPCount = 1 then s.IncrGrossPaidLoss
+                when s.CWPCount = 1 then t.IncrGrossPaidLoss
+                when s.CWPCount = -1 then s.IncrGrossPaidLoss - t.IncrGrossPaidLoss
+          end as incrgrosspaidlossonclosed
+          ,case when s.CWPCount = 0 and round(s.IncrPaidSalvage,2) = 0 then 0
+                when s.CWPCount = 0 and t.CWPCount = 1 then s.IncrPaidSalvage
+                when s.CWPCount = 1 then t.IncrPaidSalvage
+                when s.CWPCount = -1 then s.IncrPaidSalvage - t.IncrPaidSalvage
+          end as incrpaidsalvageonclosed
+          ,case when s.CWPCount = 0 and round(s.IncrPaidSubrogation,2) = 0 then 0
+                when s.CWPCount = 0 and t.CWPCount = 1 then s.IncrPaidSubrogation
+                when s.CWPCount = 1 then t.IncrPaidSubrogation
+                when s.CWPCount = -1 then s.IncrPaidSubrogation - t.IncrPaidSubrogation
+          end as incrpaidsubrogationonclosed
+          ,case when s.CWPCount = 0 and round(s.IncrPaidDCC,2) = 0 then 0
+                when s.CWPCount = 0 and t.CWPCount = 1 then s.IncrPaidDCC
+                when s.CWPCount = 1 then t.IncrPaidDCC
+                when s.CWPCount = -1 then s.IncrPaidDCC - t.IncrPaidDCC
+          end as incrpaiddcconclosed
+        from DBIncrementalClaimSummary_DF s
+        inner join DBCumulativeClaimSummary_DF t on t.claimnum = s.claimnum and t.calyrmo_end=s.calyrmo_end and t.DetailedResSeg = s.DetailedResSeg
+    drop:
+      - RN

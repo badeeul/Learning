@@ -1,0 +1,179 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: BOPExposuresSummary
+  load_strategy: overwrite
+  key_columns:
+    - policynumber
+    - exposureid
+    - calyrmo_end
+  unknown_record: false
+  identity: false
+
+source:
+  - name: uwbuildings
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: uwbuildings
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: boppremiumssummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPPremiumsSummary
+
+query:
+  - name: Initial_Setup_DF
+    sql: |
+      SELECT 
+        to_date('2008-01-01') as start_date,
+        to_date(to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))) as end_date,
+        'BP' as lob,
+        cast(round(months_between(to_date(to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))), to_date('2008-01-01')) + 1, 0) as integer) as max_maturity
+
+  - name: Buildings_Base_DF
+    sql: |
+      SELECT
+        w.code,
+        w.buildingid,
+        i.agency,
+        i.carrier,
+        w.buildingstate as buildingstate,
+        to_date(w.startdate) as StartDate,
+        last_day(to_date(w.startdate)) as PolYrMo_end,
+        to_date(w.startdate) as BeginWorkDate,
+        last_day(to_date(w.startdate)) as CalYrMo_End,
+        COALESCE(
+          COALESCE(
+            CASE WHEN i.stat5 = 'C' THEN to_date(i.pocancel) ELSE to_date(w.enddate) END,
+            to_date(w.enddate)
+          ),
+          date_add(to_date(w.startdate), 365)
+        ) as enddate,
+        w.buildinggroup
+      FROM uwbuildings w
+      INNER JOIN insured i ON i.code = w.code and i.dl_iscurrent = 1
+      CROSS JOIN Initial_Setup_DF p
+      WHERE i.lob = p.lob
+        AND to_date(i.pobegin) BETWEEN p.start_date AND p.end_date
+        AND i.stat2 = 'i'
+        AND (i.typcancel <> 'F' OR i.typcancel IS NULL)
+        AND w.dl_iscurrent = 1
+
+  - name: Filtered_Buildings_DF
+    sql: |
+      SELECT * FROM Buildings_Base_DF
+      WHERE StartDate <> enddate
+        AND BeginWorkDate <> enddate
+
+  - name: Date_Sequence_DF
+    sql: |
+      SELECT 
+        seq.i as iteration,
+        add_months(t.start_date, seq.i) as calc_date,
+        last_day(add_months(t.start_date, seq.i)) as month_end_date,
+        t.max_maturity
+      FROM Initial_Setup_DF t
+      LATERAL VIEW explode(sequence(0, max_maturity - 1)) seq as i
+
+  - name: Building_Exposures_DF
+    sql: |
+      SELECT
+        b.code,
+        b.buildingid,
+        b.buildinggroup,
+        b.agency,
+        b.carrier,
+        b.buildingstate,
+        b.PolYrMo_end,
+        b.BeginWorkDate,
+        d.month_end_date as CalYrMo_End,
+        d.iteration as maturity,
+        CASE 
+          WHEN b.PolYrMo_end = d.month_end_date THEN 
+            (datediff(day, b.BeginWorkDate, b.enddate) + 1)/365.0
+          ELSE 
+            0.0
+        END as WBY,
+        CASE 
+          WHEN d.month_end_date > b.enddate THEN 
+            (datediff(day, b.BeginWorkDate, b.enddate) + 1)/365.0
+          ELSE 
+            (datediff(day, b.BeginWorkDate, d.month_end_date) + 1)/365.0
+        END as EBY
+      FROM Filtered_Buildings_DF b
+      CROSS JOIN Date_Sequence_DF d
+      WHERE d.month_end_date <= (SELECT end_date FROM Initial_Setup_DF)
+        AND b.enddate >= b.BeginWorkDate
+
+  - name: Buildings_With_Both_Coverages_DF
+    sql: |
+      SELECT
+        exposureid,
+        calyrmo_end
+      FROM boppremiumssummary
+      WHERE exposureid <> 0
+      GROUP BY exposureid, calyrmo_end
+      HAVING COUNT(DISTINCT aslob) = 2
+
+  - name: Updated_Premiums_DF
+    sql: |
+      SELECT
+        ep.policynumber,
+        ep.exposureid,
+        ep.commonname,
+        ep.state,
+        ep.carrier,
+        ep.agency,
+        ep.lob,
+        ep.aslob,
+        ep.ResSeg as resseg,
+        ep.polyrmo_end,
+        ep.calyrmo_end,
+        ep.startdate,
+        ep.asofdate,
+        ep.earnedpremium,
+        ep.writtenpremium,
+        COALESCE(be.EBY, 0) as earnedexposures,
+        COALESCE(be.WBY, 0) as writtenexposures,
+        CASE
+          WHEN bc.exposureid IS NOT NULL AND ep.aslob = '052' THEN 0
+          ELSE 1
+        END as exposurerollup
+      FROM boppremiumssummary ep
+      LEFT JOIN Building_Exposures_DF be
+        ON ep.policynumber = be.code
+        AND ep.exposureid = be.buildingid
+        AND ep.calyrmo_end = be.CalYrMo_End
+      LEFT JOIN Buildings_With_Both_Coverages_DF bc
+        ON ep.exposureid = bc.exposureid
+        AND ep.calyrmo_end = bc.calyrmo_end
+      WHERE ep.lob = 'BP'
+
+
+  - name: Final_Output_DF
+    sql: |
+      SELECT
+        policynumber,
+        exposureid,
+        commonname,
+        state,
+        carrier,
+        agency,
+        lob,
+        aslob,
+        resseg,
+        polyrmo_end,
+        calyrmo_end,
+        asofdate,
+        startdate,
+        earnedpremium,
+        writtenpremium,
+        cast(earnedexposures as float) as earnedexposure,
+        cast(writtenexposures as float) as writtenexposure,
+        cast(exposurerollup as float) as exposurerollup
+      FROM Updated_Premiums_DF

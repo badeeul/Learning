@@ -1,0 +1,31 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_industry
+  load_strategy: type_two
+  key_columns:
+    - industry_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: BOPClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: WCClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_industry
+    sql: SELECT DISTINCT
+            NVL(industry,'') as industry_code
+        FROM BOPClaimSummary
+        UNION
+        SELECT DISTINCT
+            NVL(industry,'') as industry_code
+        FROM WCClaimSummary
+    description: "This table contains the list of industries from the claims summary tables."

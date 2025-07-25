@@ -1,0 +1,160 @@
+{
+    "definitions": {
+        "database": {
+            "type": "object",
+            "properties": {
+                "sourceSystemName": {
+                    "type": "string"
+                },
+                "includeSpecificColumns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                },
+                "filterExpression": {
+                    "type": "string",
+                    "pattern": "(?i)^and "
+                },
+                "ingestType": {
+                    "$ref": "enums.json#/definitions/ingestType"
+                },
+                "sourceWatermarkIdentifier": {
+                    "type": "string"
+                },
+                "isDynamicQuery": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "sourceSystemName",
+                "ingestType",
+                "isDynamicQuery"
+            ],
+            "if": {
+                "properties": {
+                    "ingestType": {
+                        "const": "watermark"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "sourceWatermarkIdentifier"
+                ]
+            },
+            "additionalProperties": false
+        },
+        "file": {
+            "type": "object",
+            "properties": {
+                "sourceSystemName": {
+                    "type": "string"
+                },
+                "sourceSystemType": {
+                     "$ref": "enums.json#/definitions/sourceSystemType"
+                },
+                "ingestType": {
+                    "$ref": "enums.json#/definitions/ingestType"
+                },
+                "sourceWatermarkIdentifier": {
+                    "type": "string"
+                },
+                "lakehouseName": {
+                        "type": "string"
+                },
+                "filesDirectoryName": {
+                    "type": "string"
+                },
+                "sftpFolderList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                },
+                "pgpEnabled": {
+                    "type": "boolean"
+                },
+                "privateKeySecret": {
+                    "type": "string"
+                },
+                "passphraseSecret": {
+                    "type": "string"
+                },
+                "publicKeySecret": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "sourceSystemName",
+                "sourceSystemType",
+                "ingestType",
+                "pgpEnabled"
+            ],
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "ingestType": {
+                                "const": "watermark"
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": [
+                            "sourceWatermarkIdentifier"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "sourceSystemType": {
+                                "const": "lakehouse"
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": [
+                            "lakehouseName",
+                            "filesDirectoryName"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "sourceSystemType": {
+                                "const": "sftp"
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": [
+                            "sftpFolderList"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "pgpEnabled": {
+                                "const": true
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": [
+                            "privateKeySecret",
+                            "passphraseSecret",
+                            "publicKeySecret"
+                        ]
+                    }
+                }
+            ],
+            "additionalProperties": true
+        }
+    }
+}

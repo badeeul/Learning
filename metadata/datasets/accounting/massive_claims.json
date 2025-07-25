@@ -1,0 +1,50 @@
+{
+    "datasetName": "massive_claims",
+    "enable": true,
+    "datasetTypeName": "file",
+    "fileType": "csv",
+    "isStaticFileName": false,
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "Reserving",
+        "sourceSystemType": "lakehouse",
+        "ingestType": "watermark",
+        "sourceWatermarkIdentifier": "LastModifiedDateTime",
+        "lakehouseName": "den_lhw_pdi_001_raw",
+        "filesDirectoryName": "user_data/massive_claims",
+        "pgpEnabled": true,
+        "privateKeySecret": "distro-delauth-private-key-pgp",
+        "passphraseSecret": "distro-delauth-passphrase-pgp",
+        "publicKeySecret": "distro-delauth-ftp-public-key-pgp"
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "fileType": "csv",
+        "directoryName": "Reserving"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_scu_001_tables_for_data_product_zone",
+        "schemaName": "iis",
+        "schemaEvolutionMode": "none",
+        "schemaLocation": null,
+        "fileOptions": {
+            "header": true,
+            "inferColumnTypes": false,
+            "multiline": true,
+            "delimiter": ",",
+            "escape": "\"",
+            "timestampFormat": "dd/MM/yyyy"
+        },
+        "columnList": ["*"],
+        "primaryKeyList": [
+            "claimnum"
+        ],
+        "sensitiveColumns": null,
+        "enableSensitiveFieldCheck": false,
+        "deletionCaptureEnabled": false,
+        "duplicateCheckEnabled": true,
+        "duplicateCheckQuarantineType": "retain_one_duplicate",
+        "targetFileFormat": "delta",
+        "targetLoadType": "merge"
+    }
+}

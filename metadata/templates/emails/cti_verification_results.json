@@ -1,0 +1,11 @@
+{
+    "subject": "Verification Process Results - Action Required for Failed LOBs",
+    "body": {
+        "contentType": "text/html",
+        "content": "<div><div>The verification process for Lines of Business (LOBs) has been completed. Please find the summary and required actions below:</div><div>&nbsp;</div><div><strong>Successfully Verified LOBs</strong></div><div>The following LOBs have passed verification(i.e., paid and incurred expenses/losses match between Arius Input files and IIS data):</div><div>{successful_lobs}</div><div>&nbsp;</div><div>No further action is required for these LOBs.</div><div>&nbsp;</div><div><strong>LOBs Requiring Attention</strong></div><div>Unfortunately, discrepancies were identified between the claims data and accounting file for the following LOBs:</div><div>&nbsp;</div><div>{failed_lobs}</div><div>&nbsp;</div><div><strong>Paid and Incurred Loss & Expense for Disability</strong></div>{disability_amounts}<div>&nbsp;</div><div>To resolve mismatches, please follow these recommended actions:</div><div>&nbsp;</div><div>1. Review the attached error files, which details mismatches by Accident Year and Carrier.</div><div>2. Make necessary corrections in IIS.</div><div>3. Request the pipeline be rerun.</div><div>&nbsp;</div><p>&nbsp;</p>"
+    },
+    "emailRecipient": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailCc": "",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

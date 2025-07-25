@@ -1,0 +1,33 @@
+# Do not use sql in-line comments. Use yaml comments if needed
+# unknown_record works for type_two and merge load strategies
+# identity works for type_two, merge, overwrite_by_key load strategies
+target:
+  lakehouse: lakehouse # required
+  schema: schema # required
+  table: table # required - Target table that will be written to
+  load_strategy: merge # required - type_two, merge, overwrite, append, overwrite_by_key
+  key_columns: # optional - required for all merge strategies except overwrite and append
+    - one
+    - two
+  unknown_record: False # optional - default False - adds a -1 unknown record ( for dimensions )
+  identity: False # optional - default False - adds an identity column using max from table
+  partition_by: # optional
+    - three
+  pii_columns: # optional
+    - four
+
+# Sources are tables that exist in a lakehouse and need to be references by a query. 
+# Sources are optional if the query doesn't need any such as a date table based on relative time.
+source:
+  - name: source_name # name of the source for it to be references by queries below
+    lakehouse: lakehouse
+    schema: schema
+    table: table
+
+# At least one query is required and the last query defined below will be written to the target table.
+query:
+  - name: query_name # name of the query for it to be references by other queries below
+    sql: select col
+         from source_name
+    drop: # optional - drops columns from the query dataframe
+      - col

@@ -1,0 +1,80 @@
+{
+    "datasetName": "claims_cavehicles",
+    "enable": true,
+    "datasetTypeName": "database",
+    "databaseName": "giginsdata",
+    "datasetSchema": "dbo",
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "IIS",
+        "includeSpecificColumns": [
+            "cavehicleid",
+            "claimantid",
+            "wcclaimid",
+            "vehicletype",
+            "vehicleid",
+            "modelyear",
+            "make",
+            "model",
+            "vin",
+            "platenumber",
+            "platestate",
+            "pointofimpactcode",
+            "isvehicledriveable",
+            "enteredon",
+            "enteredby",
+            "updateon",
+            "updateby",
+            "driverid",
+            "drivertype",
+            "driverfirst",
+            "drivermiddle",
+            "driverlast",
+            "driversuffix",
+            "driverresidencephone",
+            "drivercellphone",
+            "driverlicensenumber",
+            "driverlicensestate",
+            "driverrelationtoinsured",
+            "vehicleusedwithpermission",
+            "vehicletotalloss",
+            "vehicletheft",
+            "driverdob",
+            "vehicleretained"
+        ],
+        "ingestType": "watermark",
+        "sourceWatermarkIdentifier": "updateon",
+        "sourceDatabaseType": "sqldatabase",
+        "isDynamicQuery": true
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "fileType": "parquet",
+        "directoryName": "IIS_TRANSACTION"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_scu_001_claims_transaction_curated",
+        "schemaName": "iis_transaction",
+        "schemaEvolutionMode": "addNewColumns",
+        "schemaLocation": null,
+        "fileOptions": {
+            "encoding": "ISO-8859-1",
+            "header": true,
+            "inferColumnTypes": true,
+            "multiline": true,
+            "delimiter": ",",
+            "escape": "\"",
+            "timestampFormat": "dd/MM/yyyy"
+        },
+        "columnList": ["*"],
+        "primaryKeyList": [
+            "CAVehicleID"
+        ],
+        "sensitiveColumns": null,
+        "enableSensitiveFieldCheck": false,
+        "deletionCaptureEnabled": false,
+        "duplicateCheckEnabled": false,
+        "targetFileFormat": "delta",
+        "targetLoadType": "merge"
+    }
+}

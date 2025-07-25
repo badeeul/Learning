@@ -1,0 +1,90 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_carrier
+  load_strategy: type_two
+  key_columns:
+    - carrier_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: curated_bop_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: curated_db_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: curated_ho_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: curated_wc_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_carrier
+    sql: SELECT 
+            cast(carrier as string) as carrier_code
+            ,cast(null as string) as carrier_name
+            ,cast(null as string) as admitted_flag
+            ,cast(null as string) as description
+        FROM 
+            curated_bop_claim_summary
+        GROUP BY
+            carrier
+        UNION
+        SELECT 
+            carrier as carrier_code
+            ,cast(null as string) as carrier_name
+            ,cast(null as string) as admitted_flag
+            ,cast(null as string) as description
+        FROM
+            curated_ca_claim_summary
+        GROUP BY
+            carrier
+        UNION
+        SELECT 
+            carrier as carrier_code
+            ,cast(null as string) as carrier_name
+            ,cast(null as string) as admitted_flag
+            ,cast(null as string) as description
+        FROM
+            curated_db_claim_summary
+        GROUP BY
+            carrier
+        UNION
+        SELECT 
+            carrier as carrier_code
+            ,cast(null as string) as carrier_name
+            ,cast(null as string) as admitted_flag
+            ,cast(null as string) as description
+        FROM
+            curated_ho_claim_summary
+        GROUP BY
+            carrier
+        UNION
+        SELECT 
+            carrier as carrier_code
+            ,cast(null as string) as carrier_name
+            ,cast(null as string) as admitted_flag
+            ,cast(null as string) as description
+        FROM
+            curated_wc_claim_summary
+        GROUP BY
+            carrier
+    description: |
+      This table is used to store the carrier information for the claims reserves data product. 
+      The carrier information is extracted from various claim summary tables and is used to identify the insurance carriers associated with the claims. 

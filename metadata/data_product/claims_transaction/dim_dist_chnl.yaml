@@ -1,0 +1,38 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_dist_chnl
+  load_strategy: type_two
+  key_columns:
+    - agcy_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: dist_chnl_key
+
+source:
+  - name: agency
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: agency
+
+query:
+
+  - name: agency_df
+    sql: |
+      SELECT 
+        *
+        FROM agency
+        WHERE dl_iscurrent = 1
+
+  - name: dim_dist_chnl
+    sql: |
+      SELECT 
+        a.agency AS agcy_cd_bus_key,
+        a.name AS agcy_desc,
+        a.state AS agcy_state,
+        a.sagency AS super_agcy_cd,
+        b.name AS super_agcy_desc
+      FROM agency_df a
+      INNER JOIN agency_df b ON UPPER(TRIM(a.sagency)) = UPPER(TRIM(b.agency)) 
+
+    description: "This query creates a dimension table for agencies, joining agency data with its parent/super agency information. It provides agency codes, descriptions, state information, and the hierarchy relationship between agencies and their parent agencies."

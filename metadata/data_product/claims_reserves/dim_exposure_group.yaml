@@ -1,0 +1,31 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_exposure_group
+  load_strategy: type_two
+  key_columns:
+    - exposure_group_code
+  unknown_record: True
+  identity: True
+
+source:
+  - name: BOPClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: WCClaimSummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_exposure_group
+    sql: SELECT DISTINCT
+            exposuregroup as exposure_group_code
+        FROM BOPClaimSummary
+        UNION
+        SELECT DISTINCT
+            exposuregroup as exposure_group_code
+        FROM WCClaimSummary
+    description: "This table contains the list of exposure groups from the claims summary tables."

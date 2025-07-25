@@ -1,0 +1,73 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_payee
+  load_strategy: type_two
+  key_columns:
+    - payee_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: payee_key
+
+source:
+  - name: provider
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: provider
+    
+  - name: provtype
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: provtype 
+  
+  - name: address
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: address 
+
+  - name: counties
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: counties 
+
+query:
+  - name: dim_payee
+    sql: |
+      SELECT 
+        p.provider AS payee_cd_bus_key,
+        p.name AS payee_nm,
+        c.name AS payee_county,
+        a.stateprovince AS payee_state,
+        pt.provtype AS payee_type_cd,
+        pt.provtypdes AS payee_type_desc
+      FROM provider p
+      INNER JOIN provtype pt ON UPPER(TRIM(p.provtype)) = UPPER(TRIM(pt.provtype)) 
+        AND pt.dl_iscurrent = 1
+      LEFT JOIN address a ON p.addressid = a.addressid
+        AND a.dl_iscurrent = 1
+      LEFT JOIN counties c ON p.county = c.fips 
+        AND UPPER(TRIM(a.stateprovince)) = UPPER(TRIM(c.state)) 
+        AND UPPER(TRIM(a.locality)) = UPPER(TRIM(c.city)) 
+        AND LEFT(a.postalcode, 5) = c.zipcode
+        AND c.dl_iscurrent = 1
+      WHERE p.dl_iscurrent = 1
+      UNION
+
+      SELECT 
+        'Insured' AS payee_cd_bus_key,
+        'Insured' AS payee_nm,
+        'NA' AS payee_county,
+        'NA' AS payee_state,
+        'Insured' AS payee_type_cd,
+        'Insured' AS payee_type_desc
+
+      UNION
+
+      SELECT 
+        'Claimant' AS payee_cd_bus_key,
+        'Claimant' AS payee_nm,
+        'NA' AS payee_county,
+        'NA' AS payee_state,
+        'Claimant' AS payee_type_cd,
+        'Claimant' AS payee_type_desc
+    description: "This query creates a dimension table for payees, combining provider data with special payee types (Insured and Claimant). It provides payee identification information including name, county, state, and type classification with descriptive names for each type."

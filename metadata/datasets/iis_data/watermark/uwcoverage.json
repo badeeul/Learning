@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM dbo.uwcoverage ",
+    "sourceWatermarkIdentifier": "",
+    "watermarkValue": ""
+}

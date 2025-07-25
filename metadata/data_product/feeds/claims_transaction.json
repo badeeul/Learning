@@ -1,0 +1,182 @@
+{
+    "loadGroupCDCInserts": [
+        {
+            "files": [
+                {
+                    "fileName": "transaction_uwcoverage_curated_inserts",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "claimstrans_curated_inserts",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupCDCUpdates": [
+        {
+            "files": [
+                {
+                    "fileName": "transaction_uwcoverage_curated_updates",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "claimstrans_curated_updates",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupCDCDeletes": [
+        {
+            "files": [
+                {
+                    "fileName": "transaction_uwcoverage_curated_deletes",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "claimstrans_curated_deletes",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupStaging1": [
+        {
+            "files": [
+                {
+                    "fileName": "stg_core_claim_data",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "stg_core_claim_transaction_data",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupDims": [
+        {
+            "files": [
+                {
+                    "fileName": "dim_adjuster",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_aslob",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_carrier",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_cat",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_cause_of_loss",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_claim_status",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_claim_trans_type",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_claim_type",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_claimant",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_coverage",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_date",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_dist_chnl",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_ins_obj",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_insured",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_lob",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_mkt_type",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_occurrence",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_payee",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_policy",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "dim_prod_src",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupStaging2": [
+        {
+            "files": [
+                {
+                    "fileName": "stg_claim_supporting_data",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "stg_claim_transaction_supporting_data",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupFacts1": [
+        {
+            "files": [
+                {
+                    "fileName": "fact_claim_status_log",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "fact_claim_transaction",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ],
+    "loadGroupFacts2": [
+        {
+            "files": [
+                {
+                    "fileName": "fact_claim",
+                    "modelConfigFolderName": "claims_transaction"
+                }
+            ]
+        }
+    ]
+}

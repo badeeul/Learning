@@ -1,0 +1,647 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: stage
+  table: BOPIncrLossReservesStg
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: massive_claims
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: massive_claims
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcclaim
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claimant
+
+  - name: reserves
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: reserves
+
+  - name: claims_catastrophe
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_catastrophe
+
+  - name: claims_catcodes
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_catcodes
+
+  - name: cl_occurrence
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_occurrence
+
+  - name: wclocnam
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wclocnam
+
+  - name: claims_extra
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_extra
+
+  - name: claims_causeofloss
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_causeofloss
+
+  - name: claims_lossdetail
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_lossdetail
+
+  - name: wcinfo
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcinfo
+
+  - name: pc_products
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_products
+
+  - name: payments
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: payments
+
+  - name: uwbuildings
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: uwbuildings
+
+  - name: bpclass
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: bpclass
+
+  - name: lookups
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: lookups
+
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_coverage
+
+query:
+  - name: Reserving_MassiveClaims_DF
+    sql: select
+          claimnum
+          ,asofdate
+        from massive_claims
+        where dl_iscurrent = 1
+        and lower(claimnum) <> 'claimnum'
+
+  - name: BOPIncrLossReserves_DF
+    sql: |
+      select
+        to_timestamp('01/01/2008 0:00:00', 'M/d/yyyy H:m:s') as startdate,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate,
+        to_date(w.dol, 'M/d/yyyy') as dol,
+        year(w.dol) as accyr,
+        to_date(c.adjustorclosed, 'M/d/yyyy') as closed,
+        to_date(c.adjustorreopened, 'M/d/yyyy') as reopened,
+        to_date(c.received, 'M/d/yyyy') as received,
+        nvl(c.legalreferral, 'N') as legal,
+        case when c.suitfiled = 'Y' then 'Y' else 'N' end as suitfiled,
+        case when nvl(c.tpataxid,'') = '' then 'N' else 'Y' end as tpa,
+        case when cl.locationoflosslocnum = '' then cl.locationoflossstate else wc.state end as state,
+        w.wcclaimid,
+        concat_ws('-', r.code, w.occurrencenumber, r.claim, c.claimantnumber) as claimnum,
+        concat(r.code, '-', w.occurrencenumber) as occnum,
+        r.code,
+        w.occurrencenumber,
+        r.claim,
+        c.claimantnumber,
+        w.lob,
+        case when i.renewof='NEW' then 'New' else 'Renewal' end as newrenew,
+        sum(r.medical) + sum(r.indemnity) as lossreserves,
+        sum(r.expense) as expensereserves,
+        last_day(to_date(r.updateon, 'M/d/yyyy')) as calyrmo_end,
+        cast(round(year(to_date(r.updateon, 'M/d/yyyy')) + month(to_date(r.updateon, 'M/d/yyyy'))/100.0,2) as decimal(10,2)) as calyr_mo,
+        ct.catastrophecode as catcode,
+        case when nvl(ca.catastrophecodeid,'N') = 'N' then 'N' else 'Y' end as catind,
+        i.carrier,
+        i.markettype,
+        i.productionsrc,
+        i.agency,
+        to_date(i.pobegin, 'M/d/yyyy') as pobegin,
+        nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir) as expir,
+        ccl.causeoflossdesc as causeofloss,
+        cld.lossdetaildesc as lossdescrip,
+        r.claimantid,
+        case when w.coveragecategory='LI' then '052' 
+             when w.coveragecategory='PD' then '051' 
+             else 'WHAT IS THIS' 
+        end as aslob,
+        case when w.coveragecategory='LI' then 
+              case when i.carrier='PAAZGU10' then 'BOP - CAS E&S' else 'BOP - CAS' end
+             when w.coveragecategory='PD' then 
+              case when i.carrier='PAAZGU10' then 'BOP - PROP E&S' else 'BOP - PROP' end
+             else 'WHAT IS THIS'
+        end as transmittal_segment_code,
+        replace(p.description, ',', '') as productid,
+        cast('' as string) as exposureid,
+        cast('' as string) as exposuregroup,
+        cast('' as string) as exposureclass,
+        cast('' as string) as industry
+      from 
+        wcclaim w 
+        left join insured i on i.code=w.code and i.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid=c.wcclaimid and c.dl_iscurrent = 1
+        left join reserves r on r.code=w.code and r.claim=w.claim and r.claimantid=c.claimantid and r.dl_iscurrent = 1
+        left join claims_catastrophe ca on ca.sqlfieldvalue=w.occid and ca.sqlfield='OCCID' and ca.dl_iscurrent = 1
+        left join claims_catcodes ct on ca.catastrophecodeid=ct.catastrophecodeid and ct.dl_iscurrent = 1
+        left join cl_occurrence cl on cl.code=w.code and cl.occurrencenumber=w.occurrencenumber and cl.dl_iscurrent = 1
+        left join wclocnam wc on w.code=wc.code and wc.loctypenum=cl.locationoflosslocnum and wc.dl_iscurrent = 1
+        left join claims_extra be on c.claimantid=be.claimantid and be.dl_iscurrent = 1
+        left join claims_causeofloss ccl on be.causeoflossid=ccl.causeoflossid and ccl.dl_iscurrent = 1
+        left join claims_lossdetail cld on be.lossdetailid=cld.lossdetailid and cld.dl_iscurrent = 1
+        left join wcinfo wi on wi.code=w.code and wi.dl_iscurrent = 1
+        left join pc_products p on p.productid=wi.productid and p.dl_iscurrent = 1
+      where 
+        r.updateon between to_timestamp('01/01/2008 0:00:00', 'M/d/yyyy H:m:s') 
+        and to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+        and w.lob = 'BP'
+        and nvl(c.voidortransfer, '') not in ('T', 'V')
+        and w.dl_iscurrent = 1
+      group by
+        concat_ws('-', r.code, w.occurrencenumber, r.claim, c.claimantnumber),
+        concat(r.code, '-', w.occurrencenumber),
+        r.code,
+        w.occurrencenumber,
+        r.claim,
+        c.claimantnumber,
+        w.lob,
+        case when i.renewof='NEW' then 'New' else 'Renewal' end,
+        c.adjustorclosed,
+        c.adjustorreopened,
+        c.received,
+        nvl(c.legalreferral, 'N'),
+        case when c.suitfiled='Y' then 'Y' else 'N' end,
+        case when nvl(c.tpataxid,'') = '' then 'N' else 'Y' end,
+        case when cl.locationoflosslocnum='' then cl.locationoflossstate else wc.state end,
+        w.wcclaimid,
+        ct.catastrophecode,
+        case when nvl(ca.catastrophecodeid,'N') = 'N' then 'N' else 'Y' end,
+        last_day(to_date(r.updateon, 'M/d/yyyy')),
+        cast(round(year(to_date(r.updateon, 'M/d/yyyy')) + month(to_date(r.updateon, 'M/d/yyyy'))/100.0,2) as decimal(10,2)),
+        i.carrier,
+        i.markettype,
+        i.productionsrc,
+        i.agency,
+        i.pobegin,
+        nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir),
+        ccl.causeoflossdesc,
+        cld.lossdetaildesc,
+        r.claimantid,
+        w.dol,
+        year(w.dol),
+        w.coveragecategory,
+        replace(p.description, ',', '')
+
+  - name: BOPIncrLossReserves_DF
+    sql: |
+      with cte as (
+        select 
+          b.*,
+          case when mc.claimnum is not null then 'Y' else 'N' end as massind
+        from BOPIncrLossReserves_DF b
+        left join Reserving_MassiveClaims_DF mc on b.claimnum = mc.claimnum and to_date(b.asofdate) = to_date(mc.asofdate, 'M/d/yyyy')
+      ),
+      cte2 as (
+        select 
+          *,
+          case when aslob='052' then
+                case when massind='Y' then 'COMMLIAB_MASS' else 'COMMLIAB_NET' end
+               when aslob='051' then
+                case when massind='Y' and catind='Y' then 'COMMPROP_MASSCAT'
+                     when massind='Y' and catind='N' then 'COMMPROP_MASS'
+                     when catind='Y' then 'COMMPROP_CAT'
+                     else 'COMMPROP_NET'
+                end
+               else 'WHAT IS THIS'
+          end as reserve_segment_code,
+          case reserve_segment_code
+            when 'COMMLIAB_NET' then 'BOP_LIAB'
+            when 'COMMLIAB_MASS' then 'BOP_LIAB'
+            when 'COMMPROP_NET' then 'BOP_PROP'
+            when 'COMMPROP_CAT' then 'BOP_PROP'
+            when 'COMMPROP_MASS' then 'BOP_PROP'
+            when 'COMMPROP_MASSCAT' then 'BOP_PROP'
+            else 'ERROR'
+          end as reserve_detailed_segment_code
+        from cte
+      )
+      select 
+        *,
+        case when carrier='PAAZGU10' then concat(reserve_detailed_segment_code, '_ES')
+             else reserve_detailed_segment_code
+        end as reserve_detailed_segment_code_final
+      from cte2
+
+  - name: BuildingReserves_DF
+    sql: select 
+           d.claimnum
+          ,cov.buildingid
+          ,d.claimantid
+          ,sum(LossReserves) as loss
+          ,sum(ExpenseReserves) as expense
+        from BOPIncrLossReserves_DF d
+        inner join cl_coverage cov 
+          on cov.claimantid=d.claimantid 
+          and cov.code=d.code 
+          and cov.claim=d.claim 
+          and cov.claimantnumber=d.claimantnumber
+          and cov.dl_iscurrent = 1
+        group by 
+          d.claimnum, 
+          cov.buildingid, 
+          d.claimantid
+
+# update only those that have one building
+  - name: BOPIncrLossReserves_DF
+    sql: with cte as
+          (
+          select claimnum
+          from BuildingReserves_DF
+          group by claimnum
+          having count(*)=1
+          )
+          select /*+ BROADCAST(BuildingReserves_DF) */
+             l.startdate
+            ,l.asofdate
+            ,l.calyrmo_end
+            ,l.calyr_mo
+            ,l.dol
+            ,l.accyr
+            ,l.closed
+            ,l.reopened
+            ,l.received
+            ,l.legal
+            ,l.suitfiled
+            ,l.tpa
+            ,l.state
+            ,l.wcclaimid
+            ,l.claimnum
+            ,l.occnum
+            ,l.code
+            ,l.claim
+            ,l.claimantnumber
+            ,l.lob
+            ,l.newrenew
+            ,l.lossreserves
+            ,l.expensereserves
+            ,l.catcode
+            ,l.catind
+            ,l.massind
+            ,l.carrier
+            ,l.markettype
+            ,l.productionsrc
+            ,l.agency
+            ,l.pobegin
+            ,l.expir
+            ,l.causeofloss
+            ,l.lossdescrip
+            ,l.claimantid
+            ,l.aslob
+            ,l.transmittal_segment_code
+            ,l.reserve_segment_code
+            ,l.reserve_detailed_segment_code_final
+            ,l.productid
+            ,case when c.claimnum is not null then b.buildingid else l.exposureid end as exposureid
+            ,l.exposuregroup
+            ,l.exposureclass
+            ,l.industry
+          from BOPIncrLossReserves_DF l
+          left join cte c on c.claimnum=l.claimnum
+          left join BuildingReserves_DF b on b.claimnum = l.claimnum and c.claimnum = b.claimnum
+
+  - name: BuildingReserves_DF
+    sql:  select b.*
+          from BuildingReserves_DF b
+          left join BOPIncrLossReserves_DF l 
+            on l.ClaimNum=b.claimnum 
+           and l.ExposureID=b.buildingid 
+           and l.ExposureID<>'' 
+          where l.claimnum is null
+
+# update only those that have only one building with reserves
+  - name: BOPIncrLossReserves_DF
+    sql: with cte as
+          (
+          select 
+             claimnum
+          from BuildingReserves_DF b
+          where loss+expense != 0
+          group by claimnum
+          having count(*) = 1
+          )
+          select /*+ BROADCAST(BuildingReserves_DF) */
+             l.startdate
+            ,l.asofdate
+            ,l.calyrmo_end
+            ,l.calyr_mo
+            ,l.dol
+            ,l.accyr
+            ,l.closed
+            ,l.reopened
+            ,l.received
+            ,l.legal
+            ,l.suitfiled
+            ,l.tpa
+            ,l.state
+            ,l.wcclaimid
+            ,l.claimnum
+            ,l.occnum
+            ,l.code
+            ,l.claim
+            ,l.claimantnumber
+            ,l.lob
+            ,l.newrenew
+            ,l.lossreserves
+            ,l.expensereserves
+            ,l.catcode
+            ,l.catind
+            ,l.massind
+            ,l.carrier
+            ,l.markettype
+            ,l.productionsrc
+            ,l.agency
+            ,l.pobegin
+            ,l.expir
+            ,l.causeofloss
+            ,l.lossdescrip
+            ,l.claimantid
+            ,l.aslob
+            ,l.transmittal_segment_code
+            ,l.reserve_segment_code
+            ,l.reserve_detailed_segment_code_final
+            ,l.productid
+            ,case when c.claimnum is not null then b.buildingid else l.exposureid end as exposureid
+            ,l.exposuregroup
+            ,l.exposureclass
+            ,l.industry
+          from BOPIncrLossReserves_DF l
+          left join cte c on c.claimnum=l.claimnum
+          left join BuildingReserves_DF b on b.claimnum = l.claimnum and c.claimnum = b.claimnum
+
+  - name: BuildingReserves_DF
+    sql:  select b.*
+          from BuildingReserves_DF b
+          left join BOPIncrLossReserves_DF l 
+            on l.ClaimNum=b.claimnum 
+           and l.ExposureID<>'' 
+          where l.claimnum is null
+
+# update with max loss reserves
+  - name: BOPIncrLossReserves_DF
+    sql: with cte as
+          (
+          select distinct
+             claimnum
+            ,buildingid
+          from BuildingReserves_DF b
+          where loss = (
+              select max(loss) as loss
+              from BuildingReserves_DF b1
+              where b.claimnum=b1.claimnum
+            ) 
+            and loss<>0
+          )
+          select /*+ BROADCAST(BuildingReserves_DF) */
+             l.startdate
+            ,l.asofdate
+            ,l.calyrmo_end
+            ,l.calyr_mo
+            ,l.dol
+            ,l.accyr
+            ,l.closed
+            ,l.reopened
+            ,l.received
+            ,l.legal
+            ,l.suitfiled
+            ,l.tpa
+            ,l.state
+            ,l.wcclaimid
+            ,l.claimnum
+            ,l.occnum
+            ,l.code
+            ,l.claim
+            ,l.claimantnumber
+            ,l.lob
+            ,l.newrenew
+            ,l.lossreserves
+            ,l.expensereserves
+            ,l.catcode
+            ,l.catind
+            ,l.massind
+            ,l.carrier
+            ,l.markettype
+            ,l.productionsrc
+            ,l.agency
+            ,l.pobegin
+            ,l.expir
+            ,l.causeofloss
+            ,l.lossdescrip
+            ,l.claimantid
+            ,l.aslob
+            ,l.transmittal_segment_code
+            ,l.reserve_segment_code
+            ,l.reserve_detailed_segment_code_final
+            ,l.productid
+            ,case when c.claimnum is not null then c.buildingid else l.exposureid end as exposureid
+            ,l.exposuregroup
+            ,l.exposureclass
+            ,l.industry
+          from BOPIncrLossReserves_DF l
+          left join cte c on c.claimnum = l.claimnum and l.exposureid=''
+  
+  - name: BuildingReserves_DF
+    sql:  select b.*
+          from BuildingReserves_DF b
+          left join BOPIncrLossReserves_DF l 
+            on l.ClaimNum=b.claimnum 
+           and l.ExposureID<>'' 
+          where l.claimnum is null
+
+# update with max expense reserves that have no loss reserves
+  - name: BOPIncrLossReserves_DF
+    sql: with cte as
+          (
+          select 
+             claimnum
+            ,buildingid
+          from BuildingReserves_DF b
+          where expense = (
+              select max(expense) as expense
+              from BuildingReserves_DF b1
+              where b.claimnum=b1.claimnum
+            ) 
+            and expense<>0
+          )
+          select /*+ BROADCAST(BuildingReserves_DF) */
+             l.startdate
+            ,l.asofdate
+            ,l.calyrmo_end
+            ,l.calyr_mo
+            ,l.dol
+            ,l.accyr
+            ,l.closed
+            ,l.reopened
+            ,l.received
+            ,l.legal
+            ,l.suitfiled
+            ,l.tpa
+            ,l.state
+            ,l.wcclaimid
+            ,l.claimnum
+            ,l.occnum
+            ,l.code
+            ,l.claim
+            ,l.claimantnumber
+            ,l.lob
+            ,l.newrenew
+            ,l.lossreserves
+            ,l.expensereserves
+            ,l.catcode
+            ,l.catind
+            ,l.massind
+            ,l.carrier
+            ,l.markettype
+            ,l.productionsrc
+            ,l.agency
+            ,l.pobegin
+            ,l.expir
+            ,l.causeofloss
+            ,l.lossdescrip
+            ,l.claimantid
+            ,l.aslob
+            ,l.transmittal_segment_code
+            ,l.reserve_segment_code
+            ,l.reserve_detailed_segment_code_final
+            ,l.productid
+            ,case when c.claimnum is not null then c.buildingid else l.exposureid end as exposureid
+            ,l.exposuregroup
+            ,l.exposureclass
+            ,l.industry
+          from BOPIncrLossReserves_DF l
+          left join cte c on c.claimnum = l.claimnum
+
+  - name: BuildingReserves_DF
+    sql:  select /*+ BROADCAST(BuildingReserves_DF) */
+            b.*
+          from BuildingReserves_DF b
+          left join BOPIncrLossReserves_DF l 
+            on l.ClaimNum=b.claimnum 
+           and l.ExposureID<>'' 
+          where l.claimnum is null
+
+# now update with the latest coverage as IIS does 
+# update Net Liability ResSegs based on building group
+  - name: BOPIncrLossReserves_DF_final
+    sql: with cte as
+          (
+          select /*+ BROADCAST(BuildingReserves_DF) */
+             b.claimnum
+            ,c.buildingid
+          from BuildingReserves_DF b
+          inner join cl_coverage c
+            on c.claimantid = b.claimantid
+            and c.dl_iscurrent = 1
+          where c.updateon = (
+              select max(updateon) as updateon
+              from cl_coverage cl1
+              where cl1.claimantid = c.claimantid
+              and cl1.dl_iscurrent = 1
+            ) 
+          )
+          select /*+ BROADCAST(BuildingReserves_DF) */
+                 /*+ BROADCAST(lookups) */
+             l.startdate
+            ,l.asofdate
+            ,l.calyrmo_end
+            ,l.calyr_mo
+            ,l.dol
+            ,l.accyr
+            ,l.closed
+            ,l.reopened
+            ,l.received
+            ,l.legal
+            ,l.suitfiled
+            ,l.tpa
+            ,l.state
+            ,l.wcclaimid
+            ,l.claimnum
+            ,l.occnum
+            ,l.code
+            ,l.claim
+            ,l.claimantnumber
+            ,l.lob
+            ,l.newrenew
+            ,l.lossreserves
+            ,l.expensereserves
+            ,l.catcode
+            ,l.catind
+            ,l.massind
+            ,l.carrier
+            ,l.markettype
+            ,l.productionsrc
+            ,l.agency
+            ,l.pobegin
+            ,l.expir
+            ,l.causeofloss
+            ,l.lossdescrip
+            ,l.claimantid
+            ,l.aslob
+            ,l.transmittal_segment_code
+            ,case when l.reserve_segment_code='COMMLIAB_NET' then
+                  case when lower(lk.descrip)='apartment' then 'COMMLIAB_AP'
+                    when lower(lk.descrip) in ('auto services', 'contractors office', 'contractors shop') then 'COMMLIAB_AS_CO_CS'
+                    else 'COMMLIAB_OTH'
+                  end
+              else l.reserve_segment_code 
+              end as reserve_segment_code
+            ,l.reserve_detailed_segment_code_final as reserve_detailed_segment_code
+            ,l.productid
+            ,case when c.claimnum is not null then c.buildingid else l.exposureid end as exposureid
+            ,lk.descrip as exposuregroup
+            ,concat(bp.class, '-', bp.classsuffix) as exposureclass
+            ,replace(l2.descrip, ',', '') as industry    
+          from BOPIncrLossReserves_DF l
+          left join cte c on c.claimnum=l.claimnum
+          left outer join uwbuildings u on l.exposureid=u.buildingID and u.dl_iscurrent = 1
+          left outer join bpclass bp on u.bpclass_id=bp.bpclass_id and bp.dl_iscurrent = 1
+          left outer join lookups lk 
+            on upper(lk.programid)='UWBUILDINGS' 
+            and lower(lk.keyfield)='buildinggroup' 
+            and instr(lk.lob, 'BP') > 0
+            and lk.vals=u.buildinggroup
+            and lk.dl_iscurrent = 1
+          left outer join lookups l2 
+            on upper(l2.programid)='BPCLASS' 
+            and upper(l2.keyfield)='EZRATE_INDUSTRY' 
+            and instr(nvl(l2.lob,'BP'), 'BP') > 0
+            and l2.vals=u.ezrate_industry 
+            AND nvl(l2.discontinued, cast(date_add(CURRENT_TIMESTAMP, 1) as date)) > cast(CURRENT_TIMESTAMP AS date)
+            and l2.dl_iscurrent = 1

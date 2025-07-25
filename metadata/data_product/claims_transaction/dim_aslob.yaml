@@ -1,0 +1,26 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_aslob
+  load_strategy: type_two
+  key_columns:
+    - aslob_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: aslob_key
+
+source:
+  - name: aslob_codes
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: aslob_codes
+
+query:
+  - name: dim_aslob
+    sql: |
+      SELECT
+        aslob_code AS aslob_cd_bus_key,
+        aslob_description AS aslob_desc
+      FROM aslob_codes
+      WHERE  dl_iscurrent = 1
+    description: "Selects ASLOB code and description from the AsLob_Codes source table."

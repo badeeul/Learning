@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Platform Services Data Product Feed",
+    "description": "A feed that represents which transformation configs to run",
+    "type": "object",
+    "properties": {
+        "loadGroupA": {
+            "$ref": "loadGroup.json#/loadGroup"
+        },
+        "loadGroupB": {
+            "$ref": "loadGroup.json#/loadGroup"
+        },
+        "loadGroupC": {
+            "$ref": "loadGroup.json#/loadGroup"
+        }
+    },
+    "required": [
+        "loadGroupA",
+        "loadGroupB",
+        "loadGroupC"
+    ]
+}

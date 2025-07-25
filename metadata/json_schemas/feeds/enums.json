@@ -1,0 +1,11 @@
+{
+    "definitions": {
+        "datasetType": {
+            "type": "string",
+            "enum": [
+                "database",
+                "file"
+            ]
+        }
+    }
+}

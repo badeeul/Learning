@@ -1,0 +1,70 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Platform Services Ingest Feed",
+    "description": "A feed that represents which dataset configs to run",
+    "type": "object",
+    "properties": {
+        "feedName": {
+            "type": "string"
+        },
+        "feedDescription": {
+            "type": "string"
+        },
+        "workLoadType": {
+            "type": "string"
+        },
+        "skipProductLoad": {
+            "type": "boolean"
+        },
+        "dataDeduplicationAlert": {
+            "type": "boolean"
+        },
+        "deduplicationAlertTemplate": {
+            "type": "string"
+        },
+        "datasetsConfig": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "datasetType": {
+                        "$ref": "enums.json#/definitions/datasetType"
+                    },
+                    "datasets": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "fileName": {
+                                    "type": "string"
+                                },
+                                "sourceConfigFolderName": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "fileName",
+                                "sourceConfigFolderName"
+                            ]
+                        },
+                        "minItems": 1
+                    }
+                },
+                "required": [
+                    "datasetType",
+                    "datasets"
+                ]
+            },
+            "minItems": 1
+        }
+    },
+    "required": [
+        "feedName",
+        "feedDescription",
+        "workLoadType",
+        "skipProductLoad",
+        "dataDeduplicationAlert",
+        "deduplicationAlertTemplate",
+        "datasetsConfig"
+    ]
+}

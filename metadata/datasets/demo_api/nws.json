@@ -1,0 +1,35 @@
+{
+    "datasetName": "nws_forecast",
+    "enable": true,
+    "datasetTypeName": "file",
+    "fileType": "csv",
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "nws_api",
+        "sourceSystemType": "notebook",
+        "ingestType": "full",
+        "latitude": 39.7456,
+        "longitude": -97.0892
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_pdi_001_raw",
+        "fileType": "csv",
+        "directoryName": "demo_file"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_pdi_001_curated",
+        "schemaName": "demo",
+        "fileOptions": {
+            "header": true,
+            "inferColumnTypes": false,
+            "multiline": true,
+            "delimiter": ",",
+            "escape": "\"",
+            "timestampFormat": "dd/MM/yyyy"
+        },
+        "duplicateCheckEnabled": false,
+        "duplicateCheckQuarantineType": "retain_one_duplicate",
+        "targetFileFormat": "delta",
+        "targetLoadType": "append"
+    }
+}

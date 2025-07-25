@@ -1,0 +1,414 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: fact_claim_status_log
+  load_strategy: overwrite
+  key_columns:
+    - claim_status_log_key
+    - ins_obj_key
+  unknown_record: False
+  identity: False
+
+source:
+  - name: claimant_status_asof
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claimant_status_asof
+
+  - name: stg_claim_supporting_data
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: stg_claims_transaction
+    table: stg_claim_supporting_data
+
+  - name: dim_cat
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_cat
+
+  - name: dim_claimant
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claimant
+
+  - name: dim_policy
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_policy
+
+  - name: dim_ins_obj
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_ins_obj
+
+  - name: dim_carrier
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_carrier
+
+  - name: dim_dist_chnl
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_dist_chnl
+
+  - name: dim_policy
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_policy
+
+  - name: dim_claim_status
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_status
+
+  - name: dim_insured
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_insured
+
+  - name: dim_date
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_date
+
+  - name: dim_lob
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_lob
+
+  - name: dim_aslob
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_aslob
+
+  - name: dim_claim_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_type
+
+  - name: dim_adjuster
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_adjuster
+
+  - name: dim_occurrence
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_occurrence
+
+  - name: dim_cause_of_loss
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_cause_of_loss
+
+  - name: dim_mkt_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_mkt_type
+
+  - name: dim_prod_src
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_prod_src
+
+query:
+  - name: stg_claim_base_info
+    sql: |
+      SELECT DISTINCT 
+        claimantid,
+        upper(lob) as lob,
+        policy_num,
+        carrier,
+        coveragecategory,
+        lte,
+        productionsrc,
+        markettype,
+        dol,
+        pobegin,
+        poexpir,
+        CASE WHEN upper(lob) IN ('BP','CA','HO') THEN received ELSE recvd END AS received_date,
+        agency,
+        occid,
+        claim,
+        claimantnumber,
+        tpataxid,
+        adjustor,
+        buildingid,
+        vehicleid,
+        transaction_uwhomes_id,
+        catcode,
+        causeoflossid,
+        lossdetailid,
+        causedetailid,
+        accident,
+        injury,
+        catastrophecodeid
+      FROM stg_claim_supporting_data
+
+  - name: claimant_status_temp
+    sql: |
+      SELECT 
+        a.claimantid,
+        UPPER(TRIM(a.status)) AS status,
+        UPPER(TRIM(a.adjustorstatus)) AS adjustorstatus,
+        a.transactiondate,
+        a.claimantstatusasofid,
+        ROW_NUMBER() OVER (PARTITION BY a.claimantid ORDER BY a.transactiondate, a.claimantstatusasofid) AS rn
+      FROM claimant_status_asof a
+      WHERE a.dl_iscurrent = 1
+
+  - name: stg_claimant_status_asof_temp
+    sql: |
+      SELECT 
+        a.claimantid,
+        a.status,
+        a.adjustorstatus,
+        a.transactiondate AS status_eff_start_date,
+        b.transactiondate AS status_eff_end_date,
+        CASE WHEN b.rn IS NULL THEN 1 ELSE 0 END AS iscurr,
+        a.claimantstatusasofid
+      FROM claimant_status_temp a
+      LEFT JOIN claimant_status_temp b ON a.claimantid = b.claimantid AND a.rn + 1 = b.rn
+
+  - name: fact_claim_status_log_stg
+    sql: |
+      SELECT DISTINCT 
+        cs.claimantid AS claimant_id_bus_key,
+        cs.status_eff_start_date AS status_eff_start_date_bus_key,
+        cs.status_eff_end_date AS status_eff_end_date_bus_key,
+        cs.status AS claim_status_bus_key,
+        cs.adjustorstatus AS adjustr_status_bus_key,
+        cs.iscurr,
+        CASE 
+          WHEN b.lob IN ('BP','CP') AND b.buildingid IS NOT NULL THEN CONCAT('BG-', CAST(b.buildingid AS STRING))
+          WHEN b.lob = 'CA' AND b.vehicleid IS NOT NULL THEN CONCAT('VH-', CAST(b.vehicleid AS STRING))
+          WHEN b.lob = 'HO' AND b.transaction_uwhomes_id IS NOT NULL THEN CONCAT('HO-', CAST(b.transaction_uwhomes_id AS STRING))
+          ELSE 'NA' 
+        END AS ins_obj_bus_key,
+        b.carrier AS carrier_bus_key,
+        b.lob AS lob_bus_key,
+        b.policy_num AS policy_num_bus_key,
+        CASE 
+          WHEN b.lte = 'Y' THEN 'LT'
+          WHEN b.lte = 'N' THEN 'MO'
+          ELSE b.coveragecategory 
+        END AS claim_type_cd_bus_key,
+        CASE 
+          WHEN NVL(b.tpataxid,'') = '' THEN CONCAT('EMP-', b.adjustor)
+          ELSE CONCAT('TPA-', b.tpataxid)
+        END AS adjustr_bus_key,
+        CONCAT('EMP-', b.adjustor) AS intrnl_adjustr_bus_key,
+        CASE 
+          WHEN b.lob IN ('WC') AND b.catcode IS NOT NULL THEN CONCAT(b.policy_num, '-', b.catcode)
+          ELSE CONCAT(b.policy_num, '-', CAST(b.occid AS STRING))
+        END AS occur_bus_key,
+        CASE 
+          WHEN b.lob IN ('BP','HO') THEN CONCAT('CAUSE-', IFNULL(CAST(b.causeoflossid AS STRING), 'NA'), '-', IFNULL(CAST(b.lossdetailid AS STRING), 'NA'), '-', IFNULL(CAST(b.causedetailid AS STRING), 'NA'))
+          WHEN b.lob = 'WC' THEN CONCAT('ACC-INJ-', IFNULL(CAST(b.accident AS STRING), 'NA'), '-', IFNULL(CAST(b.injury AS STRING), 'NA'))
+          ELSE NULL 
+        END AS cause_bus_key,
+        b.catastrophecodeid AS cat_bus_key,
+        b.productionsrc AS prod_src_cd_bus_key,
+        b.markettype AS mkt_type_cd_bus_key,
+        b.dol AS loss_date_bus_key,
+        b.pobegin AS pol_eff_date_bus_key,
+        b.poexpir AS pol_exp_date_bus_key,
+        b.received_date AS claim_recd_date_bus_key,
+        b.agency AS agcy_cd_bus_key,
+        cs.claimantstatusasofid as claim_status_log_key
+      FROM 
+        stg_claimant_status_asof_temp cs
+        JOIN stg_claim_base_info b ON cs.claimantid = b.claimantid
+
+  - name: fact_claim_status_log
+    sql: |
+      SELECT DISTINCT 
+          IFNULL(a.adjustr_key, -1) as adjustr_key
+        , IFNULL(c1.claim_status_key, -1) as adjustr_status_key
+        , IFNULL(ca.carrier_key, -1) as carrier_key
+        , IFNULL(ct.cat_key, -1) as cat_key
+        , IFNULL(cl.cause_key, -1) as cause_key
+        , IFNULL(d.date_key, -1) as claim_recd_date_key
+        , IFNULL(cs.claim_status_key, -1) as claim_status_key
+        , claim_status_log_key
+        , IFNULL(cp.claim_type_key, -1) as claim_type_key
+        , IFNULL(c.claimant_key, -1) as claimant_key
+        , IFNULL(dc.dist_chnl_key, -1) as dist_chnl_key
+        , IFNULL(d1.date_key, -1) as effec_date_key
+        , IFNULL(d2.date_key, -1) as exp_date_key
+        , IFNULL(io.ins_obj_key, -1) as ins_obj_key
+        , IFNULL(i.insd_key, -1) as insd_key
+        , IFNULL(a3.adjustr_key, -1) as intrnl_adjustr_key
+        , iscurr 
+        , IFNULL(l.lob_key, -1) as lob_key
+        , IFNULL(d3.date_key, -1) as loss_date_key
+        , IFNULL(mt.mkt_type_key, -1) as mkt_type_key
+        , IFNULL(o.occur_key, -1) as occur_key
+        , IFNULL(p.policy_key, -1) as policy_key
+        , IFNULL(ps.prod_src_key, -1) as prod_src_key
+        , IFNULL(d4.date_key, -1) as status_eff_start_date_key
+        , IFNULL(d5.date_key, -1) as status_eff_end_date_key
+        , status_eff_start_date_bus_key as transaction_date_time
+        , CASE 
+            WHEN d3.date > CURRENT_DATE() THEN 0
+            ELSE 1
+          END AS dq_future_loss_date_status
+        , CASE 
+            WHEN  COALESCE(d3.date_key, -1) IN (-1,-2) THEN 0
+            ELSE 1
+          END AS dq_loss_date_key
+        , CASE 
+            WHEN d3.date NOT BETWEEN d1.date AND d2.date THEN 0
+            ELSE 1
+          END AS dq_loss_period_status
+        , CASE 
+            WHEN d3.date > d.date THEN 0
+            ELSE 1
+          END AS dq_loss_rcvd_status
+        , CASE 
+            WHEN c1.claim_status_cd_bus_key = '1' AND d4.date IS NOT NULL AND d4.date < d3.date THEN 0
+            ELSE 1
+          END AS dq_loss_closed_status
+        , CASE 
+            WHEN c1.claim_status_cd_bus_key = '1' AND d4.date IS NOT NULL AND d4.date < d.date THEN 0
+            ELSE 1
+          END AS dq_closed_rcvd_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'WC' AND mt.mkt_type_cd_bus_key = 'E' THEN 0
+            ELSE 1
+          END AS dq_wc_mkt_type_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'WC' AND ca.carrier_cd_bus_key = 'PAAZGU10' THEN 0
+            ELSE 1
+          END AS dq_wc_carrier_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'WC' AND ct.cat_bus_key NOT IN (-1, 231, 249) THEN 0
+            ELSE 1
+          END AS dq_wc_cat_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'WC' AND cp.claim_type_cd_bus_key NOT IN ('LT', 'MO') THEN 0
+            ELSE 1
+          END AS dq_wc_claim_type_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'WC' AND (c.bus_unit = 'FT' OR c.bus_unit IS NULL) THEN 0
+            ELSE 1
+          END AS dq_wc_bus_unit_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'WC' AND (
+              -- Voluntary market business
+              (LEFT(p.policy_num_bus_key, 2) NOT IN ('A9', 'V9', 'R2') AND mt.mkt_type_cd_bus_key NOT IN ('C', 'V'))
+              OR
+              -- Residual market business
+              (LEFT(p.policy_num_bus_key, 2) = 'R2' AND mt.mkt_type_cd_bus_key NOT IN ('R', 'A'))
+              OR
+              -- MGUs that are not on GUARD carriers
+              (LEFT(p.policy_num_bus_key, 2) IN ('A9', 'V9') AND mt.mkt_type_cd_bus_key != 'M')
+            ) THEN 0
+            ELSE 1
+          END AS dq_wc_pol_num_status
+        , CASE 
+            WHEN l.lob_cd_bus_key in ('BP','CA','HO') AND NOT REGEXP_LIKE(p.policy_num_bus_key, '^[A-Za-z]{4}[0-9]{6}$') THEN 0
+            ELSE 1
+          END AS dq_bp_ca_ho_pol_num_status
+        , CASE 
+            WHEN l.lob_cd_bus_key in ('DB','WC') AND io.ins_obj_key in (-1) THEN 0
+            ELSE 1
+          END AS dq_db_wc_ins_obj_status
+        , CASE 
+            WHEN l.lob_cd_bus_key in ('BP','CA','HO') AND c.complexity IS NULL THEN 0
+            ELSE 1
+          END AS dq_bp_ca_ho_complexity_status
+        , CASE
+            WHEN mt.mkt_type_cd_bus_key = 'E' AND ca.carrier_cd_bus_key != 'PAAZGU10' THEN 0
+            ELSE 1
+          END AS dq_es_carrier_status
+        , CASE 
+            WHEN l.lob_cd_bus_key = 'CA' AND cp.claim_type_cd_bus_key NOT IN ('AP','BI') THEN 0
+            ELSE 1
+          END AS dq_ca_claim_type_status
+        , CASE 
+                WHEN l.lob_cd_bus_key in ('BP','HO') AND cp.claim_type_cd_bus_key NOT IN ('LI','PD') THEN 0
+                ELSE 1
+              END AS dq_bp_ho_claim_type_status
+        , CASE 
+                WHEN l.lob_cd_bus_key = 'CA' AND mt.mkt_type_cd_bus_key != 'V' THEN 0
+                ELSE 1
+              END AS dq_ca_mkt_type_status        , CASE 
+                WHEN l.lob_cd_bus_key in ('BP','HO') AND cl.cause_key in (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_bp_ho_loss_descrip_status
+        , CASE 
+                WHEN COALESCE(d.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_claim_recd_date_key
+        , CASE 
+                WHEN COALESCE(mt.mkt_type_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_mkt_type_key
+        , CASE 
+                WHEN COALESCE(cp.claim_type_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_claim_type_key
+        , CASE 
+                WHEN COALESCE(i.insd_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_insd_key
+        , CASE 
+                WHEN COALESCE(p.policy_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_policy_key
+        , CASE 
+                WHEN COALESCE(cs.claim_status_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_claim_status_key
+        , CASE 
+                WHEN COALESCE(c1.claim_status_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_adjustr_status_key
+        , CASE 
+                WHEN COALESCE(d1.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_effec_date_key
+        , CASE 
+                WHEN COALESCE(d2.date_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_exp_date_key
+        , CASE 
+                WHEN COALESCE(dc.dist_chnl_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_dist_chnl_key
+        , CASE 
+                WHEN COALESCE(ps.prod_src_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_prod_src_key
+        , CASE 
+                WHEN COALESCE(a3.adjustr_key, -1) IN (-1,-2) THEN 0
+                ELSE 1
+              END AS dq_intrnl_adjustr_key
+
+          
+
+      FROM fact_claim_status_log_stg fs
+
+      LEFT JOIN dim_adjuster     a  ON a.adjustr_bus_key = fs.adjustr_bus_key and a.dl_is_current_flag = 1
+      LEFT JOIN dim_claim_status c1 ON c1.claim_status_cd_bus_key = fs.adjustr_status_bus_key and c1.dl_is_current_flag = 1
+      LEFT JOIN dim_adjuster     a3 ON a3.adjustr_bus_key = fs.intrnl_adjustr_bus_key and a3.dl_is_current_flag = 1
+      LEFT JOIN dim_carrier      ca ON ca.carrier_cd_bus_key = fs.carrier_bus_key and ca.dl_is_current_flag = 1
+      LEFT JOIN dim_cat          ct ON ct.cat_bus_key = fs.cat_bus_key and ct.dl_is_current_flag = 1
+      LEFT JOIN dim_cause_of_loss cl ON cl.cause_bus_key = fs.cause_bus_key and cl.dl_is_current_flag = 1
+      LEFT JOIN dim_date         d  ON d.date = fs.claim_recd_date_bus_key 
+      LEFT JOIN dim_claim_status cs ON cs.claim_status_cd_bus_key = fs.claim_status_bus_key and cs.dl_is_current_flag = 1
+      LEFT JOIN dim_claim_type   cp ON cp.claim_type_cd_bus_key = fs.claim_type_cd_bus_key and cp.dl_is_current_flag = 1
+      LEFT JOIN dim_claimant     c  ON c.claimant_bus_key = fs.claimant_id_bus_key and c.dl_is_current_flag = 1
+      LEFT JOIN dim_dist_chnl    dc ON dc.agcy_cd_bus_key = fs.agcy_cd_bus_key and dc.dl_is_current_flag = 1
+      LEFT JOIN dim_date         d1 ON d1.date = cast(fs.pol_eff_date_bus_key as date)
+      LEFT JOIN dim_date         d2 ON d2.date = cast(fs.pol_exp_date_bus_key as date)
+      LEFT JOIN dim_ins_obj      io ON io.ins_obj_bus_key = fs.ins_obj_bus_key and io.dl_is_current_flag = 1
+      LEFT JOIN dim_insured      i  ON i.policy_num_bus_key = fs.policy_num_bus_key and i.dl_is_current_flag = 1
+      LEFT JOIN dim_lob          l  ON l.lob_cd_bus_key = fs.lob_bus_key and l.dl_is_current_flag = 1
+      LEFT JOIN dim_date         d3 ON d3.date = cast(fs.loss_date_bus_key as date)
+      LEFT JOIN dim_mkt_type     mt ON mt.mkt_type_cd_bus_key = fs.mkt_type_cd_bus_key and mt.dl_is_current_flag = 1
+      LEFT JOIN dim_occurrence   o  ON o.occur_bus_key = fs.occur_bus_key and o.dl_is_current_flag = 1
+      LEFT JOIN dim_policy       p  ON p.policy_num_bus_key = fs.policy_num_bus_key and p.dl_is_current_flag = 1
+      LEFT JOIN dim_prod_src     ps ON ps.prod_src_cd_bus_key = fs.prod_src_cd_bus_key and ps.dl_is_current_flag = 1
+      LEFT JOIN dim_date         d4 ON d4.date = cast(fs.status_eff_start_date_bus_key as date)
+      LEFT JOIN dim_date         d5 ON d5.date = cast(fs.status_eff_end_date_bus_key as date)

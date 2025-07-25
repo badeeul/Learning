@@ -1,0 +1,19 @@
+{
+    "feedName": "demo_product",
+    "feedDescription": "This is a demo feed for Demo Data Product used as a refernce to setup a feed.",
+    "workLoadType": "dp-spark",
+    "skipProductLoad": true,
+    "dataDeduplicationAlert": false,
+    "deduplicationAlertTemplate": "deduplication_msg",
+    "datasetsConfig": [
+        {
+            "datasetType": "file",
+            "datasets": [
+                {
+                    "fileName": "nws",
+                    "sourceConfigFolderName": "demo_api"
+                }
+            ]
+        }
+    ]
+}

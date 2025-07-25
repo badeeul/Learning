@@ -1,0 +1,77 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: dim_market_type
+  load_strategy: type_two
+  key_columns:
+    - market_type_code
+  pii_columns: market_type_description   
+  unknown_record: True
+  identity: True
+
+source:
+  - name: curated_bop_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: BOPClaimSummary
+
+  - name: curated_ca_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+  - name: curated_db_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBClaimSummary
+
+  - name: curated_ho_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOClaimSummary
+
+  - name: curated_wc_claim_summary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: WCClaimSummary
+
+query:
+  - name: dim_agency
+    sql: SELECT 
+            markettype as market_type_code
+            ,cast(null as string) as market_type_description
+        FROM curated_bop_claim_summary
+        GROUP BY
+            markettype
+        UNION
+        SELECT 
+            markettype as market_type_code
+            ,cast(null as string) as market_type_description
+        FROM curated_ca_claim_summary
+        GROUP BY
+            markettype
+            UNION
+        SELECT 
+            markettype as market_type_code
+            ,cast(null as string) as market_type_description
+        FROM curated_db_claim_summary
+        GROUP BY
+            markettype
+        UNION
+        SELECT 
+            markettype as market_type_code
+            ,cast(null as string) as market_type_description
+        FROM curated_ho_claim_summary
+        GROUP BY
+            markettype
+        UNION
+        SELECT 
+            markettype as market_type_code
+            ,cast(null as string) as market_type_description
+        FROM curated_wc_claim_summary
+        GROUP BY
+            markettype
+    description: |
+      This query retrieves the market type code and description from various claim summary tables.
+      It combines the results using UNION to create a comprehensive list of market types across different claims.
+      

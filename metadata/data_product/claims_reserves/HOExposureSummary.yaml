@@ -1,0 +1,162 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: HOExposureSummary
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: wcinfo
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcinfo
+
+  - name: horesseg
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: accounting
+    table: ho_resseg
+
+  - name: hopremiumsummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: HOPremiumsSummary
+
+query:
+  - name: DateRange_DF
+    sql: |
+      SELECT 
+        to_date('2017-01-01') as start_date,
+        to_date(date_format(last_day(current_timestamp), 'yyyy-MM-dd 23:59:59')) as end_date
+
+  - name: PolicyBuildings_DF
+    sql: |
+      SELECT
+        i.code,
+        i.agency,
+        i.carrier,
+        w.govstate,
+        to_date(i.pobegin) as startdate,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate,
+        last_day(to_date(i.pobegin)) as polyrmo_end,
+        to_date(i.pobegin) as BeginWorkDate,
+        last_day(to_date(i.pobegin)) as InitialCalYrMo_End,
+        COALESCE(
+          CASE WHEN i.stat5='C' THEN to_date(i.pocancel) ELSE to_date(i.poexpir) END,
+          to_date(i.poexpir),
+          add_months(to_date(i.pobegin), 12)
+        ) as EndDate,
+        i.stat5,
+        i.typcancel,
+        i.poexpir,
+        i.pocancel,
+        i.lob
+      FROM insured i
+      LEFT JOIN wcinfo w ON i.code = w.code AND w.dl_iscurrent = 1
+      WHERE
+        i.lob = 'HO'
+        AND to_date(i.pobegin) BETWEEN (SELECT start_date FROM DateRange_DF) AND (SELECT end_date FROM DateRange_DF)
+        AND i.stat2 = 'i'
+        AND (i.typcancel <> 'F' OR i.typcancel IS NULL)
+        AND to_date(i.pobegin) <> COALESCE(
+          CASE WHEN i.stat5='C' THEN to_date(i.pocancel) ELSE to_date(i.poexpir) END,
+          to_date(i.poexpir),
+          add_months(to_date(i.pobegin), 12)
+        )
+        AND i.dl_iscurrent = 1
+
+  - name: MaturityMonths_DF
+    sql: |
+      SELECT 
+        datediff(month, min(startdate), max(EndDate)) + 1 as max_maturity
+      FROM PolicyBuildings_DF
+
+  - name: DateSequence_DF
+    sql: |
+      WITH date_seq AS (
+        SELECT sequence(
+          (SELECT start_date FROM DateRange_DF),
+          (SELECT end_date FROM DateRange_DF),
+          interval 1 month
+        ) as dates
+      )
+      SELECT 
+        row_number() OVER (ORDER BY date_val) - 1 as month_num,
+        date_val as calc_date,
+        last_day(date_val) as month_end_date
+      FROM (
+        SELECT explode(dates) as date_val FROM date_seq
+      )
+
+  - name: ExposureCalculations_DF
+    sql: |
+      SELECT
+        p.lob,
+        p.code,
+        p.agency,
+        p.carrier,
+        p.govstate,
+        p.polyrmo_end,
+        p.startdate,
+        p.asofdate,
+        CASE 
+          WHEN d.month_num = 0 THEN p.BeginWorkDate
+          ELSE date_add(day, 1, last_day(add_months(p.BeginWorkDate, d.month_num - 1)))
+        END as BeginWorkDate,
+        d.month_end_date as calyrmo_end,
+        d.month_num as maturity,
+        CASE 
+          WHEN p.polyrmo_end = d.month_end_date 
+          THEN (datediff(day, 
+                CASE WHEN d.month_num = 0 THEN p.BeginWorkDate
+                     ELSE date_add(day, 1, last_day(add_months(p.BeginWorkDate, d.month_num - 1)))
+                END,
+                p.EndDate) + 1)/365.0 
+          ELSE 0.0 
+        END as WBY,
+        (datediff(day, 
+          CASE WHEN d.month_num = 0 THEN p.BeginWorkDate
+               ELSE date_add(day, 1, last_day(add_months(p.BeginWorkDate, d.month_num - 1)))
+          END,
+          CASE 
+            WHEN d.month_end_date > p.EndDate THEN p.EndDate 
+            ELSE d.month_end_date 
+          END) + 1)/365.0 as EBY,
+        '040' as aslob_code -- Hardcoded as per original SQL logic
+      FROM PolicyBuildings_DF p
+      CROSS JOIN DateSequence_DF d
+      WHERE d.month_num <= (SELECT max_maturity FROM MaturityMonths_DF)
+        AND d.month_end_date <= (SELECT end_date FROM DateRange_DF)
+        AND p.EndDate >= CASE 
+                          WHEN d.month_num = 0 THEN p.BeginWorkDate
+                          ELSE date_add(day, 1, last_day(add_months(p.BeginWorkDate, d.month_num - 1)))
+                        END
+
+  - name: FinalExposureSummary_DF
+    sql: |
+      SELECT
+        e.lob,
+        e.code as policynumber,
+        e.agency,
+        e.carrier,
+        e.govstate as state,
+        e.polyrmo_end,
+        e.calyrmo_end,
+        e.maturity,
+        e.WBY as writtenexposure,
+        e.EBY as earnedexposure,
+        CASE WHEN e.EBY > 0 AND e.aslob_code = '040' THEN 1 ELSE 0 END as exposure_rollup,
+        r.resseg,
+        e.asofdate,
+        e.startdate,
+        p.aslob
+      FROM ExposureCalculations_DF e
+      INNER JOIN hopremiumsummary p on p.policynumber=e.code and p.calyrmo_end=e.calyrmo_end
+      LEFT JOIN horesseg r on r.lob=e.lob
+      WHERE e.WBY <> 0 OR e.EBY <> 0

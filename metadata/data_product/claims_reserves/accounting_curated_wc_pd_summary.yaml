@@ -1,0 +1,28 @@
+target:
+  lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+  schema: accounting_curated
+  table: wc_pd_summary
+  load_strategy: overwrite
+  key_columns:
+    - carrier
+    - ay
+  unknown_record: False
+  identity: False
+
+source:
+  - name: wc_pd_summary
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: accounting
+    table: wc_pd_summary
+
+
+query:
+  - name: accounting_curated_wc_pd_summary
+    sql: SELECT 
+           carrier as carrier,
+            cast(ay as int) as ay,
+            cast(lossespd as decimal) as  lossespd,
+            cast(expensespd as decimal) as expensespd,
+            to_date(asofdate, 'MM/dd/yyyy') as asofdate
+        FROM wc_pd_summary
+        

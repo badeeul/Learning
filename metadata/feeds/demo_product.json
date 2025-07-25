@@ -1,0 +1,46 @@
+{
+    "feedName": "demo_product",
+    "feedDescription": "This is a demo feed for Demo Data Product used as a refernce to setup a feed.",
+    "workLoadType": "dp-spark",
+    "skipProductLoad": false,
+    "dataDeduplicationAlert": false,
+    "deduplicationAlertTemplate": "deduplication_msg",
+    "datasetsConfig": [
+        {
+            "datasetType": "database",
+            "datasets": [
+                {
+                    "fileName": "claimant",
+                    "sourceConfigFolderName": "demo_sqldb"
+                },
+                {
+                    "fileName": "claims_catcodes",
+                    "sourceConfigFolderName": "demo_sqldb"
+                }
+                
+
+            ]
+        },
+        {
+            "datasetType": "file",
+            "datasets": [
+                {
+                    "fileName": "massive_claims",
+                    "sourceConfigFolderName": "demo_file"
+                },
+                {
+                    "fileName": "dop_pdos_webreport",
+                    "sourceConfigFolderName": "demo_file"
+                },
+                {
+                    "fileName": "homeowner_policy",
+                    "sourceConfigFolderName": "demo_file"
+                },
+                {
+                    "fileName": "homeowner_policy_blob",
+                    "sourceConfigFolderName": "demo_file"
+                }
+            ]
+        }
+    ]
+}

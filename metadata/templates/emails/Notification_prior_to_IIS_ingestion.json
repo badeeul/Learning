@@ -1,0 +1,11 @@
+{
+    "subject": "IMPORTANT: Upload massive claims files for Loss Triangles generation - Deadline - 1st of Next Month, 12 Midnight",
+    "body": {
+        "contentType": "text/html",
+        "content": "<p>Dear Reserving actuary,</p><p>This is a friendly reminder that the Claims Triangle Input data product is scheduled for running on the 1st of next month at midnight. To ensure the massive claims data is included in the processing cycle, please upload the files before the deadline.</p><p>The system requires the massive claims files to be uploaded before midnight to ensure accuracy and completeness of the data required for generating loss triangles in Arius.</p><p>You can upload these files directly from your MS Fabric workspace. If you have any questions or require assistance, please contact our support team at <a href='mailto:DnAClaims@guardinsurancegroup.onmicrosoft.com'>DnAClaims@guardinsurancegroup.onmicrosoft.com</a>."
+    },
+    "emailRecipient": "ActuarialReserving@guard.com",
+    "emailCc": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

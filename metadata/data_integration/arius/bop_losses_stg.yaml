@@ -1,0 +1,129 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: stage
+  table: bop_losses_stg
+  load_strategy: overwrite
+  key_columns:
+  unknown_record: False
+  identity: False
+
+source:
+  - name: cl_coverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_coverage
+
+  - name: claims_caextra
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_caextra
+
+  - name: claims_cavehicles
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_cavehicles
+
+  - name: transaction_uwcoverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: transaction_uwcoverage
+
+  - name: pc_coverage_names
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_coverage_names
+
+  - name: pc_coverage_reporting
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_coverage_reporting
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claimant
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcclaim
+
+  - name: payments
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: payments
+
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: cl_occurrence
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: cl_occurrence
+
+
+
+query:
+  - name: bop_losses
+    sql: |
+      select 	DISTINCT
+        p.code,
+        p.claim,
+        p.transid,
+        i.carrier,
+        case when nvl(r.aslob_code,'')='' then '' else aslob_code end as aslob_code,
+        p.typepmt,
+        p.chkdate,
+        p.amount as payments,
+        cast(year(w.dol) as string)	as dolyear,
+        to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate
+      from cl_coverage cl	
+      left join claims_caextra x on x.claimantid = cl.claimantid and x.dl_iscurrent = 1
+      left join claims_cavehicles cv on cv.cavehicleid = cl.cavehicleid	and cv.dl_iscurrent = 1
+      left join transaction_uwcoverage v on v.code = cl.code and v.commonname = cl.commonname 
+        and (((v.itemid = cv.vehicleid and v.state = cl.coveragestate) or nvl(v.itemid,0) = 0) or (v.buildingid = cl.buildingid or nvl(v.buildingid,0) = 0)) 
+        and v.trancnt	= 0 and v.after = 1	
+        and cl.dl_iscurrent = 1
+      left join pc_coverage_names n on n.coverageid = v.coverageid and n.dl_iscurrent = 1
+      left join pc_coverage_reporting r on r.coverageid = v.coverageid and r.dl_iscurrent = 1
+      join claimant c on c.claimantid = cl.claimantid	and c.dl_iscurrent = 1
+      join wcclaim w on w.wcclaimid = c.wcclaimid and w.dl_iscurrent = 1
+      join payments p on p.claimantid = cl.claimantid and p.cvgid = cl.cvgid and p.dl_iscurrent = 1
+      join insured i on i.code = c.code and i.dl_iscurrent = 1
+      join cl_occurrence o on o.occid = w.occid	and o.dl_iscurrent = 1
+      where	
+        ((i.MarketType in ('E', 'V', 'C')))	
+        AND ((i.PRODUCTIONSRC in ('G', 'A', 'L', 'C', 'W', 'E', 'F', 'I', 'P', 'R', 'V')))	
+        and i.lob = 'BP'
+        and cl.dl_iscurrent = 1
+        and p.chkdate <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+
+
+  - name: bop_losses_stg
+    sql: |
+      with cte_sums as (
+        select 	
+            t.typepmt,
+            t.carrier,
+            t.aslob_code,		
+            t.dolyear,
+            nvl(case when t.typepmt = 'M' then sum(payments) else 0 end,0) as medical,
+            nvl(case when t.typepmt = 'L' then sum(payments) else 0 end,0) as loss,
+            nvl(case when t.typepmt = 'X' then sum(payments) else 0 end,0) as expense,
+            nvl(sum(t.payments),0) as total
+        from bop_losses t
+        group by t.carrier, t.aslob_code, t.dolyear, t.typepmt
+      )
+      select 	
+          t.carrier,
+          t.aslob_code,		
+          t.dolyear,
+          sum(t.medical) as medical,
+          sum(t.loss) as loss,
+          sum(t.expense) as expense,
+          sum(t.total) as total
+      from cte_sums t
+      group by carrier, aslob_code, dolyear    
+  

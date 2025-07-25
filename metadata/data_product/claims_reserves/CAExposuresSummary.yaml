@@ -1,0 +1,191 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: CAExposuresSummary
+  load_strategy: overwrite
+  unknown_record: False
+  identity: False
+
+source:
+  - name: uwcoverage
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: uwcoverage
+
+  - name: uwvehicles
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: uwvehicles
+    
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: ca_claims
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: CAClaimSummary
+
+query:
+  - name: vehicles
+    sql: with dates as (
+              SELECT
+              to_timestamp(concat('01', substring(date_format(add_months(current_timestamp, -1), 'dd-MM-yyyy'),3)), 'dd-MM-yyyy') as lowdate,
+              to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as highdate,
+              to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as workdate
+          ),
+          cteVehiclesMajor as (
+              SELECT 
+                  c.code,
+                  c.vehicleid,
+                  v.vehicleid as uwvehicleid,
+                  i.agency,
+                  i.carrier,
+                  c.state,
+                  c.commonName,
+                  GREATEST(c.effective, v.startdate, i.pobegin) AS StartDate,
+                  LEAST(c.enddate, v.enddate, i.poexpir, i.pocancel) AS EndDate
+              FROM uwcoverage c
+              JOIN uwvehicles v ON c.code = v.code
+                  AND c.vehicleid = v.vehicleid
+                  and v.dl_iscurrent = 1
+              JOIN insured i ON c.code = i.code 
+                and i.dl_iscurrent = 1
+              CROSS JOIN dates d
+              WHERE c.commonName IN ('!PIP', '!UM', '!LIA', 'COL', 'OTC')
+                  AND i.lob = 'CA'
+                  AND NVL(c.vehicleid,0) != 0
+                  AND i.stat2 = 'i'
+                  AND i.pobegin <= d.highdate 
+                  and c.dl_iscurrent = 1
+          ),
+          cteVehiclesNoUIUM as (
+              SELECT
+                  c.code,
+                  c.vehicleid,
+                  v.vehicleid as uwvehicleid,
+                  i.agency,
+                  i.carrier,
+                  c.state,
+                  c.commonName,
+                  GREATEST(c.effective, v.startdate, i.pobegin) AS StartDate,
+                  LEAST(c.enddate, v.enddate, i.poexpir, i.pocancel) AS EndDate
+              FROM uwcoverage c
+              JOIN uwvehicles v ON c.code = v.code 
+                  AND c.vehicleid = v.vehicleid
+                  and v.dl_iscurrent = 1
+              JOIN insured i ON c.code = i.code
+                  and i.dl_iscurrent = 1
+              CROSS JOIN dates d  
+              WHERE c.commonName = '!UI'
+                  AND i.lob = 'CA'
+                  AND NVL(c.vehicleid,0) != 0
+                  AND i.stat2 = 'i'
+                  AND i.pobegin <= d.highdate 
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM cteVehiclesMajor v
+                      WHERE c.vehicleid = v.vehicleid AND v.commonName = '!UM'
+                  )
+                  and c.dl_iscurrent = 1
+          ),
+          cteVehicles as (
+              SELECT *
+              FROM cteVehiclesMajor 
+              UNION
+              SELECT *
+              FROM cteVehiclesNoUIUM
+          )
+          SELECT 
+              code,
+              vehicleid,
+              agency,
+              carrier,
+              state,
+              commonName,
+              StartDate,
+              EndDate,
+              LAST_DAY(DATE_ADD(StartDate, - DAY(StartDate) + 1)) as PolYrMo_end,
+              StartDate as BeginWorkDate,
+              LAST_DAY(DATE_ADD(StartDate, - DAY(StartDate) + 1)) as CalYrMo_End
+          FROM cteVehicles
+          where  StartDate <> EndDate
+
+  
+  - name: max_maturity
+    sql: with start_end_dt as (
+            select 
+            to_date('2008-01-01') as start_dt,
+            last_day(add_months(current_timestamp, -1)) as end_dt
+        )
+        ,max_maturity as (
+            select
+            ((year(end_dt) - year(start_dt)) * 12) + month(end_dt) - month(start_dt) + 1 as max_maturity
+            from start_end_dt
+        )
+        select explode(sequence(0,max_maturity)) as counter
+        from max_maturity
+
+  - name: ca_vehicles
+    sql: with cte as (
+            select
+              code
+              ,vehicleid
+              ,agency
+              ,carrier
+              ,state
+              ,PolYrMo_end
+              ,cast(case when mm.counter = 0 then BeginWorkDate else trunc(add_months(CalYrMo_End,mm.counter), 'month') end as timestamp) as BeginWorkDate
+              ,last_day(add_months(CalYrMo_End,mm.counter)) as CalYrMo_End
+              ,enddate
+              ,StartDate
+              ,EndDate
+            from vehicles v
+            join max_maturity mm
+            on last_day(add_months(v.CalYrMo_End,mm.counter)) <= to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59'))
+            and v.enddate >= case when mm.counter = 0 then  cast(case when mm.counter = 0 then BeginWorkDate else trunc(add_months(CalYrMo_End,mm.counter), 'month') end as timestamp)
+            else trunc(add_months(v.CalYrMo_End,mm.counter), 'month') end
+        )
+        select 
+        code
+        ,vehicleid
+        ,agency
+        ,carrier
+        ,state
+        ,PolYrMo_end
+        ,BeginWorkDate
+        ,CalYrMo_End
+        ,(datediff(day, BeginWorkDate, case when CalYrMo_End > enddate then enddate else CalYrMo_End end) + 1 )/365 as EVY
+        ,case when PolYrMo_End=CalYrMo_End then (DATEDIFF(DAY, BeginWorkDate, enddate)+1)/365.0 else 0.0 end as WVY
+        from cte
+
+  - name: exposures_claims
+    sql: select 
+            to_timestamp('01/01/2008 0:00:00', 'M/d/yyyy H:m:s') as startdate
+            ,to_timestamp(date_format(last_day(add_months(current_timestamp, -1)), 'yyyy-MM-dd 23:59:59')) as asofdate
+            ,v.state
+            ,'CA' as lob
+            ,v.carrier
+            ,v.agency
+            ,to_date(v.PolYrMo_end, 'M/d/yyyy') as polyrmo_end
+            ,to_date(v.CalYrMo_End, 'M/d/yyyy') as calyrmo_end
+            ,to_date(v.CalYrMo_End, 'M/d/yyyy') as loss_date
+            ,to_date(v.CalYrMo_End, 'M/d/yyyy') as first_entered_date
+            ,c.aslob_code as aslob
+            ,c.reserve_segment_code as resseg
+            ,sum(v.EVY) as earnedexposure
+            ,sum(v.WVY) as writtenexposure
+        from 
+            ca_vehicles as v
+            left join 
+                (select distinct lob as line_of_business, aslob as aslob_code, resseg as reserve_segment_code from ca_claims) as c 
+                on c.line_of_business = 'CA'
+        group by 
+             v.state
+            ,v.carrier
+            ,v.agency
+            ,to_date(v.PolYrMo_end, 'M/d/yyyy')
+            ,to_date(v.CalYrMo_End, 'M/d/yyyy')
+            ,c.aslob_code
+            ,c.reserve_segment_code

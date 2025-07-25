@@ -1,0 +1,24 @@
+{
+    "feedName": "claims_transaction_historical",
+    "feedDescription": "This is a feed for Claims - IIS Historical Incremental Data Load",
+    "workLoadType": "dp-spark",
+    "skipProductLoad": true,
+    "dataDeduplicationAlert": true,
+    "deduplicationAlertTemplate": "deduplication_msg",
+    "datasetsConfig": [
+        {
+            "datasetType": "database",
+            "datasets": [
+                {
+                    "fileName": "transaction_uwcoverage",
+                    "sourceConfigFolderName": "iis_transaction_historical"
+                },
+                {
+                    "fileName": "claimstrans",
+                    "sourceConfigFolderName": "iis_transaction_historical"
+                }
+
+            ]
+        }
+    ]
+}

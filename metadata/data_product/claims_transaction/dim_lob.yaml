@@ -1,0 +1,27 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_lob
+  load_strategy: type_two
+  key_columns:
+    - lob_cd_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: lob_key
+
+source:
+  - name: curated_lob
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: lob
+
+query:
+  - name: dim_lob
+    sql: |
+      SELECT
+        lob AS lob_cd_bus_key,
+        lobdescrip AS lob_desc
+      FROM curated_lob
+      WHERE dl_iscurrent = 1
+    description: "This query selects LOB code and description from the curated_lob source table."
+    

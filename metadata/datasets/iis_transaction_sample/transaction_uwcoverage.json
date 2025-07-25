@@ -1,0 +1,79 @@
+{
+    "datasetName": "transaction_uwcoverage",
+    "enable": true,
+    "datasetTypeName": "database",
+    "databaseName": "giginsdata",
+    "datasetSchema": "dbo",
+    "skipCuratedLoad": false,
+    "sourceSystemProperties": {
+        "sourceSystemName": "IIS",
+        "includeSpecificColumns": [
+            "transaction_uwcoverage_id",
+            "code",
+            "trancnt",
+            "recordtype",
+            "uwcoverageid",
+            "coverageid",
+            "buildingid",
+            "vehicleid",
+            "premium",
+            "fees",
+            "deletedon",
+            "state",
+            "lcm",
+            "effective",
+            "enddate",
+            "commonname",
+            "itemid",
+            "before",
+            "after",
+            "ratingkey",
+            "enteredby",
+            "enteredon",
+            "gigpremium",
+            "hasproperties",
+            "renewal_source_id",
+            "transaction_source_id",
+            "overridden",
+            "overriddenby",
+            "overriddenon",
+            "linkuwcoverageid",
+            "manualpremium"
+        ],
+        "ingestType": "watermark",
+        "sourceWatermarkIdentifier": "enteredon",
+        "sourceDatabaseType": "sqldatabase",
+        "isDynamicQuery": true,
+        "filterExpression": "code in ('ADBP596889','STBP589292','SABP551863','SKBP587813','CABP479397','NEBP519187','ONBP912860','DOBP506030','MKBP521864','AVBP577895','REAU599020','PAAU599008','PAAU597564','ECAU608020','YAAU613931','MGAU366178','RIAU630067','LYAU581866','GLAU530973','ELAU539949','KADB541321','CIDB544035','MADB550644','BRDB664773','SSDB648044','SUDB692234','FEDB642656','LADB526871','URDB671040','MEDB621795','NIHO558874','KIHO507126','RAHO529089','MIHO531169','ALHO545100','ANHO521870','COHO555160','RAHO597824','PAHO533700','TEHO548905','ALWC636871','ADWC587071','A9WC690411','BAWC614424','CTWC551615','WIWC579926','KAWC613406','KHWC528450','LUWC576022','MAWC595186')"
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "fileType": "parquet",
+        "directoryName": "IIS_TXN_SAMPLE_FILES"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_scu_001_claims_transaction_curated",
+        "schemaName": "iis_transaction",
+        "schemaEvolutionMode": "addNewColumns",
+        "schemaLocation": null,
+        "fileOptions": {
+            "encoding": "ISO-8859-1",
+            "header": true,
+            "inferColumnTypes": true,
+            "multiline": true,
+            "delimiter": ",",
+            "escape": "\"",
+            "timestampFormat": "dd/MM/yyyy"
+        },
+        "columnList": ["*"],
+        "primaryKeyList": [
+            "transaction_uwcoverage_id"
+        ],
+        "sensitiveColumns": null,
+        "enableSensitiveFieldCheck": false,
+        "deletionCaptureEnabled": false,
+        "duplicateCheckEnabled": false,
+        "targetFileFormat": "delta",
+        "targetLoadType": "merge"
+    }
+}

@@ -1,0 +1,294 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_reporting
+  table: exception_report
+  load_strategy: overwrite
+  key_columns:
+
+  unknown_record: false
+  identity: false
+
+source:
+  - name: fact_claim_transaction
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: fact_claim_transaction
+    
+  - name: fact_claim
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: fact_claim
+    
+  - name: dim_claimant
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claimant
+    
+  - name: dim_policy
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_policy
+    
+  - name: dim_insured
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_insured
+    
+  - name: dim_occurrence
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_occurrence
+    
+  - name: dim_claim_status
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_status
+    
+  - name: dim_lob
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_lob
+    
+  - name: dim_claim_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_type
+
+  - name: dim_claim_trans_type
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_claim_trans_type
+    
+  - name: dim_cause_of_loss
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_cause_of_loss
+    
+  - name: dim_adjuster
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_adjuster
+    
+  - name: dim_coverage
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_coverage
+    
+  - name: dim_date
+    lakehouse: den_lhw_dpr_001_claims_transaction
+    schema: claims_transaction
+    table: dim_date
+
+query:
+  - name: latest_reserves
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        MAX(dd.date) AS last_reserve_date
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN dim_date dd 
+            ON fct.trans_date_key = dd.date_key
+      WHERE 
+        dctt.claim_trans_type_bus_key IN ('RMM', 'RLL', 'REE')
+      GROUP BY 
+        fct.claimant_key
+
+  - name: latest_loss_reserves
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        MAX(dd.date) AS last_loss_reserve_date
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN dim_date dd 
+            ON fct.trans_date_key = dd.date_key
+      WHERE 
+        dctt.claim_trans_type_bus_key IN ('RMM', 'RLL')
+      GROUP BY 
+        fct.claimant_key
+
+  - name: latest_payments
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        MAX(dd.date) AS last_payment_date
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN dim_date dd 
+            ON fct.trans_date_key = dd.date_key
+      WHERE 
+        dctt.claim_trans_type_bus_key LIKE 'D%'             
+        OR dctt.claim_trans_type_bus_key LIKE 'I%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'L%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'E%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'X%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'M%'
+      GROUP BY 
+        fct.claimant_key
+
+  - name: latest_loss_payments
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        MAX(dd.date) AS last_loss_payment_date
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN dim_date dd 
+            ON fct.trans_date_key = dd.date_key
+      WHERE 
+        dctt.claim_trans_type_bus_key LIKE 'D%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'I%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'L%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'E%'
+      GROUP BY 
+        fct.claimant_key
+
+  - name: loss_paid_amounts
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        SUM(fct.amt) AS loss_paid_amount
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN latest_loss_payments llp 
+            ON fct.claimant_key = llp.claimant_key
+        JOIN dim_date dd 
+            ON fct.trans_date_key = dd.date_key AND dd.date = llp.last_loss_payment_date
+      WHERE 
+        dctt.claim_trans_type_bus_key LIKE 'D%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'I%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'L%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'E%'
+      GROUP BY 
+        fct.claimant_key
+
+  - name: expense_paid_amounts
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        SUM(fct.amt) AS expense_paid_amount
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN latest_payments lp 
+            ON fct.claimant_key = lp.claimant_key
+        JOIN dim_date dd 
+            ON fct.trans_date_key = dd.date_key AND dd.date = lp.last_payment_date
+      WHERE 
+        dctt.claim_trans_type_bus_key LIKE 'E%' 
+        OR dctt.claim_trans_type_bus_key LIKE 'X%'
+      GROUP BY 
+        fct.claimant_key
+
+  - name: coverage
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        dcc.cvrg_desc AS coverage_desc
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_coverage dcc 
+            ON fct.cvrg_key = dcc.cvrg_key AND dcc.dl_is_current_flag = 1
+      WHERE 
+        dcc.lob IN ('BOP', 'CA', 'HO')
+
+  - name: exception_report
+    sql: |
+      SELECT
+        di.insd_nm AS `Insured Name`,
+        dc.claimant_full_num AS `Claim Number`,
+        dcs.claim_status_desc AS `Claimant Status`,
+        dl.lob_desc AS `LOB`,
+        dct.claim_type_desc AS `Claim Type`,
+        do.occur_loc_state AS `Loss State`,
+        do.occur_loc_city AS `Loss City`,
+        do.occur_loc_zip AS `Loss Zip`,
+        dcol.cause_desc AS `CauseOfLossDesc`,
+        dcol.loss_detail AS `LossDesc`,
+        dd_loss.date AS `DOL`,
+        dd_recd.date AS `Date Received`,
+        lr.last_reserve_date AS `Last Reserve Date`,
+        DATEDIFF(current_date, lr.last_reserve_date) AS `Days Since last Reserve`,
+        llr.last_loss_reserve_date AS `Last Loss Reserve Date`,
+        DATEDIFF(current_date, llr.last_loss_reserve_date) AS `Days Since last Loss Reserve`,
+        lp.last_payment_date AS `Last Payment Date`,
+        llp.last_loss_payment_date AS `Last Loss Payment Date`,
+        fc.tot_paymt_amt AS `Last Incurred amount`,
+        COALESCE(lpa.loss_paid_amount, 0) AS `Loss Paid Amount`,
+        COALESCE(epa.expense_paid_amount, 0) AS `Expense Paid Amount`,
+        (fc.tot_paymt_amt - COALESCE(lpa.loss_paid_amount, 0) - COALESCE(epa.expense_paid_amount, 0)) AS `O/S Amount`,
+        CASE WHEN da.adjustr_tpa_flg = 1 THEN 'Y' ELSE 'N' END AS `TPA (Y/N)`,
+        dc.tpa_claim_num AS `TPA Claim Num`,
+        da.adjustr_nm AS `Adjuster Name`,
+        COALESCE(CAST(dc.source_updated_date AS STRING), 'Unknown') AS `Last Updated`,
+        fc.last_updated_by_adjuster AS `Last Updated by Assigned Adjuster`,
+        dc.closure_review_date AS `Closure Review Date`,
+        dc.closure_reviewer AS `Closure Reviewer`,
+        dc.void_or_transfer AS `Void or Transfer`,
+        cvrg.coverage_desc AS `Coverage Category`,
+        'Not Available' AS `Entered On`,
+        da.adjustr_bus_key AS `User ID`,
+        'Not Available' AS `coveragecategory/LOB`,
+        'Not Available' AS `Total Limit`
+      FROM 
+        fact_claim fc
+        JOIN dim_claimant dc 
+            ON fc.claimant_key = dc.claimant_key AND dc.dl_is_current_flag = 1
+        JOIN dim_policy dp 
+            ON fc.policy_key = dp.policy_key AND dp.dl_is_current_flag = 1
+        JOIN dim_insured di 
+            ON fc.insd_key = di.insd_key AND di.dl_is_current_flag = 1
+        JOIN dim_occurrence do 
+            ON fc.occur_key = do.occur_key AND do.dl_is_current_flag = 1
+        JOIN dim_claim_status dcs 
+            ON fc.latest_status_key = dcs.claim_status_key AND dcs.dl_is_current_flag = 1
+        JOIN dim_lob dl 
+            ON fc.lob_key = dl.lob_key AND dl.dl_is_current_flag = 1
+        JOIN dim_claim_type dct 
+            ON fc.claim_type_key = dct.claim_type_key AND dct.dl_is_current_flag = 1
+        JOIN dim_cause_of_loss dcol 
+            ON fc.cause_key = dcol.cause_key AND dcol.dl_is_current_flag = 1
+        JOIN dim_adjuster da 
+            ON fc.adjustr_key = da.adjustr_key AND da.dl_is_current_flag = 1
+        JOIN dim_date dd_loss 
+            ON fc.loss_date_key = dd_loss.date_key
+        JOIN dim_date dd_recd 
+            ON fc.claim_recd_date_key = dd_recd.date_key
+        LEFT JOIN coverage cvrg 
+            ON fc.claimant_key = cvrg.claimant_key
+        LEFT JOIN latest_reserves lr 
+            ON fc.claimant_key = lr.claimant_key
+        LEFT JOIN latest_loss_reserves llr 
+            ON fc.claimant_key = llr.claimant_key
+        LEFT JOIN latest_payments lp 
+            ON fc.claimant_key = lp.claimant_key
+        LEFT JOIN latest_loss_payments llp 
+            ON fc.claimant_key = llp.claimant_key
+        LEFT JOIN loss_paid_amounts lpa 
+            ON fc.claimant_key = lpa.claimant_key
+        LEFT JOIN expense_paid_amounts epa 
+            ON fc.claimant_key = epa.claimant_key
+      WHERE 
+        dl.lob_cd_bus_key IN ('BP', 'CA', 'HO')
+        AND dc.void_or_transfer IS NULL
+      AND dcs.claim_status_desc IN('Open', 'Reopened')
+      ORDER BY DATEDIFF(current_date, lr.last_reserve_date) desc
+      

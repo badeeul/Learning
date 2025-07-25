@@ -1,0 +1,38 @@
+target:
+  lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+  schema: accounting_curated
+  table: bop_pdos_summary
+  load_strategy: overwrite
+  key_columns:
+    - carrier
+    - aslob
+    - ay
+  unknown_record: False
+  identity: False
+
+source:
+  - name: bop_pdos_summary
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: accounting
+    table: bop_pdos_summary
+
+
+query:
+  - name: accounting_curated_bop_pdos_summary
+    sql: SELECT 
+             carrier as carrier
+            ,aslob as aslob
+            ,cast(ay as int) as ay
+            ,cast(lossos as decimal) as lossos
+            ,cast(alaeos as decimal) as alaeos
+            ,cast(losspd as decimal) as losspd
+            ,cast(alaepd as decimal) as alaepd
+            ,cast(lossos1 as decimal) as lossos1
+            ,cast(alaeos1 as decimal) as alaeos1
+            ,cast(losspd1 as decimal) as losspd1
+            ,cast(alaepd1 as decimal) as alaepd1
+            ,loss as loss
+            ,lae as lae
+            ,to_date(asofdate, 'MM/dd/yyyy') as asofdate
+        FROM bop_pdos_summary
+        

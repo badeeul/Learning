@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM dbo.claims_extra WHERE UPDATEON > '01/01/2020'",
+    "sourceWatermarkIdentifier": "UPDATEON",
+    "watermarkValue": "2020-01-01T00:00:00Z"
+}

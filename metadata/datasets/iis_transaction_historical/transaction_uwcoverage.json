@@ -1,0 +1,73 @@
+{
+    "datasetName": "transaction_uwcoverage",
+    "enable": true,
+    "datasetTypeName": "database",
+    "databaseName": "giginsdata",
+    "datasetSchema": "dbo",
+    "skipCuratedLoad": true,
+    "sourceSystemProperties": {
+        "sourceSystemName": "IIS",
+        "sourceSystemType": "lakehouse",
+        "filesDirectoryName": "IIS_TRANSACTION_HISTORICAL/dbo_transaction_uwcoverage",
+        "includeSpecificColumns": [
+            "transaction_uwcoverage_id",
+            "code",
+            "trancnt",
+            "recordtype",
+            "uwcoverageid",
+            "coverageid",
+            "buildingid",
+            "vehicleid",
+            "premium",
+            "fees",
+            "deletedon",
+            "state",
+            "lcm",
+            "effective",
+            "enddate",
+            "commonname",
+            "itemid",
+            "before",
+            "after",
+            "ratingkey",
+            "enteredby",
+            "enteredon",
+            "gigpremium",
+            "hasproperties",
+            "renewal_source_id",
+            "transaction_source_id",
+            "overridden",
+            "overriddenby",
+            "overriddenon",
+            "linkuwcoverageid",
+            "manualpremium"
+        ],
+        "ingestType": "custom",
+        "sourceWatermarkIdentifier": "transaction_uwcoverage_id",
+        "sourceSystemType": "sqldatabase",
+        "isDynamicQuery": true
+    },
+    "rawProperties": {
+        "lakehouseName": "den_lhw_raw_001_raw_files",
+        "fileType": "parquet",
+        "directoryName": "IIS_TRANSACTION_HISTORICAL"
+    },
+    "curatedProperties": {
+        "lakehouseName": "den_lhw_scu_001_claims_transaction_curated",
+        "schemaName": "iis_transaction_historical",
+        "schemaEvolutionMode": "addNewColumns",
+        "schemaLocation": null,
+        "fileOptions": {
+        },
+        "columnList": ["*"],
+        "primaryKeyList": [
+            "transaction_uwcoverage_id"
+        ],
+        "sensitiveColumns": null,
+        "enableSensitiveFieldCheck": false,
+        "deletionCaptureEnabled": false,
+        "duplicateCheckEnabled": false,
+        "targetFileFormat": "delta",
+        "targetLoadType": "merge"
+    }
+}

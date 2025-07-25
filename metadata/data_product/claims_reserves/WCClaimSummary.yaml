@@ -1,0 +1,1190 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: WCClaimSummary
+  load_strategy: overwrite
+  key_columns:
+    - claimnum
+    - calyrmo_end
+  unknown_record: False
+  identity: False
+
+source:
+  - name: massive_claims
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: massive_claims
+
+  - name: wcclaim
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcclaim
+
+  - name: insured_base
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: claimant
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claimant
+
+  - name: reserves
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: reserves
+
+  - name: payments_base
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: payments
+
+  - name: wcinfo
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcinfo
+
+  - name: pc_products
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: pc_products
+
+  - name: claims_catastrophe
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_catastrophe
+
+  - name: claims_catcodes
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: claims_catcodes
+
+  - name: accident
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: accident
+
+  - name: injury
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: injury
+
+  - name: injuryclass
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: injuryclass
+
+query:
+  - name: insured
+    sql: |
+      select *
+      from insured_base
+      where lob = 'WC'
+
+  - name: payments
+    sql: |
+      select *
+      from payments_base
+      where lob = 'WC'
+
+  - name: Reserving_MassiveClaims_DF
+    sql: |
+      select
+        claimnum as claim_number,
+        asofdate
+      from massive_claims
+      where dl_iscurrent = 1
+      and claimnum <> 'claimnum'
+
+  - name: MedOnlyDecode_DF1
+    sql: |
+      select
+        concat(w.code, '-', w.claim) as claimnum,
+        w.reserves0,
+        w.reserves1,
+        sum(case when r.medical<>0 then 1 else 0 end) as GrossMedReserveTransactions,
+        sum(case when r.indemnity<>0 then 1 else 0 end) as GrossIndReserveTransactions,
+        sum(case when p.typprefix='0' and p.typepmt='M' then p.amount else 0 end) as GrossMedPayments,
+        sum(case when p.typprefix='0' and p.typepmt='M' then 1 else 0 end) as GrossMedPaymentTransactions,
+        sum(case when p.typprefix='0' and p.typepmt='I' then p.amount else 0 end) as GrossIndPayments,
+        sum(case when p.typprefix='0' and p.typepmt='I' then 1 else 0 end) as GrossIndPaymentTransactions,
+        ' ' as MedOnly
+      from 
+        wcclaim w
+        left join reserves r on r.code=w.code and r.claim=w.claim and r.dl_iscurrent = 1
+        left join payments p on p.code=w.code and p.claim=w.claim and p.dl_iscurrent = 1
+        left join claimant c on w.code=c.code and w.wcclaimid=c.wcclaimid and c.dl_iscurrent = 1
+      where 
+        nvl(c.voidortransfer, '') not in ('T', 'V')
+      group by 
+        concat(w.code, '-', w.claim),
+        w.reserves0,
+        w.reserves1
+
+  - name: MedOnlyDecode_DF
+    sql: |
+      select
+        claimnum,
+        reserves0,
+        reserves1,
+        GrossMedReserveTransactions,
+        GrossIndReserveTransactions,
+        GrossMedPayments,
+        GrossMedPaymentTransactions,
+        GrossIndPayments,
+        GrossIndPaymentTransactions,
+        case 
+          when round(reserves0, 2)=round(0,2) and round(reserves1, 2)=round(0,2) then
+            case 
+              when GrossIndPaymentTransactions=0 and GrossMedPaymentTransactions=0 and GrossIndReserveTransactions=0 then 'MedOnly'
+              when GrossIndPaymentTransactions=0 and GrossMedPaymentTransactions=0 then 'MedLT'
+              when GrossIndPayments=0 and GrossMedPayments=0 and GrossIndPaymentTransactions=0 then 'MedOnly'
+              when GrossIndPayments=0 and GrossMedPayments=0 then 'MedOnly'
+              when GrossIndPayments=0 then 'MedOnly'
+              else 'MedLT'
+            end
+          when round(reserves1, 2) = round(0,2) and GrossIndPayments>0 then 'MedLT'
+          when round(reserves1, 2) = round(0,2) then 'MedOnly'
+          else 'MedLT'
+        end as MedOnly
+      from MedOnlyDecode_DF1
+
+  - name: WCMedLossReserves_DF1
+    sql: |
+      select
+        to_timestamp('01/01/1983 00:00:00', 'M/d/yyyy H:m:s') as startdate,
+        to_timestamp('1/31/2025 23:59:59', 'M/d/yyyy H:m:s') as asofdate,
+        to_date(w.dol, 'M/d/yyyy') as dol,
+        year(w.dol) as accyr,
+        to_date(w.adjustorclosed, 'M/d/yyyy') as closed,
+        to_date(w.adjustorreopened, 'M/d/yyyy') as reopened,
+        to_date(w.recvd, 'M/d/yyyy') as received,
+        nvl(c.legalreferral, 'N') as legal,
+        case when c.suitfiled = 'Y' then 'Y' else 'N' end as suitfiled,
+        case when nvl(c.tpataxid,'') = '' then 'N' else 'Y' end as tpa,
+        w.jurisstate as state,
+        w.wcclaimid,
+        concat(r.code, '-', r.claim) as claim_number,
+        concat(r.code, '-', w.occurrencenumber) as occnum,
+        r.code,
+        w.lob,
+        case when i.renewof='NEW' then 'New' else 'Renewal' end as newrenew,
+        sum(r.medical) as medicalreserves,
+        sum(r.expense) as expensereserves,
+        last_day(to_date(r.updateon, 'M/d/yyyy')) as calyrmo_end,
+        ct.catastrophecode as catcode,
+        case when ca.catastrophecodeid is null then 'N' else 'Y' end as catind, 
+        nvl(i.risc, 'N') as riscind,
+        i.carrier,
+        i.markettype,
+        i.productionsrc,
+        i.agency,
+        to_date(i.pobegin, 'M/d/yyyy') as pobegin,
+        nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir) as expir,
+        replace(a.accdesc, ',', '') as causeofloss,
+        replace(inj.injdesc, ',', '') as lossdescrip,
+        r.claimantid,
+        case 
+          when round(w.reserves1, 2) = round(0,2) and round(w.reserves0, 2) = round(0,2) then nvl(d.medonly, 'MedLT')
+          when round(w.reserves1, 2) = round(0,2) and nvl(d.grossindpayments, 0) > 0 then 'MedLT'
+          when round(w.reserves1, 2) = round(0,2) then 'MedOnly'
+          else 'MedLT'
+        end as medonlyind,
+        '160' as aslob,
+        case 
+          when i.productionsrc='E' then 'Workers'' Compensation ELS'
+          else case i.markettype
+            when 'A' then 'Workers'' Compensation Direct Assigment'
+            when 'R' then 'Workers'' Compensation RISC'
+            when 'M' then 'Workers'' Compensation NICO'
+            else 'Workers'' Compensation'
+          end
+        end as transmittal_segment_code,
+        replace(p.description, ',', '') as productid,
+        cast(null as string) as exposureid,
+        case 
+          when i.sic between '0000' and '0999' then 'Agricultural'
+          when i.sic between '1000' and '1999' then 'Construction'
+          when i.sic between '2000' and '3999' then 'Manufacturing'
+          when i.sic between '4000' and '4999' then 'Transportation'
+          when i.sic between '5200' and '5999' then 'Retail Trade'
+          when i.sic between '6000' and '6999' then 'Finance Ins and Real Estate'
+          when i.sic between '7000' and '8999' then 'Services'
+          when i.sic between '9000' and '9999' then 'Public Administration'
+          when i.sic between '5000' and '5199' then 'Wholesale Trade'
+          else 'Unknown'
+        end as exposuregroup,
+        w.payclass as exposureclass,
+        wi.industry as industry,
+        case when w.injury in ('69', '72', '73', '77', '78', '80') then 'WC CT' else 'WC Non-CT' end as wc_ct_flag
+      from 
+        wcclaim w
+        left join reserves r on r.code=w.code and r.claim=w.claim and r.dl_iscurrent = 1
+        left join claims_catastrophe ca on ca.sqlfieldvalue=r.claimantid and sqlfield='claimantid' and ca.dl_iscurrent = 1
+        left join claims_catcodes ct on ca.catastrophecodeid=ct.catastrophecodeid and ct.dl_iscurrent = 1
+        left join insured i on i.code=r.code and i.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid=c.wcclaimid and c.dl_iscurrent = 1
+        left join MedOnlyDecode_DF d on concat(r.code, '-', r.claim)=d.claimnum
+        left join wcinfo wi on wi.code=w.code and wi.dl_iscurrent = 1
+        left join pc_products p on p.productid=wi.productid and p.dl_iscurrent = 1
+        left join accident a on w.accident=a.accident and a.dl_iscurrent = 1
+        left join injury inj on w.injury=inj.injury and inj.dl_iscurrent = 1
+        left join injuryClass ic on inj.injuryclassid=ic.classnum and ic.dl_iscurrent = 1
+      where 
+        r.updateon between to_timestamp('01/01/1983 00:00:00', 'M/d/yyyy H:m:s') 
+        and to_timestamp('1/31/2025 23:59:59', 'M/d/yyyy H:m:s')
+        and w.lob = 'WC'
+        and w.dol is not null
+        and nvl(c.voidortransfer, '') not in ('T', 'V')
+      group by
+        w.dol,
+        year(w.dol),
+        w.adjustorclosed,
+        w.adjustorreopened,
+        w.recvd,
+        nvl(c.legalreferral, 'N'),
+        case when c.suitfiled='Y' then 'Y' else 'N' end,
+        case when nvl(c.tpataxid,'') = '' then 'N' else 'Y' end,
+        w.jurisstate,
+        w.wcclaimid,
+        r.code,
+        r.claim,
+        concat(r.code, '-', w.occurrencenumber),
+        w.lob,
+        case when i.renewof='NEW' then 'New' else 'Renewal' end,
+        last_day(to_date(r.updateon, 'M/d/yyyy')),
+        ct.catastrophecode,
+        case when ca.catastrophecodeid is null then 'N' else 'Y' end,
+        nvl(i.risc, 'N'),
+        i.carrier,
+        i.markettype,
+        i.productionsrc,
+        i.agency,
+        i.pobegin,
+        nvl(case when i.porein is not null then i.poexpir else i.pocancel end, i.poexpir),
+        replace(a.accdesc, ',', ''),
+        replace(inj.injdesc, ',', ''),
+        r.claimantid,
+        case 
+          when round(w.reserves1, 2) = round(0,2) and round(w.reserves0, 2) = round(0,2) then nvl(d.medonly, 'MedLT')
+          when round(w.reserves1, 2) = round(0,2) and nvl(d.grossindpayments, 0) > 0 then 'MedLT'
+          when round(w.reserves1, 2) = round(0,2) then 'MedOnly'
+          else 'MedLT'
+        end,
+        case 
+          when i.productionsrc='E' then 'Workers'' Compensation ELS'
+          else case i.markettype
+            when 'A' then 'Workers'' Compensation Direct Assigment'
+            when 'R' then 'Workers'' Compensation RISC'
+            when 'M' then 'Workers'' Compensation NICO'
+            else 'Workers'' Compensation'
+          end
+        end,
+        replace(p.description, ',', ''),
+        case 
+          when i.sic between '0000' and '0999' then 'Agricultural'
+          when i.sic between '1000' and '1999' then 'Construction'
+          when i.sic between '2000' and '3999' then 'Manufacturing'
+          when i.sic between '4000' and '4999' then 'Transportation'
+          when i.sic between '5200' and '5999' then 'Retail Trade'
+          when i.sic between '6000' and '6999' then 'Finance Ins and Real Estate'
+          when i.sic between '7000' and '8999' then 'Services'
+          when i.sic between '9000' and '9999' then 'Public Administration'
+          when i.sic between '5000' and '5199' then 'Wholesale Trade'
+          else 'Unknown'
+        end,
+        w.payclass,
+        wi.industry,
+        case when w.injury in ('69', '72', '73', '77', '78', '80') then 'WC CT' else 'WC Non-CT' end
+
+  - name: WCMedLossReserves_DF2
+    sql: |
+      with cte as (
+        select 
+          b.*,
+          case when mc.claim_number is not null then 'Y' else 'N' end as massind
+        from WCMedLossReserves_DF1 b
+        left join Reserving_MassiveClaims_DF mc on b.claim_number = mc.claim_number
+      )
+      select * from cte
+
+  - name: WCMedLossReserves_DF3
+    sql: |
+      select
+        *,
+        case 
+          when productionsrc = 'E' then 'WC_ELS'
+          when markettype in ('V', 'C') then 
+            case 
+              when medonlyind='MedOnly' then 'WC_MedOnly'
+              else 'WC_MedLT'
+            end
+          when markettype in ('A') then 'WC_MedInd_DA'
+          when markettype in ('R') then 
+            case 
+              when medonlyind='MedOnly' then 'WC_MedOnly_RISC'
+              else 'WC_MedLT_RISC'
+            end
+          when markettype in ('E') then 'WC_NONREVIEWED'
+          when markettype in ('M') then 'WC_NICO'
+          else 'WHAT IS THIS'
+        end as reserve_detailed_segment_code
+      from WCMedLossReserves_DF2
+
+  - name: WCMedLossReserves_DF4
+    sql: |
+      select
+        *,
+        case 
+          when (productionsrc<>'E') and (markettype in ('V', 'C')) and medonlyind<>'MedOnly' then
+            case when massind='Y' then concat(reserve_detailed_segment_code, '_MASS') 
+                 else concat(reserve_detailed_segment_code, '_NET')
+            end
+          else reserve_detailed_segment_code
+        end as reserve_segment_code
+      from WCMedLossReserves_DF3
+  
+  - name: WCMedLossReserves_DF
+    sql: |
+      select
+        *,
+        case
+          when reserve_segment_code in ('WC_MedLT_NET', 'WC_Ind_NET', 'WC_MedOnly') then
+            case when state='CA' then concat(reserve_segment_code, '_CA')
+                  else concat(reserve_segment_code, '_xCA')
+            end
+          else reserve_segment_code
+        end as reserve_segment_code_final
+      from WCMedLossReserves_DF4
+
+
+  - name: WCIndLossReserves_DF1
+    sql: |
+      select
+        concat(r.code, '-', r.claim) as claim_number,
+        sum(case when round(w.reserves1, 2) = round(0,2) then 0 else r.indemnity end) as indemnityreserves,
+        0.0 as expensereserves,
+        last_day(to_date(r.updateon, 'M/d/yyyy')) as calyrmo_end,
+        i.markettype,
+        i.productionsrc,
+        w.jurisstate as state,
+        nvl(c.legalreferral, 'N') as legal,
+        case 
+          when round(w.reserves1, 2) = round(0,2) and round(w.reserves0, 2) = round(0,2) then nvl(d.medonly, 'MedLT')
+          when round(w.reserves1, 2) = round(0,2) and nvl(d.grossindpayments, 0) > 0 then 'MedLT'
+          when round(w.reserves1, 2) = round(0,2) then 'MedOnly'
+          else 'MedLT'
+        end as medonlyind
+      from 
+        wcclaim w
+        left join reserves r on r.code=w.code and r.claim=w.claim and r.dl_iscurrent = 1
+        left join insured i on i.code=r.code and i.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid=c.wcclaimid and c.dl_iscurrent = 1
+        left join MedOnlyDecode_DF d on concat(r.code, '-', r.claim)=d.claimnum
+      where 
+        r.updateon between to_timestamp('01/01/1983 00:00:00', 'M/d/yyyy H:m:s') 
+        and to_timestamp('1/31/2025 23:59:59', 'M/d/yyyy H:m:s')
+        and w.lob = 'WC'
+        and w.dol is not null
+        and nvl(c.voidortransfer, '') not in ('T', 'V')
+      group by 
+        concat(r.code, '-', r.claim),
+        last_day(to_date(r.updateon, 'M/d/yyyy')),
+        case 
+          when round(w.reserves1, 2) = round(0,2) and round(w.reserves0, 2) = round(0,2) then nvl(d.medonly, 'MedLT')
+          when round(w.reserves1, 2) = round(0,2) and nvl(d.grossindpayments, 0) > 0 then 'MedLT'
+          when round(w.reserves1, 2) = round(0,2) then 'MedOnly'
+          else 'MedLT'
+        end,
+        i.markettype,
+        i.productionsrc,
+        nvl(c.legalreferral, 'N'),
+        w.jurisstate
+
+  - name: WCIndLossReserves_DF2
+    sql: |
+      with cte as (
+        select 
+          b.*,
+          case when mc.claim_number is not null then 'Y' else 'N' end as massind
+        from WCIndLossReserves_DF1 b
+        left join Reserving_MassiveClaims_DF mc on b.claim_number = mc.claim_number
+      )
+      select * from cte
+
+  - name: WCIndLossReserves_DF3
+    sql: |
+      select
+        *,
+        case 
+          when productionsrc = 'E' then 'WC_ELS'
+          when markettype in ('V', 'C') then 
+            case 
+              when medonlyind='MedOnly' then 'WC_MedOnly'
+              else 'WC_Ind'
+            end
+          when markettype in ('A') then 'WC_MedInd_DA'
+          when markettype in ('R') then 
+            case 
+              when medonlyind='MedOnly' then 'WC_MedOnly_RISC'
+              else 'WC_Ind_RISC'
+            end
+          when markettype in ('E') then 'WC_NONREVIEWED'
+          when markettype in ('M') then 'WC_NICO'
+          else 'WHAT IS THIS'
+        end as reserve_detailed_segment_code
+      from WCIndLossReserves_DF2
+
+  - name: WCIndLossReserves_DF4
+    sql: |
+      select
+        *,
+        case 
+          when reserve_detailed_segment_code='WC_Ind' then
+            case when massind='Y' then concat(reserve_detailed_segment_code, '_MASS') 
+                 else concat(reserve_detailed_segment_code, '_NET')
+            end
+          else reserve_detailed_segment_code
+        end as reserve_segment_code
+      from WCIndLossReserves_DF3
+
+  - name: WCIndLossReserves_DF
+    sql: |
+      select
+        *,
+        case
+          when reserve_segment_code in ('WC_MedLT_NET', 'WC_Ind_NET', 'WC_MedOnly') then
+            case when state='CA' then concat(reserve_segment_code, '_CA')
+                  else concat(reserve_segment_code, '_xCA')
+            end
+          else reserve_segment_code
+        end as reserve_segment_code_final
+      from WCIndLossReserves_DF4
+
+  - name: WCUnionLossReserves_DF
+    sql: |
+      select
+        claim_number,
+        indemnityreserves as lossreserves,
+        expensereserves,
+        calyrmo_end,
+        reserve_segment_code_final as reserve_segment_code,
+        reserve_detailed_segment_code,
+        'I' as indmed
+      from WCIndLossReserves_DF
+      union all
+      select
+        claim_number,
+        medicalreserves as lossreserves,
+        expensereserves,
+        calyrmo_end,
+        reserve_segment_code_final as reserve_segment_code,
+        reserve_detailed_segment_code,
+        'M' as indmed
+      from WCMedLossReserves_DF
+
+  - name: WCIncrLossReserves_DF
+    sql: |
+      select
+        m.startdate,
+        m.asofdate,
+        m.dol,
+        m.accyr,
+        m.closed,
+        m.reopened,
+        m.received,
+        m.legal,
+        m.suitfiled,
+        m.tpa,
+        m.state,
+        m.wcclaimid,
+        i.claim_number,
+        m.occnum,
+        m.code,
+        m.lob,
+        m.claimantid,
+        m.newrenew,
+        sum(i.lossreserves) as lossreserves,
+        sum(i.expensereserves) as expensereserves,
+        i.calyrmo_end,
+        m.catcode,
+        m.catind,
+        m.massind,
+        m.carrier,
+        m.markettype,
+        m.productionsrc,
+        m.agency,
+        m.pobegin,
+        m.expir,
+        m.causeofloss,
+        m.lossdescrip,
+        m.medonlyind,
+        m.aslob,
+        m.transmittal_segment_code,
+        i.reserve_segment_code,
+        i.reserve_detailed_segment_code,
+        m.productid,
+        m.exposureid,
+        m.exposuregroup,
+        m.exposureclass,
+        m.industry,
+        m.wc_ct_flag
+      from WCUnionLossReserves_DF i
+      left join WCMedLossReserves_DF m on m.claim_number=i.claim_number and m.calyrmo_end=i.calyrmo_end
+      group by
+        m.startdate, m.asofdate, m.dol, m.accyr, m.closed, m.reopened, m.received, m.legal, m.suitfiled, m.tpa, m.state,
+        m.wcclaimid, i.claim_number, m.code, m.lob, m.newrenew, i.calyrmo_end, m.occnum, m.catcode, m.catind, m.massind,
+        m.carrier, m.markettype, m.productionsrc, m.agency, m.pobegin, m.expir, m.causeofloss, m.lossdescrip, m.medonlyind,
+        m.aslob, m.transmittal_segment_code, i.reserve_segment_code, i.reserve_detailed_segment_code, m.productid, m.exposureid,
+        m.exposuregroup, m.exposureclass, m.industry, m.claimantid, m.wc_ct_flag
+
+  - name: WCIncrPayments_DF1
+    sql: |
+      select
+        to_timestamp('01/01/1983 00:00:00', 'M/d/yyyy H:m:s') as startdate,
+        to_timestamp('1/31/2025 23:59:59', 'M/d/yyyy H:m:s') as asofdate,
+        w.wcclaimid,
+        concat(p.code, '-', p.claim) as claim_number,
+        nvl(c.legalreferral, 'N') as legal,
+        w.jurisstate as state,
+        last_day(to_date(p.chkdate, 'M/d/yyyy')) as calyrmo_end,
+        sum(case when p.typepmt in ('I', 'M') and p.typprefix='0' then p.amount else 0 end) as grosspaidloss,
+        sum(case when p.typepmt in ('I', 'M') and p.typprefix in ('A', 'B', 'D') then p.amount else 0 end) as paidsub,
+        0.0 as paidsalvage,
+        sum(case when p.typepmt='E' then p.amount else 0 end) as paiddcc,
+        case 
+          when i.productionsrc = 'E' then 'WC_ELS'
+          when i.markettype in ('V', 'C') then 
+            case 
+              when p.typepmt='I' and d.medonly='MedOnly' then 'WC_MedOnly'
+              when p.typepmt='I' then 'WC_Ind'
+              when p.typepmt in ('E', 'M') and d.medonly='MedOnly' then 'WC_MedOnly'
+              when p.typepmt in ('E', 'M') then 'WC_MedLT'
+              else 'ERROR'
+            end
+          when i.markettype in ('A') then 'WC_MedInd_DA'
+          when i.markettype in ('R') then 
+            case 
+              when p.typepmt in ('I') then 'WC_Ind_RISC'
+              when p.typepmt in ('E', 'M') and d.medonly='MedOnly' then 'WC_MedOnly_RISC'
+              when p.typepmt in ('E', 'M') then 'WC_MedLT_RISC'
+              else 'ERROR'
+            end
+          when i.markettype in ('E') then 'WC_NONREVIEWED'
+          when i.markettype in ('M') then 'WC_NICO'
+          else 'WHAT IS THIS'
+        end as reserve_detailed_segment_code
+      from 
+        wcclaim w
+        left join payments p on p.code=w.code and p.claim=w.claim and p.dl_iscurrent = 1
+        left join claimant c on w.wcclaimid=c.wcclaimid and c.dl_iscurrent = 1
+        left join insured i on i.code=p.code and i.dl_iscurrent = 1
+        left join MedOnlyDecode_DF d on concat(p.code, '-', p.claim)=d.claimnum
+      where 
+        p.chkdate between to_timestamp('01/01/1983 00:00:00', 'M/d/yyyy H:m:s') 
+        and to_timestamp('1/31/2025 23:59:59', 'M/d/yyyy H:m:s')
+        and w.lob = 'WC'
+        and nvl(c.voidortransfer, '') not in ('T', 'V')
+      group by 
+        concat(p.code, '-', p.claim),
+        last_day(to_date(p.chkdate, 'M/d/yyyy')),
+        w.wcclaimid,
+        nvl(c.legalreferral, 'N'),
+        w.jurisstate,
+        case 
+          when i.productionsrc = 'E' then 'WC_ELS'
+          when i.markettype in ('V', 'C') then 
+            case 
+              when p.typepmt='I' and d.medonly='MedOnly' then 'WC_MedOnly'
+              when p.typepmt='I' then 'WC_Ind'
+              when p.typepmt in ('E', 'M') and d.medonly='MedOnly' then 'WC_MedOnly'
+              when p.typepmt in ('E', 'M') then 'WC_MedLT'
+              else 'ERROR'
+            end
+          when i.markettype in ('A') then 'WC_MedInd_DA'
+          when i.markettype in ('R') then 
+            case 
+              when p.typepmt in ('I') then 'WC_Ind_RISC'
+              when p.typepmt in ('E', 'M') and d.medonly='MedOnly' then 'WC_MedOnly_RISC'
+              when p.typepmt in ('E', 'M') then 'WC_MedLT_RISC'
+              else 'ERROR'
+            end
+          when i.markettype in ('E') then 'WC_NONREVIEWED'
+          when i.markettype in ('M') then 'WC_NICO'
+          else 'WHAT IS THIS'
+        end
+
+  - name: WCIncrPayments_DF2
+    sql: |
+      with cte as (
+        select 
+          b.*,
+          case when mc.claim_number is not null then 'Y' else 'N' end as massind
+        from WCIncrPayments_DF1 b
+        left join Reserving_MassiveClaims_DF mc on b.claim_number = mc.claim_number
+      )
+      select * from cte
+
+  - name: WCIncrPayments_DF3
+    sql: |
+      select
+        *,
+        case 
+          when reserve_detailed_segment_code in ('WC_MedLT', 'WC_Ind') then
+            case when massind='Y' then concat(reserve_detailed_segment_code, '_MASS') 
+                 else concat(reserve_detailed_segment_code, '_NET')
+            end
+          else reserve_detailed_segment_code
+        end as reserve_segment_code
+      from WCIncrPayments_DF2
+
+  - name: WCIncrPayments_DF4
+    sql: |
+      select
+        *,
+        case
+          when reserve_segment_code in ('WC_MedLT_NET', 'WC_Ind_NET', 'WC_MedOnly') then
+            case when state='CA' then concat(reserve_segment_code, '_CA')
+                 else concat(reserve_segment_code, '_xCA')
+            end
+          else reserve_segment_code
+        end as reserve_segment_code_final
+      from WCIncrPayments_DF3
+      where not (round(grosspaidloss, 2)= round(0,2)
+        and round(paidsub, 2)= round(0,2)
+        and round(paidsalvage, 2)= round(0,2)
+        and round(paiddcc, 2)= round(0,2))
+
+  - name: MinDates_DF
+    sql: |
+      select
+        claim_number as claimnum,
+        reserve_segment_code,
+        min(calyrmo_end) as mindate
+      from WCUnionLossReserves_DF
+      group by claim_number, reserve_segment_code
+
+  - name: WCIncrPayments_DF
+    sql: |
+      select
+        p.startdate,
+        p.asofdate,
+        p.wcclaimid,
+        p.claim_number,
+        p.legal,
+        p.state,
+        case when p.calyrmo_end < m.mindate then m.mindate else p.calyrmo_end end as calyrmo_end,
+        sum(p.grosspaidloss) as grosspaidloss,
+        sum(p.paidsub) as paidsub,
+        sum(p.paidsalvage) as paidsalvage,
+        sum(p.paiddcc) as paiddcc,
+        p.massind,
+        p.reserve_segment_code_final as reserve_segment_code,
+        p.reserve_detailed_segment_code
+      from WCIncrPayments_DF4 p
+      left join MinDates_DF m on p.claim_number=m.claimnum and p.reserve_segment_code_final=m.reserve_segment_code
+      group by
+        p.startdate,
+        p.asofdate,
+        p.wcclaimid,
+        p.claim_number,
+        p.legal,
+        p.state,
+        case when p.calyrmo_end < m.mindate then m.mindate else p.calyrmo_end end,
+        p.massind,
+        p.reserve_segment_code_final,
+        p.reserve_detailed_segment_code
+
+  - name: date_key
+    sql: |
+      with init as (
+        SELECT sequence(to_date('1983-01-01'), to_date(to_timestamp(date_format(last_day(current_timestamp), 'yyyy-MM-dd 23:59:59')))) as date
+      ),
+      exploded_date as (
+        select explode(date) as date from init
+      )
+      select distinct
+        last_day(date) as calyrmo_end,
+        cast(concat(year(date), '.', date_format(date, 'MM')) as decimal(6,2)) as calyr_mo
+      from exploded_date
+
+  - name: Dates_DF
+    sql: |
+      with cte as (
+        select
+          claim_number,
+          calyrmo_end,
+          reserve_segment_code
+        from WCIncrLossReserves_DF
+        union
+        select
+          claim_number,
+          calyrmo_end,
+          reserve_segment_code
+        from WCIncrPayments_DF
+      ),
+      cte2 as (
+        select
+          claim_number,
+          calyrmo_end,
+          reserve_segment_code,
+          row_number() over (partition by claim_number, calyrmo_end, reserve_segment_code order by claim_number) as RN
+        from cte
+      )
+      select
+        claim_number,
+        calyrmo_end,
+        reserve_segment_code
+      from cte2
+      where RN = 1
+
+  - name: WCCumulativeReserves_DF
+    sql: |
+      select
+        r.asofdate,
+        d.calyr_mo,
+        d.calyrmo_end,
+        r.dol,
+        r.accyr,
+        r.closed,
+        r.reopened,
+        r.received,
+        min(d.calyrmo_end) as firstentered,
+        r.wcclaimid,
+        r.state,
+        r.claim_number,
+        r.occnum,
+        r.code,
+        r.lob,
+        r.carrier,
+        r.markettype,
+        r.productionsrc,
+        r.agency,
+        r.newrenew,
+        r.pobegin,
+        r.expir,
+        r.causeofloss,
+        r.lossdescrip,
+        r.catcode,
+        r.catind,
+        r.massind,
+        r.legal,
+        r.suitfiled,
+        r.tpa,
+        sum(r.lossreserves) as cmllossreserves,
+        sum(r.expensereserves) as cmlexpensereserves,
+        r.claimantid,
+        r.medonlyind,
+        r.aslob,
+        r.transmittal_segment_code,
+        r.reserve_segment_code,
+        r.reserve_detailed_segment_code,
+        case when d.calyrmo_end=min(d.calyrmo_end) then 1 else 0 end as rptdind,
+        r.productid,
+        r.exposureid,
+        r.exposuregroup,
+        r.exposureclass,
+        r.industry,
+        r.wc_ct_flag
+      from WCIncrLossReserves_DF r 
+      inner join date_key d on r.calyrmo_end <= d.calyrmo_end
+      group by
+        r.asofdate,
+        d.calyr_mo,
+        d.calyrmo_end,
+        r.dol,
+        r.accyr,
+        r.closed,
+        r.reopened,
+        r.received,
+        r.wcclaimid,
+        r.state,
+        r.claim_number,
+        r.occnum,
+        r.code,
+        r.lob,
+        r.carrier,
+        r.markettype,
+        r.productionsrc,
+        r.agency,
+        r.newrenew,
+        r.pobegin,
+        r.expir,
+        r.causeofloss,
+        r.lossdescrip,
+        r.catcode,
+        r.catind,
+        r.massind,
+        r.legal,
+        r.suitfiled,
+        r.tpa,
+        r.claimantid,
+        r.medonlyind,
+        r.aslob,
+        r.transmittal_segment_code,
+        r.reserve_segment_code,
+        r.reserve_detailed_segment_code,
+        r.productid,
+        r.exposureid,
+        r.exposuregroup,
+        r.exposureclass,
+        r.industry,
+        r.wc_ct_flag
+
+  - name: WCCumulativePaid_DF
+    sql: |
+      select
+        p.wcclaimid,
+        p.claim_number,
+        sum(p.grosspaidloss) as claim_paid_loss,
+        sum(p.paidsub) as claim_paid_subrogation,
+        sum(p.paidsalvage) as claim_paid_salvage,
+        sum(p.paiddcc) as claim_paid_dcc,
+        d.calyrmo_end,
+        p.reserve_segment_code
+      from WCIncrPayments_DF p
+      inner join date_key d on p.calyrmo_end <= d.calyrmo_end
+      group by
+        p.wcclaimid,
+        p.claim_number,
+        d.calyrmo_end,
+        p.reserve_segment_code
+
+  - name: WCCumulativeClaimSummary_DF1
+    sql: |
+      SELECT
+        l.claim_number,
+        l.occnum,
+        l.code as policynumber,
+        l.state,
+        l.lob,
+        l.carrier,
+        l.agency,
+        l.markettype,
+        l.productionsrc,
+        l.newrenew,
+        l.pobegin as policyeffectivedate,
+        l.expir as policyexpirationdate,
+        l.dol as lossdate,
+        l.closed as closeddate,
+        l.reopened as reopeneddate,
+        l.received as receiveddate,
+        l.firstentered as firstentereddate,
+        l.calyrmo_end,
+        (year(l.calyrmo_end)-year(l.dol))*12+month(l.calyrmo_end) as maturity,
+        l.wcclaimid,
+        l.claimantid,
+        l.productid,
+        l.exposureid,
+        l.exposuregroup,
+        l.exposureclass,
+        l.industry,
+        replace(l.causeofloss, ',', '') as causeofloss,
+        replace(l.lossdescrip, ',', '') as lossdescrip,
+        l.catcode,
+        l.legal as handledbylegalind,
+        l.suitfiled as suitfiledind,
+        l.tpa as tpaind,
+        0 as cwpfinalind,
+        l.massind,
+        l.catind,
+        l.aslob,
+        l.transmittal_segment_code,
+        l.reserve_segment_code,
+        l.reserve_detailed_segment_code,
+        l.medonlyind,
+        (case when round(cmllossreserves,2)=round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) 
+          and round(cmlexpensereserves,2)=round(nvl(p.claim_paid_dcc, 0),2) 
+          and round(nvl(p.claim_paid_loss, 0)+nvl(p.claim_paid_dcc, 0)+nvl(p.claim_paid_subrogation, 0)+nvl(p.claim_paid_salvage,0),2)<>0 then 1 else 0 end) as CWPCount,
+        (case when round(cmllossreserves,2)=round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) 
+          and round(cmlexpensereserves,2)=round(nvl(p.claim_paid_dcc, 0),2) then 1 else 0 end) as ClosedCount,
+        0 as reopenedcount,
+        (case when round(cmllossreserves,2)<>round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) 
+          or round(cmlexpensereserves,2)<>round(nvl(p.claim_paid_dcc, 0),2) then 1 else 0 end) as PendingCount,
+        l.rptdind as reportedcount,
+        (case when round(cmllossreserves,2)=round(nvl(p.claim_paid_loss,0)+nvl(p.claim_paid_subrogation,0)+nvl(p.claim_paid_salvage,0),2) 
+          and round(cmlexpensereserves,2)=round(nvl(p.claim_paid_dcc, 0),2) 
+          and round(cmllossreserves,2)=0 and round(cmlexpensereserves, 2)>0 then 1 else 0 end) as DCCOnlyCount,
+        nvl(l.cmllossreserves, 0.0) as IncrNetIncurredLoss,
+        nvl(l.cmllossreserves, 0.0)-nvl(p.claim_paid_subrogation, 0.0)-nvl(p.claim_paid_salvage, 0.0) as IncrGrossIncurredLoss,
+        nvl(l.cmlexpensereserves, 0.0) as IncrIncurredDCC,
+        nvl(p.claim_paid_loss, 0.0) as IncrGrossPaidLoss,
+        cast(p.claim_paid_salvage as decimal(10,2)) as IncrPaidSalvage,
+        nvl(p.claim_paid_subrogation, 0.0) as IncrPaidSubrogation,
+        nvl(p.claim_paid_dcc, 0.0) as IncrPaidDCC,
+        datediff(day, l.dol, l.received) as timetoreport,
+        datediff(day, l.received, l.closed) as timetoclose,
+        l.accyr,
+        cast('NA' as string) as autosecondaryclass,
+        cast('NA' as string) as autovehiclesize,
+        l.wc_ct_flag
+      from WCCumulativeReserves_DF l
+      left outer join WCCumulativePaid_DF p 
+        on l.calyrmo_end = p.calyrmo_end 
+        and l.claim_number = p.claim_number
+        and l.reserve_segment_code = p.reserve_segment_code
+
+  - name: CWPFinalInd_DF
+    sql: |
+      WITH cte as (
+        SELECT
+          ClosedCount as latest_closed_indicator,
+          IncrGrossPaidLoss + IncrPaidDCC + IncrPaidSubrogation + IncrPaidSalvage as latest_total_paid,
+          claim_number,
+          reserve_segment_code,
+          reserve_detailed_segment_code,
+          row_number() over (partition by claim_number, reserve_segment_code, reserve_detailed_segment_code order by calyrmo_end desc) as RN
+        FROM WCCumulativeClaimSummary_DF1
+      )
+      SELECT
+        latest_closed_indicator,
+        latest_total_paid,
+        claim_number,
+        reserve_segment_code,
+        reserve_detailed_segment_code
+      FROM cte
+      WHERE RN = 1
+
+  - name: ReopenedCount_DF
+    sql: |
+      SELECT
+        ClosedCount as Prior_Closed_Indicator,
+        claim_number,
+        calyrmo_end,
+        reserve_segment_code,
+        reserve_detailed_segment_code
+      FROM WCCumulativeClaimSummary_DF1
+
+  - name: WCCumulativeClaimSummary_DF
+    sql: |
+      with cte as (
+        SELECT
+          t.*,
+          case when l.latest_closed_indicator=1 and l.latest_total_paid > 0 then 1 else 0 end as cwp_final_indicator,
+          row_number() over (partition by t.claim_number, t.reserve_segment_code, t.reserve_detailed_segment_code, t.calyrmo_end order by r.calyrmo_end desc) as RN,
+          case when nvl(r.Prior_Closed_Indicator,0)=1 and (round(t.IncrGrossPaidLoss + t.IncrPaidDCC + t.IncrPaidSubrogation + t.IncrPaidSalvage,2) <> round(t.IncrNetIncurredLoss + t.IncrIncurredDCC,2)) then 1 else 0 end as reopened_count
+        FROM WCCumulativeClaimSummary_DF1 t
+        left join CWPFinalInd_DF l ON l.claim_number = t.claim_number and l.reserve_segment_code = t.reserve_segment_code and l.reserve_detailed_segment_code = t.reserve_detailed_segment_code
+        left join ReopenedCount_DF r ON r.calyrmo_end < t.calyrmo_end and r.claim_number = t.claim_number and r.reserve_segment_code = t.reserve_segment_code and r.reserve_detailed_segment_code = t.reserve_detailed_segment_code
+      )
+      select * from cte where RN = 1
+
+  - name: WCIncrementalClaimSummary_DF1
+    sql: |
+      SELECT
+        d.claim_number,
+        s.policynumber as policy_number,
+        s.state,
+        s.lob as line_of_business,
+        s.carrier as carrier_code,
+        s.agency as agency_code,
+        s.markettype as market_type,
+        s.productionsrc as production_source,
+        s.policyeffectivedate as policy_effective_date,
+        s.policyexpirationdate as policy_expiration_date,
+        s.lossdate as loss_date,
+        s.closeddate as closed_date,
+        s.reopeneddate as reopened_date,
+        s.receiveddate as received_date,
+        s.firstentereddate as first_entered_date,
+        d.calyrmo_end,
+        s.maturity,
+        s.wcclaimid,
+        s.causeofloss as cause_of_loss,
+        s.lossdescrip as loss_description,
+        s.catcode as catastrophe_code,
+        s.handledbylegalind as handled_by_legal_indicator,
+        s.suitfiledind as suit_filed_indicator,
+        s.tpaind as tpa_indicator,
+        s.cwpfinalind as cwp_final_indicator,
+        s.massind as mass_indicator,
+        s.catind as cat_indicator,
+        s.aslob,
+        s.transmittal_segment_code,
+        s.reserve_segment_code,
+        s.reserve_detailed_segment_code,
+        s.medonlyind as medical_only_indicator,
+        s.reopenedcount as reopened_count,
+        s.reportedcount as reported_count,
+        l.exposureclass as exposure_class,
+        l.exposuregroup as exposure_group,
+        l.exposureid as exposure_id,
+        l.claimantid,
+        s.industry,
+        s.maturity as months_maturity,
+        s.productid as product_id,
+        s.wc_ct_flag,
+        s.newrenew as new_renew,
+        s.occnum as occurence_number,
+        nvl(l.lossreserves,0.0) as IncrNetIncurredLoss,
+        nvl(l.lossreserves,0.0)-nvl(p.paidsub, 0.0)-nvl(p.paidsalvage, 0.0) as IncrGrossIncurredLoss,
+        nvl(l.expensereserves,0.0) as IncrIncurredDCC,
+        nvl(p.grosspaidloss, 0.0) as IncrGrossPaidLoss,
+        nvl(p.paidsalvage, 0.0) as IncrPaidSalvage,
+        nvl(p.paidsub, 0.0) as IncrPaidSubrogation,
+        nvl(p.paiddcc, 0.0) as IncrPaidDCC,
+        nvl(l.lossreserves,0.0)-nvl(p.grosspaidloss, 0.0)-nvl(p.paidsub, 0.0)-nvl(p.paidsalvage, 0.0) as CaseLossReserveOnOpen,
+        nvl(l.expensereserves,0.0)-nvl(p.paiddcc, 0.0) as CaseDCCReserveOnOpen,
+        cast(0.0 as float) as earned_premium,
+        cast(0.0 as float) as written_premium,
+        cast(0.0 as float) as earned_exposures,
+        cast(0.0 as float) as written_exposures,
+        datediff(day, s.lossdate, s.receiveddate) as time_to_report_days,
+        datediff(day, s.receiveddate, s.closeddate) as time_to_close_days,
+        l.asofdate,
+        l.startdate
+      FROM Dates_DF d
+      left join WCIncrLossReserves_DF l on d.claim_number=l.claim_number and d.calyrmo_end=l.calyrmo_end and d.reserve_segment_code=l.reserve_segment_code
+      left join WCIncrPayments_DF p on p.claim_number = d.claim_number and p.calyrmo_end = d.calyrmo_end and p.reserve_segment_code = d.reserve_segment_code
+      left join WCCumulativeClaimSummary_DF s on s.claim_number = d.claim_number and s.calyrmo_end = d.calyrmo_end and s.reserve_segment_code = d.reserve_segment_code
+
+  - name: Counts_DF
+    sql: |
+      select
+        CWPCount as previous_CWPCount,
+        ClosedCount as previous_ClosedCount,
+        PendingCount as previous_PendingCount,
+        DCCOnlyCount as previous_DCCOnlyCount,
+        claim_number,
+        calyrmo_end,
+        reserve_segment_code
+      from WCCumulativeClaimSummary_DF
+
+  - name: WCIncrementalClaimSummary_DF2
+    sql: |
+      with cte as (
+        SELECT
+          s.*,
+          row_number() over (partition by t.claim_number, t.reserve_segment_code, t.calyrmo_end order by r.calyrmo_end desc) as RN,
+          case when nvl(t.CWPCount,0)==nvl(r.previous_CWPCount,0) then 0 when nvl(t.CWPCount,0)==1 and nvl(r.previous_CWPCount,0)==0 then 1 else -1 end as CWPCount,
+          case when nvl(t.ClosedCount,0)==nvl(r.previous_ClosedCount,0) then 0 when nvl(t.ClosedCount,0)==1 and nvl(r.previous_ClosedCount,0)==0 then 1 else -1 end as ClosedCount,
+          case when nvl(t.PendingCount,0)==nvl(r.previous_PendingCount,0) then 0 when nvl(t.PendingCount,0)==1 and nvl(r.previous_PendingCount,0)==0 then 1 else -1 end as PendingCount,
+          case when nvl(t.DCCOnlyCount,0)==nvl(r.previous_DCCOnlyCount,0) then 0 when nvl(t.DCCOnlyCount,0)==1 and nvl(r.previous_DCCOnlyCount,0)==0 then 1 else -1 end as DCCOnlyCount
+        from WCIncrementalClaimSummary_DF1 s
+        inner join WCCumulativeClaimSummary_DF t
+        on s.calyrmo_end = t.calyrmo_end and s.claim_number = t.claim_number and s.reserve_segment_code = t.reserve_segment_code
+        left join Counts_DF r
+        on r.calyrmo_end < t.calyrmo_end and r.claim_number = t.claim_number and r.reserve_segment_code = t.reserve_segment_code
+      )
+      select * from cte where RN = 1
+
+  - name: WCIncrementalClaimSummary_DF
+    sql: |
+      SELECT
+        d.claim_number as claimnum,
+        s.occnum as occnum,
+        s.policynumber as policynumber,
+        s.state,
+        s.lob as lob,
+        s.carrier,
+        s.agency,
+        s.markettype as markettype,
+        s.productionsrc,
+        s.newrenew as newrenew,
+        s.policyeffectivedate as policyeffectivedate,
+        s.policyexpirationdate as policyexpirationdate,
+        s.lossdate as lossdate,
+        s.closeddate as closeddate,
+        s.reopeneddate as reopeneddate,
+        s.receiveddate as receiveddate,
+        s.firstentereddate as firstentereddate,
+        d.calyrmo_end as calyrmo_end,
+        s.maturity as maturity,
+        s.wcclaimid,
+        l.claimantid as claimantid,
+        s.productid as productid,
+        l.exposureid as exposureid,
+        l.exposuregroup as exposuregroup,
+        l.exposureclass as exposureclass,
+        s.industry as industry,
+        s.causeofloss as causeofloss,
+        s.lossdescrip as lossdescrip,
+        s.catcode as catcode,
+        s.handledbylegalind as handledbylegalind,
+        s.suitfiledind as suitfiledind,
+        s.tpaind as tpaind,
+        s.cwpfinalind as cwpfinalind,
+        s.massind as massind,
+        s.catind as catind,
+        s.aslob as aslob,
+        l.transmittal_segment_code as transmittalseg,
+        l.reserve_segment_code as resseg,
+        l.reserve_detailed_segment_code as detailedresseg,
+        s.medonlyind as medonlyind,
+        s.cwpcount,
+        s.closedcount,
+        s.reopenedcount as reopenedcount,
+        s.pendingcount,
+        s.reportedcount as reportedcount,
+        s.dcconlycount,   
+        nvl(l.lossreserves,0.0) as incrnetincurredloss,
+        nvl(l.lossreserves,0.0)-nvl(p.paidsub, 0.0)-nvl(p.paidsalvage, 0.0) as incrgrossincurredloss,
+        nvl(l.expensereserves,0.0) as incrincurreddcc,
+        nvl(p.grosspaidloss, 0.0) as incrgrosspaidloss,
+        nvl(p.paidsalvage, 0.0) as incrpaidsalvage,
+        nvl(p.paidsub, 0.0) as incrpaidsubrogation,
+        nvl(p.paiddcc, 0.0) as incrpaiddcc,
+        nvl(l.lossreserves,0.0)-nvl(p.grosspaidloss, 0.0)-nvl(p.paidsub, 0.0)-nvl(p.paidsalvage, 0.0) as caselossreserveonopen,
+        nvl(l.expensereserves,0.0)-nvl(p.paiddcc, 0.0) as casedccreserveonopen,
+        cast(0.0 as float) as earnedpremium,
+        cast(0.0 as float) as writtenpremium,
+        cast(0.0 as float) as earnedexposures,
+        cast(0.0 as float) as writtenexposures,
+        datediff(day, s.lossdate, s.receiveddate) as timetoreport,
+        datediff(day, s.receiveddate, s.closeddate) as timetoclose,
+        s.accyr as accyr,
+        s.autosecondaryclass as autosecondaryclass,
+        s.autovehiclesize as autovehiclesize,
+        s.wc_ct_flag as wc_ctflag,
+        l.startdate,
+        l.asofdate
+      FROM Dates_DF d
+      left join WCIncrLossReserves_DF l on d.claim_number=l.claim_number and d.calyrmo_end=l.calyrmo_end and d.reserve_segment_code=l.reserve_segment_code
+      left join WCIncrPayments_DF p on p.claim_number = d.claim_number and p.calyrmo_end = d.calyrmo_end and p.reserve_segment_code = d.reserve_segment_code
+      left join WCCumulativeClaimSummary_DF s on s.claim_number = d.claim_number and s.calyrmo_end = d.calyrmo_end and s.reserve_segment_code = d.reserve_segment_code
+
+  - name: WCIncrementalClaimSummary_DF_Final
+    sql: |
+      select
+        s.*,
+        case when t.pendingcount = -1 then s.incrnetincurredloss - t.incrnetincurredloss
+             when t.reopened_count = 1 then t.incrnetincurredloss
+             when t.pendingcount = 1 then s.incrnetincurredloss
+             else 0 
+        end as incrnetincurredlossonopen,
+        case when t.pendingcount = -1 then s.incrgrossincurredloss - t.incrgrossincurredloss
+             when t.reopened_count = 1 then t.incrgrossincurredloss
+             when t.pendingcount = 1 then s.incrgrossincurredloss
+             else 0
+        end as incrgrossincurredlossonopen,
+        case when t.pendingcount = -1 then s.incrincurreddcc - t.incrincurreddcc
+             when t.reopened_count = 1 then t.incrincurreddcc
+             when t.pendingcount = 1 then s.incrincurreddcc
+             else 0
+        end as incrincurreddcconopen,
+        case when s.cwpcount = 0 and round(s.incrgrosspaidloss,2) = 0 then 0
+             when s.cwpcount = 0 and t.cwpcount = 1 then s.incrgrosspaidloss
+             when s.cwpcount = 1 then t.incrgrosspaidloss
+             when s.cwpcount = -1 then s.incrgrosspaidloss - t.incrgrosspaidloss
+        end as incrgrosspaidlossonclosed,
+        case when s.cwpcount = 0 and round(s.incrpaidsalvage,2) = 0 then 0
+             when s.cwpcount = 0 and t.cwpcount = 1 then s.incrpaidsalvage
+             when s.cwpcount = 1 then t.incrpaidsalvage
+             when s.cwpcount = -1 then s.incrpaidsalvage - t.incrpaidsalvage
+        end as incrpaidsalvageonclosed,
+        case when s.cwpcount = 0 and round(s.incrpaidsubrogation,2) = 0 then 0
+             when s.cwpcount = 0 and t.cwpcount = 1 then s.incrpaidsubrogation
+             when s.cwpcount = 1 then t.incrpaidsubrogation
+             when s.cwpcount = -1 then s.incrpaidsubrogation - t.incrpaidsubrogation
+        end as incrpaidsubrogationonclosed,
+        case when s.cwpcount = 0 and round(s.incrpaiddcc,2) = 0 then 0
+             when s.cwpcount = 0 and t.cwpcount = 1 then s.incrpaiddcc
+             when s.cwpcount = 1 then t.incrpaiddcc
+             when s.cwpcount = -1 then s.incrpaiddcc - t.incrpaiddcc
+        end as incrpaiddcconclosed
+      from WCIncrementalClaimSummary_DF s
+      inner join WCCumulativeClaimSummary_DF t 
+        on t.claim_number = s.claimnum 
+        and t.calyrmo_end=s.calyrmo_end 
+        and t.reserve_segment_code = s.resseg

@@ -1,0 +1,78 @@
+{
+    "loadGroupA": [
+        {
+            "files": [
+                {
+                    "fileName": "bop_losses_stg",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "bop_reserves_stg",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "ca_losses_stg",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "ca_reserves_stg",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "ho_losses_stg",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "ho_reserves_stg",
+                    "modelConfigFolderName": "arius"
+                }
+            ]
+        }
+    ],
+    "loadGroupB": [
+        {
+            "files": [
+                {
+                    "fileName": "bop_source_verification",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "ca_source_verification",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "ho_source_verification",
+                    "modelConfigFolderName": "arius"
+                },
+                {
+                    "fileName": "wc_source_verification",
+                    "modelConfigFolderName": "arius"
+                }
+            ]
+        }
+    ],
+    "loadGroupC": [
+        {
+            "files": [
+                {
+                    "fileName": "incremental_claims_summary",
+                    "modelConfigFolderName": "arius",
+                    "arius_dbname": "System_Incremental_Data_Testing",
+                    "arius_mappername": "System Loss Paid ClmCt"
+                },
+                {
+                    "fileName": "incremental_exposures_summary",
+                    "modelConfigFolderName": "arius",
+                    "arius_dbname": "System_Incremental_Data_Testing",
+                    "arius_mappername": "System Loss Paid ClmCt"                    
+                },
+                {
+                    "fileName": "incremental_premium_summary",
+                    "modelConfigFolderName": "arius",
+                    "arius_dbname": "System_Incremental_Data_Testing",
+                    "arius_mappername": "System Loss Paid ClmCt"                                      
+                }
+            ]
+        }
+    ]
+}

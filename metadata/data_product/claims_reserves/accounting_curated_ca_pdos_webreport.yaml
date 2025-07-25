@@ -1,0 +1,46 @@
+target:
+  lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+  schema: accounting_curated
+  table: ca_pdos_webreport
+  load_strategy: overwrite
+  key_columns:
+    - carrier
+    - aslob_code
+    - dolyear
+  unknown_record: False
+  identity: False
+
+source:
+  - name: ca_pdos_webreport
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: accounting
+    table: ca_pdos_webreport
+
+
+query:
+  - name: accounting_curated_ca_pdos_webreport
+    sql: SELECT 
+           carrier as carrier,
+            aslob_code as aslob_code,
+            state as state,
+            cast(dolyear as int) as dolyear,
+            cast(medical as decimal) as medical,
+            cast(loss as decimal) as loss,
+            cast(expense as decimal) as expense,
+            cast(total as decimal) as total,
+            cast(lmedical as decimal) as lmedical,
+            cast(lloss as decimal) as lloss,
+            cast(lexpense as decimal) as lexpense,
+            cast(ltotal as decimal) as ltotal,
+            cast(rmedical as decimal) as rmedical,
+            cast(rloss as decimal) as rloss,
+            cast(rexpense as decimal) as rexpense,
+            cast(rtotal as decimal) as rtotal,
+            stateshow as stateshow,
+            dolshow as dolshow,
+            aslob_code2 as aslob_code2,
+            cast(dolyear2 as int) as dolyear2,
+            cast(osloss as decimal) as osloss,
+            to_date(asofdate, 'MM/dd/yyyy') as asofdate
+        FROM ca_pdos_webreport
+        

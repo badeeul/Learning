@@ -1,0 +1,11 @@
+{
+    "subject": "Failed file upload to Arius",
+    "body": {
+        "contentType": "text/html",
+        "content": "<p>Dear Reserving actuary,</p><p>Our system encountered an error while attempting to upload files to Arius.</p><p><b>Upload details:</b></p><ul><li>Status - FAILED</li><li>Error time - {uploadedTime}</li></ul><p>Please manually upload the files to Arius or rerun the pipeline from your Fabric workspace.</p><p>If you have any questions or require assistance, please contact our support team at <a href='mailto:DnAClaims@guardinsurancegroup.onmicrosoft.com'>DnAClaims@guardinsurancegroup.onmicrosoft.com</a>.</p><p>Thank you!</p>"
+    },
+    "emailRecipient": "ActuarialReserving@guard.com",
+    "emailCc": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

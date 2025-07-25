@@ -1,0 +1,9 @@
+{
+    "subject": "Source Data - Duplicates Notification",
+    "body": {
+                "contentType": "text/html",
+                "content": "<p>A data deduplication failure has been detected.The duplicates have been quarantined in DQ error table.Please see the following details for more information:</p><p><b>Data Duplicates Details:</b></p><p>Duplicates Workspace : {workspace_name}</p><p>No. of Datasets: {table_count} </p><p>{error_details}</p><p>Please click on the Power BI report link below for further details.</p><p><a href= {powerbi_report_link}>Data Deduplication  Report</a></p><p style=color:red;>*Please do not reply to this email.</p><p>Thanks,<br>Support Team</p>"           },
+    "emailRecipient": "DnAClaims@guardinsurancegroup.onmicrosoft.com",
+    "emailSender": "DnAFluidity-DoNotReply@GUARD.com",
+    "enabled": true
+}

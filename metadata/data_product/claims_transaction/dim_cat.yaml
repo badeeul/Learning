@@ -1,0 +1,46 @@
+target:
+  lakehouse: den_lhw_dpr_001_claims_transaction
+  schema: claims_transaction
+  table: dim_cat
+  load_strategy: type_two
+  key_columns:
+    - cat_bus_key
+  unknown_record: True
+  identity: True
+  identity_column_name: cat_key
+
+source:
+  - name: curated_claims_catcodes
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction
+    table: claims_catcodes
+
+query:
+  - name: dim_cat
+    sql: |
+      SELECT 
+        catastrophecodeid AS cat_bus_key,
+        catastrophecode AS cat_cd,
+        regexp_replace(regexp_replace(perils, '\r', ''), '\n', '') AS perils,
+        CASE 
+          WHEN perils LIKE '%wildfire%' THEN 'Wildfire/Fire'
+          WHEN perils LIKE '%fire%' THEN 'Wildfire/Fire'
+          WHEN perils LIKE '%riot%' THEN 'Riots'
+          WHEN perils LIKE '%covid%' THEN 'Covid'
+          WHEN perils LIKE '%hurricane%' THEN 'Hurricane/Tropical Storm'
+          WHEN perils LIKE '%tropical%' THEN 'Hurricane/Tropical Storm'
+          WHEN perils LIKE '%ts%' THEN 'Hurricane/Tropical Storm'
+          WHEN perils LIKE '%winter%' THEN 'Winter Storm'
+          WHEN perils LIKE '%hail%' THEN 'Wind'
+          WHEN perils LIKE '%tornadoes%' THEN 'Wind'
+          WHEN perils LIKE '%wind%' THEN 'Wind'
+          ELSE 'Other'
+        END AS cat_type,
+        effectivelowdate AS cat_eff_start_date,
+        effectivehighdate AS cat_eff_end_date,
+        CONCAT('(', date_format(effectivelowdate, 'MM/dd/yyyy'), '-', date_format(effectivehighdate, 'MM/dd/yyyy'), ')') AS rptng_period
+      FROM curated_claims_catcodes
+      WHERE dl_iscurrent = 1
+
+    description: "This query selects catastrophe code information, classifies the peril type, and formats the reporting period from the curated_claims_catcodes source table."
+    

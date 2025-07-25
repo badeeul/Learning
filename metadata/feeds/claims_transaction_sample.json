@@ -1,0 +1,19 @@
+{
+    "feedName": "claims_transaction_sample",
+    "feedDescription": "This is a feed for Claims Transaction Data Product (sample data)",
+    "workLoadType": "dp-spark",
+    "skipProductLoad": true,
+    "dataDeduplicationAlert": true,
+    "deduplicationAlertTemplate": "deduplication_msg_claims",
+    "datasetsConfig": [
+        {
+            "datasetType": "database",
+            "datasets": [
+                {
+                    "fileName": "transaction_uwcoverage",
+                    "sourceConfigFolderName": "iis_transaction_sample"
+                }
+            ]
+        }
+    ]
+}

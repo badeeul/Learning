@@ -1,0 +1,162 @@
+target:
+  lakehouse: den_lhw_dpr_001_data_product_tables
+  schema: reserves
+  table: DBExposuresSummary
+  load_strategy: overwrite
+  unknown_record: false
+  identity: false
+
+source:
+  - name: insured
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: insured
+
+  - name: wcinfo
+    lakehouse: den_lhw_scu_001_tables_for_data_product_zone
+    schema: iis
+    table: wcinfo
+
+  - name: dbpremiumssummary
+    lakehouse: den_lhw_dpr_001_data_product_tables
+    schema: reserves
+    table: DBPremiumsSummary
+
+query:
+  - name: Initial_Setup_DF
+    sql: |
+      SELECT 
+        to_date('2012-01-01') as start_date,
+        to_date(date_format(last_day(current_timestamp), 'yyyy-MM-dd 23:59:59')) as end_date,
+        'DB' as lob,
+        cast(round(months_between(to_date(date_format(last_day(current_timestamp), 'yyyy-MM-dd')), to_date('2012-01-01')) + 1,0) as integer) as max_maturity
+
+  - name: Policy_Base_DF
+    sql: |
+      SELECT
+        i.code,
+        i.agency,
+        i.carrier,
+        w.govstate,
+        to_date(i.pobegin) as StartDate,
+        last_day(to_date(i.pobegin)) as PolYrMo_end,
+        to_date(i.pobegin) as BeginWorkDate,
+        last_day(to_date(i.pobegin)) as CalYrMo_End,
+        COALESCE(
+          CASE WHEN i.stat5 = 'C' THEN to_date(i.pocancel) ELSE to_date(i.poexpir) END,
+          date_add(to_date(i.pobegin), 365)
+        ) as enddate
+      FROM insured i
+      LEFT JOIN wcinfo w ON i.code = w.code AND w.dl_iscurrent = 1
+      CROSS JOIN Initial_Setup_DF p
+      WHERE i.lob = p.lob
+        AND to_date(i.pobegin) BETWEEN p.start_date AND p.end_date
+        AND i.stat2 = 'i'
+        AND (i.typcancel <> 'F' OR i.typcancel IS NULL)
+        AND i.dl_iscurrent = 1
+
+  - name: Filtered_Policies_DF
+    sql: |
+      SELECT * FROM Policy_Base_DF
+      WHERE StartDate <> enddate
+        AND BeginWorkDate <> enddate
+
+  - name: Date_Sequence_DF
+    sql: |
+      SELECT 
+        seq.i as iteration,
+        add_months(t.start_date, seq.i) as calc_date,
+        last_day(add_months(t.start_date, seq.i)) as month_end_date,
+        t.max_maturity
+      FROM Initial_Setup_DF t
+      LATERAL VIEW explode(sequence(0, max_maturity - 1)) seq as i
+
+  - name: Policy_Exposures_DF
+    sql: |
+      SELECT
+        p.code as policynumber,
+        d.month_end_date as calyrmo_end,
+        p.agency,
+        p.carrier,
+        p.govstate as state,
+        p.polyrmo_end,
+        d.iteration as maturity,
+        CASE 
+          WHEN d.month_end_date > p.enddate THEN 
+            (datediff(day, p.BeginWorkDate, p.enddate) + 1)/365.0
+          ELSE 
+            (datediff(day, p.BeginWorkDate, d.month_end_date) + 1)/365.0
+        END as EPY,
+        ep.commonname
+      FROM Filtered_Policies_DF p
+      CROSS JOIN Date_Sequence_DF d
+      LEFT JOIN dbpremiumssummary ep ON ep.policynumber = p.code
+      WHERE d.month_end_date <= (SELECT end_date FROM Initial_Setup_DF)
+        AND p.enddate >= p.BeginWorkDate
+        AND d.month_end_date >= p.StartDate
+
+  - name: Policies_With_Both_Coverages_DF
+    sql: |
+      SELECT
+        policynumber,
+        calyrmo_end
+      FROM dbpremiumssummary
+      WHERE lob = 'DB'
+      GROUP BY policynumber, calyrmo_end
+      HAVING COUNT(DISTINCT commonname) = 2
+
+  - name: Updated_Premiums_DF
+    sql: |
+      SELECT
+        ep.policynumber,
+        ep.exposureid,
+        ep.commonname,
+        ep.state,
+        ep.carrier,
+        ep.agency,
+        ep.lob,
+        ep.aslob,
+        ep.resseg,
+        ep.polyrmo_end,
+        ep.calyrmo_end,
+        ep.startdate,
+        ep.asofdate,
+        ep.earnedpremium,
+        ep.writtenpremium,
+        COALESCE(pe.EPY, 0) as earnedexposures,
+        ep.writtenexposures,
+        CASE
+          WHEN b.policynumber IS NOT NULL AND ep.commonname = 'PFL' THEN 0
+          ELSE 1
+        END as exposurerollup
+      FROM dbpremiumssummary ep
+      LEFT JOIN Policy_Exposures_DF pe
+        ON ep.policynumber = pe.policynumber
+        AND ep.calyrmo_end = pe.calyrmo_end
+      LEFT JOIN Policies_With_Both_Coverages_DF b
+        ON ep.policynumber = b.policynumber
+        AND ep.calyrmo_end = b.calyrmo_end
+      WHERE ep.lob = 'DB'
+
+  - name: Final_Output_DF
+    sql: |
+      SELECT
+        policynumber,
+        exposureid,
+        commonname,
+        state,
+        carrier,
+        agency,
+        lob,
+        aslob,
+        resseg,
+        startdate,
+        asofdate,
+        polyrmo_end,
+        calyrmo_end,   
+        earnedpremium,
+        writtenpremium,
+        cast(earnedexposures as float) as earnedexposure,
+        writtenexposures as writtenexposure,
+        cast(exposurerollup as float) as exposurerollup
+      FROM Updated_Premiums_DF

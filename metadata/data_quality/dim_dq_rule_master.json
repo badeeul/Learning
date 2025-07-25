@@ -1,0 +1,4115 @@
+[
+    {
+        "dq_rule_master_key": 1,
+        "dq_rule_id": "DP_TXN_001",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "mkt_type_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_mkt_type",
+        "dq_rule_applicable_attribute": "mkt_type_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 2,
+        "dq_rule_id": "DP_TXN_002",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "agcy_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_dist_chnl",
+        "dq_rule_applicable_attribute": "agcy_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 3,
+        "dq_rule_id": "DP_TXN_003",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "prod_src_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_prod_src",
+        "dq_rule_applicable_attribute": "prod_src_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 4,
+        "dq_rule_id": "DP_TXN_004",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "aslob_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_aslob",
+        "dq_rule_applicable_attribute": "aslob_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 5,
+        "dq_rule_id": "DP_TXN_005",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "carrier_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_carrier",
+        "dq_rule_applicable_attribute": "carrier_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 6,
+        "dq_rule_id": "DP_TXN_006",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "lob_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_lob",
+        "dq_rule_applicable_attribute": "lob_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 7,
+        "dq_rule_id": "DP_TXN_007",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "cat_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_cat",
+        "dq_rule_applicable_attribute": "cat_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 8,
+        "dq_rule_id": "DP_TXN_008",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "policy_num_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_insured",
+        "dq_rule_applicable_attribute": "policy_num_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 9,
+        "dq_rule_id": "DP_TXN_009",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "policy_num_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_policy",
+        "dq_rule_applicable_attribute": "policy_num_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 10,
+        "dq_rule_id": "DP_TXN_010",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "ins_obj_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_ins_obj",
+        "dq_rule_applicable_attribute": "ins_obj_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 11,
+        "dq_rule_id": "DP_TXN_011",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "claim_status_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_claim_status",
+        "dq_rule_applicable_attribute": "claim_status_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 12,
+        "dq_rule_id": "DP_TXN_012",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "payee_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_payee",
+        "dq_rule_applicable_attribute": "payee_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 13,
+        "dq_rule_id": "DP_TXN_013",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "claim_trans_type_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_claim_trans_type",
+        "dq_rule_applicable_attribute": "claim_trans_type_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 14,
+        "dq_rule_id": "DP_TXN_014",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "adjustr_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_adjuster",
+        "dq_rule_applicable_attribute": "adjustr_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 15,
+        "dq_rule_id": "DP_TXN_015",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "claimant_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_claimant",
+        "dq_rule_applicable_attribute": "claimant_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 16,
+        "dq_rule_id": "DP_TXN_016",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "cause_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_cause_of_loss",
+        "dq_rule_applicable_attribute": "cause_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 17,
+        "dq_rule_id": "DP_TXN_017",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "claim_type_cd_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_claim_type",
+        "dq_rule_applicable_attribute": "claim_type_cd_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 18,
+        "dq_rule_id": "DP_TXN_018",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "occur_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_occurrence",
+        "dq_rule_applicable_attribute": "occur_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 19,
+        "dq_rule_id": "DP_TXN_019",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Primary key check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_unique",
+            "kwargs": {
+                "column": "cvrg_bus_key"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_coverage",
+        "dq_rule_applicable_attribute": "cvrg_bus_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 20,
+        "dq_rule_id": "DP_TXN_020",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Uniqueness check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_compound_columns_to_be_unique",
+            "kwargs": {
+                "column_list": [
+                    "claimant_key",
+                    "claim_trans_type_key",
+                    "transid",
+                    "ins_obj_key"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_unique_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 21,
+        "dq_rule_id": "DP_TXN_021",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Uniqueness check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_compound_columns_to_be_unique",
+            "kwargs": {
+                "column_list": [
+                    "claim_status_log_key",
+                    "ins_obj_key"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_unique_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 22,
+        "dq_rule_id": "DP_TXN_022",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Uniqueness check that there are no duplicates",
+        "dq_rule_constraint": {
+            "type": "expect_compound_columns_to_be_unique",
+            "kwargs": {
+                "column_list": [
+                    "claimant_key",
+                    "ins_obj_key"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Uniqueness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_unique_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 23,
+        "dq_rule_id": "DP_TXN_023",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not be in the future",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_future_loss_date_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_future_loss_date_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 24,
+        "dq_rule_id": "DP_TXN_024",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not be in the future",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_future_loss_date_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_future_loss_date_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 25,
+        "dq_rule_id": "DP_TXN_025",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not be in the future",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_future_loss_date_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_future_loss_date_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 26,
+        "dq_rule_id": "DP_TXN_026",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not be null\n\nuse loss_date_key to join to dim_date, date not in ('unknown', 'not applicable')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_loss_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 27,
+        "dq_rule_id": "DP_TXN_027",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not be null\n\nuse loss_date_key to join to dim_date, date not in ('unknown', 'not applicable')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_loss_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 28,
+        "dq_rule_id": "DP_TXN_028",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not be null\n\nuse loss_date_key to join to dim_date, date not in ('unknown', 'not applicable')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_loss_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 29,
+        "dq_rule_id": "DP_TXN_029",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must be within the policy period",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_period_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_loss_period_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 30,
+        "dq_rule_id": "DP_TXN_030",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must be within the policy period",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_period_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_loss_period_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 31,
+        "dq_rule_id": "DP_TXN_031",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must be within the policy period",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_period_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_loss_period_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 32,
+        "dq_rule_id": "DP_TXN_032",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not occur after received date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_rcvd_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_loss_rcvd_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 33,
+        "dq_rule_id": "DP_TXN_033",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not occur after received date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_rcvd_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_loss_rcvd_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 34,
+        "dq_rule_id": "DP_TXN_034",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss date must not occur after received date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_rcvd_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_loss_rcvd_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 35,
+        "dq_rule_id": "DP_TXN_035",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If close date is not null (claim is closed), close date must not occur before loss date\n\nuse adjustr_status_key to link to dim_claim_status and then\nstatus_eff_start_date_key where claim_status_cd_bus_key = 1 will give you the close date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_closed_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_loss_closed_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 36,
+        "dq_rule_id": "DP_TXN_036",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If close date is not null (claim is closed), close date must not occur before loss date\n\nuse latest_adjustr_status_key to link to dim_claim_status and then status_eff_start_date_key where claim_status_cd_bus_key = 1  will give you the close date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_loss_closed_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_loss_closed_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 37,
+        "dq_rule_id": "DP_TXN_037",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If close date is not null (claim is closed), close date must not occur before received date\n\nuse adjustr_status_key to link to dim_claim_status and then\nstatus_eff_start_date_key where claim_status_cd_bus_key = 1 will give you the close date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_closed_rcvd_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_closed_rcvd_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 38,
+        "dq_rule_id": "DP_TXN_038",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If close date is not null (claim is closed), close date must not occur before received date\n\nuse latest_adjustr_status_key to link to dim_claim_status and then status_eff_start_date_key where claim_status_cd_bus_key = 1  will give you the close date",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_closed_rcvd_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_closed_rcvd_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 39,
+        "dq_rule_id": "DP_TXN_039",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "E&S is not a valid market type for WC\n\nmkt_type_code_bus_key should not = 'E' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_mkt_type_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_mkt_type_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 40,
+        "dq_rule_id": "DP_TXN_040",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "E&S is not a valid market type for WC\n\nmkt_type_code_bus_key should not = 'E' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_mkt_type_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_wc_mkt_type_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 41,
+        "dq_rule_id": "DP_TXN_041",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "E&S is not a valid market type for WC\n\nmkt_type_code_bus_key should not = 'E' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_mkt_type_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_wc_mkt_type_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 42,
+        "dq_rule_id": "DP_TXN_042",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "PAAZGU10 is not a valid carrier for WC\n\ncarrier_cd_bus_key should not = 'PAAZGU10' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_carrier_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_carrier_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 43,
+        "dq_rule_id": "DP_TXN_043",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "PAAZGU10 is not a valid carrier for WC\n\ncarrier_cd_bus_key should not = 'PAAZGU10' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_carrier_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_wc_carrier_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 44,
+        "dq_rule_id": "DP_TXN_044",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "PAAZGU10 is not a valid carrier for WC\n\ncarrier_cd_bus_key should not = 'PAAZGU10' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_carrier_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_wc_carrier_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 45,
+        "dq_rule_id": "DP_TXN_045",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Catastrophe can only be equal to 9999 or 2033 or Unknown for WC\n\ncat_bus_key in (-1, 231, 249) where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_carrier_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_cat_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 46,
+        "dq_rule_id": "DP_TXN_046",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Catastrophe can only be equal to 9999 or 2033 or Unknown for WC\n\ncat_bus_key in (-1, 231, 249) where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_cat_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_wc_cat_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 47,
+        "dq_rule_id": "DP_TXN_047",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Catastrophe can only be equal to 9999 or 2033 or Unknown for WC\n\ncat_bus_key in (-1, 231, 249) where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_cat_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_wc_cat_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 48,
+        "dq_rule_id": "DP_TXN_048",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Salvage transactions are not applicable for WC \n\nclaim_trans_type_bus_key not in ('L035','L038','X035','X038','X039') where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_salvage_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_salvage_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 49,
+        "dq_rule_id": "DP_TXN_049",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim type can only be equal to 'MO' or 'LT' for WC\n\nclaim_type_cd_bus_key in ('LT,'MO') where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_claim_type_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_claim_type_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 50,
+        "dq_rule_id": "DP_TXN_050",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim type can only be equal to 'MO' or 'LT' for WC\n\nclaim_type_cd_bus_key in ('LT,'MO') where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_claim_type_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_wc_claim_type_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 51,
+        "dq_rule_id": "DP_TXN_051",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim type can only be equal to 'MO' or 'LT' for WC\n\nclaim_type_cd_bus_key in ('LT,'MO') where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_claim_type_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_wc_claim_type_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 52,
+        "dq_rule_id": "DP_TXN_052",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Business Unit cannot be null or equal to 'FT' for WC\n\nbus_unit <> 'FT' or null where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_bus_unit_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_bus_unit_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 53,
+        "dq_rule_id": "DP_TXN_053",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Business Unit cannot be null or equal to 'FT' for WC\n\nbus_unit <> 'FT' or null where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_bus_unit_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_wc_bus_unit_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 54,
+        "dq_rule_id": "DP_TXN_054",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Business Unit cannot be null or equal to 'FT' for WC\n\nbus_unit <> 'FT' or null where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_bus_unit_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_wc_bus_unit_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 55,
+        "dq_rule_id": "DP_TXN_055",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy number must follow the following format  for WC voluntary market business:\nAAAA######\nIf left(policy_num_bus_key,2) not in ('A9','V9','R2') then mkt_type_code_bus_key must be in ('C','V') where lob_cd_bus_key = 'WC'\n\nPolicy number must follow the following format for WC residual market business: \n'R2'AA######\nIf left(policy_num_bus_key,2) = 'R2' then mkt_type_code_bus_key must be in ('R','A') where lob_cd_bus_key = 'WC'\n\nPolicy number must follow the following format for WC MGUs that are not on GUARD carriers:\n'V9'AA######\nor\n'A9'AA######\nIf left(policy_num_bus_key,2) in ('A9','V9') then mkt_type_code_bus_key must be = 'M' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_pol_num_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_wc_pol_num_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 56,
+        "dq_rule_id": "DP_TXN_056",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy number must follow the following format  for WC voluntary market business:\nAAAA######\nIf left(policy_num_bus_key,2) not in ('A9','V9','R2') then mkt_type_code_bus_key must be in ('C','V') where lob_cd_bus_key = 'WC'\n\nPolicy number must follow the following format for WC residual market business: \n'R2'AA######\nIf left(policy_num_bus_key,2) = 'R2' then mkt_type_code_bus_key must be in ('R','A') where lob_cd_bus_key = 'WC'\n\nPolicy number must follow the following format for WC MGUs that are not on GUARD carriers:\n'V9'AA######\nor\n'A9'AA######\nIf left(policy_num_bus_key,2) in ('A9','V9') then mkt_type_code_bus_key must be = 'M' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_pol_num_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_wc_pol_num_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 57,
+        "dq_rule_id": "DP_TXN_057",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy number must follow the following format  for WC voluntary market business:\nAAAA######\nIf left(policy_num_bus_key,2) not in ('A9','V9','R2') then mkt_type_code_bus_key must be in ('C','V') where lob_cd_bus_key = 'WC'\n\nPolicy number must follow the following format for WC residual market business: \n'R2'AA######\nIf left(policy_num_bus_key,2) = 'R2' then mkt_type_code_bus_key must be in ('R','A') where lob_cd_bus_key = 'WC'\n\nPolicy number must follow the following format for WC MGUs that are not on GUARD carriers:\n'V9'AA######\nor\n'A9'AA######\nIf left(policy_num_bus_key,2) in ('A9','V9') then mkt_type_code_bus_key must be = 'M' where lob_cd_bus_key = 'WC'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_wc_pol_num_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_wc_pol_num_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 58,
+        "dq_rule_id": "DP_TXN_058",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy number must follow the following format for BP, CA, and HO:\n\nAAAA######",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_pol_num_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_pol_num_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 59,
+        "dq_rule_id": "DP_TXN_059",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy number must follow the following format for BP, CA, and HO:\n\nAAAA######",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_pol_num_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_pol_num_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 60,
+        "dq_rule_id": "DP_TXN_060",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy number must follow the following format for BP, CA, and HO:\n\nAAAA######",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_pol_num_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Conformity\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_pol_num_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 61,
+        "dq_rule_id": "DP_TXN_061",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claims with payments must include a Payee\n\npayee_cd_bus_key not in ('not applicable', 'unknown') where claim_trans_type is 'payment'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_pmt_payee_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_pmt_payee_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 62,
+        "dq_rule_id": "DP_TXN_062",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "WC and DB claims must not be tied to an insurable object\n\nins_obj_bus_key = 'unknown' where lob_bus_key in ('DB','WC')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_db_wc_ins_obj_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_db_wc_ins_obj_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 63,
+        "dq_rule_id": "DP_TXN_063",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "WC and DB claims must not be tied to an insurable object\n\nins_obj_bus_key = 'unknown' where lob_bus_key in ('DB','WC')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_db_wc_ins_obj_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_db_wc_ins_obj_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 64,
+        "dq_rule_id": "DP_TXN_064",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "WC and DB claims must not be tied to an insurable object\n\nins_obj_bus_key = 'unknown' where lob_bus_key in ('DB','WC')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_db_wc_ins_obj_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_db_wc_ins_obj_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 65,
+        "dq_rule_id": "DP_TXN_065",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Received Date must not be null\n\ndate not in ('unknown', 'not applicable') \n\nclaim_recd_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_recd_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_claim_recd_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 66,
+        "dq_rule_id": "DP_TXN_066",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Received Date must not be null\n\ndate not in ('unknown', 'not applicable') \n\nclaim_recd_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_recd_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_claim_recd_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 67,
+        "dq_rule_id": "DP_TXN_067",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Received Date must not be null\n\ndate not in ('unknown', 'not applicable') \n\nclaim_recd_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_recd_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_claim_recd_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 68,
+        "dq_rule_id": "DP_TXN_068",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Market Type must not be null\n\nmkt_type_cd_bus_key not in ('unknown','not applicable')\n\nmkt_type_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_mkt_type_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_mkt_type_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 69,
+        "dq_rule_id": "DP_TXN_069",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Market Type must not be null\n\nmkt_type_cd_bus_key not in ('unknown','not applicable')\n\nmkt_type_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_mkt_type_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_mkt_type_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 70,
+        "dq_rule_id": "DP_TXN_070",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Market Type must not be null\n\nmkt_type_cd_bus_key not in ('unknown','not applicable')\n\nmkt_type_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_mkt_type_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_mkt_type_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 71,
+        "dq_rule_id": "DP_TXN_071",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "ASLOB must not be null for WC, DB, and HO\n\naslob_cd_bus_key not in ('unknown','not applicable') where lob_cd_bus_key in ('DB','HO','WC')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_db_ho_wc_aslob_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_db_ho_wc_aslob_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 72,
+        "dq_rule_id": "DP_TXN_072",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim Type must not be null\n\nclaim_type_cd_bus_key not in ('unknown','not applicable')\n\nclaim_type_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_type_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_claim_type_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 73,
+        "dq_rule_id": "DP_TXN_073",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim Type must not be null\n\nclaim_type_cd_bus_key not in ('unknown','not applicable')\n\nclaim_type_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_type_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_claim_type_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 74,
+        "dq_rule_id": "DP_TXN_074",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim Type must not be null\n\nclaim_type_cd_bus_key not in ('unknown','not applicable')\n\nclaim_type_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_type_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_claim_type_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 75,
+        "dq_rule_id": "DP_TXN_075",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Complexity must not be null for BP, CA, or HO\n\ncomplexity from dim_claimant is not null where lob_cd_bus_key in ('BP','CA','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_complexity_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_complexity_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 76,
+        "dq_rule_id": "DP_TXN_076",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Complexity must not be null for BP, CA, or HO\n\ncomplexity from dim_claimant is not null where lob_cd_bus_key in ('BP','CA','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_complexity_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_complexity_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 77,
+        "dq_rule_id": "DP_TXN_077",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Complexity must not be null for BP, CA, or HO\n\ncomplexity from dim_claimant is not null where lob_cd_bus_key in ('BP','CA','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_complexity_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_complexity_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 78,
+        "dq_rule_id": "DP_TXN_078",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Insured must not be null\n\npolicy_num_bus_key not in ('unknown','not applicable')\n\ninsd_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_insd_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_insd_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 79,
+        "dq_rule_id": "DP_TXN_079",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Insured must not be null\n\npolicy_num_bus_key not in ('unknown','not applicable')\n\ninsd_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_insd_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_insd_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 80,
+        "dq_rule_id": "DP_TXN_080",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Insured must not be null\n\npolicy_num_bus_key not in ('unknown','not applicable')\n\ninsd_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_insd_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_insd_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 81,
+        "dq_rule_id": "DP_TXN_081",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Number must not be null\n\npolicy_num_bus_key not in ('unknown','not applicable')\n\npolicy_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_policy_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_policy_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 82,
+        "dq_rule_id": "DP_TXN_082",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Number must not be null\n\npolicy_num_bus_key not in ('unknown','not applicable')\n\npolicy_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_policy_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_policy_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 83,
+        "dq_rule_id": "DP_TXN_083",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Number must not be null\n\npolicy_num_bus_key not in ('unknown','not applicable')\n\npolicy_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_policy_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_policy_key",
+        "dq_rule_failure_action": "Warn",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 84,
+        "dq_rule_id": "DP_TXN_084",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim Number must not be null\n\nclaimant_full_num from dim_claimant must not be null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "claimant_full_num"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "dim_claimant",
+        "dq_rule_applicable_attribute": "claimant_full_num",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 85,
+        "dq_rule_id": "DP_TXN_085",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim Status must not be null\n\nclaim_status_cd_bus_key not in ('unknown','not applicable')\n\nlatest_status_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_latest_status_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_latest_status_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 86,
+        "dq_rule_id": "DP_TXN_086",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Adjuster Claim Status must not be null\n\nclaim_status_cd_bus_key not in ('unknown','not applicable')\n\nlatest_adjustr_status_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_latest_adjustr_status_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_latest_adjustr_status_key",
+        "dq_rule_failure_action": "Warn",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 87,
+        "dq_rule_id": "DP_TXN_087",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim Status must not be null\n\nclaim_status_cd_bus_key not in ('unknown','not applicable')\n\nclaim_status_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_claim_status_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_claim_status_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 88,
+        "dq_rule_id": "DP_TXN_088",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Adjuster Claim Status must not be null\n\nclaim_status_cd_bus_key not in ('unknown','not applicable')\n\nadjustr_status_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_adjustr_status_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_adjustr_status_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 89,
+        "dq_rule_id": "DP_TXN_089",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transaction Amount must not be null\n\namt is not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "amt"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "amt",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 90,
+        "dq_rule_id": "DP_TXN_090",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transaction Amount must not be null\n\ntot_resv_pndg_amt is not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "tot_resv_pndg_amt"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "tot_resv_pndg_amt",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 91,
+        "dq_rule_id": "DP_TXN_091",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Transaction Amount must not be null\n\ntot_paymt_amt is not null",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_not_be_null",
+            "kwargs": {
+                "column": "tot_paymt_amt"
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "tot_paymt_amt",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 92,
+        "dq_rule_id": "DP_TXN_092",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Effective Date must not be null\n\ndate not in ('unknown','not applicable')\n\neffec_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_effec_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_effec_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 93,
+        "dq_rule_id": "DP_TXN_093",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Effective Date must not be null\n\ndate not in ('unknown','not applicable')\n\neffec_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_effec_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_effec_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 94,
+        "dq_rule_id": "DP_TXN_094",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Effective Date must not be null\n\ndate not in ('unknown','not applicable')\n\neffec_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_effec_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_effec_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 95,
+        "dq_rule_id": "DP_TXN_095",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Expiration Date must not be null\n\ndate not in ('unknown','not applicable')\n\nexp_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_exp_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_exp_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 96,
+        "dq_rule_id": "DP_TXN_096",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Expiration Date must not be null\n\ndate not in ('unknown','not applicable')\n\nexp_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_exp_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_exp_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 97,
+        "dq_rule_id": "DP_TXN_097",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Policy Expiration Date must not be null\n\ndate not in ('unknown','not applicable')\n\nexp_date_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_exp_date_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_exp_date_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 98,
+        "dq_rule_id": "DP_TXN_098",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Insurable Object must not be null for BP, CA, HO\n\nins_obj_bus_key not in ('unknown','not applicable') where lob_cd_bus_key in ('BP','CA','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ca_ho_ins_obj_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_bp_ca_ho_ins_obj_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 99,
+        "dq_rule_id": "DP_TXN_099",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Agency must not be null\n\nagcy_cd_bus_key not in ('unknown','not applicable')\n\ndist_chnl_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_dist_chnl_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_dist_chnl_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 100,
+        "dq_rule_id": "DP_TXN_100",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Agency must not be null\n\nagcy_cd_bus_key not in ('unknown','not applicable')\n\ndist_chnl_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_dist_chnl_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_dist_chnl_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 101,
+        "dq_rule_id": "DP_TXN_101",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Agency must not be null\n\nagcy_cd_bus_key not in ('unknown','not applicable')\n\ndist_chnl_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_dist_chnl_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_dist_chnl_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 102,
+        "dq_rule_id": "DP_TXN_102",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Production Source must not be null\n\nprod_src_cd_bus_key not in ('unknown','not applicable')\n\nprod_src_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_prod_src_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_prod_src_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 103,
+        "dq_rule_id": "DP_TXN_103",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Production Source must not be null\n\nprod_src_cd_bus_key not in ('unknown','not applicable')\n\nprod_src_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_prod_src_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_prod_src_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 104,
+        "dq_rule_id": "DP_TXN_104",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Production Source must not be null\n\nprod_src_cd_bus_key not in ('unknown','not applicable')\n\nprod_src_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_prod_src_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_prod_src_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 105,
+        "dq_rule_id": "DP_TXN_105",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Adjuster must not be null\n\nadjutr_bus_key not in ('unknown','not applicable')\n\nintrnl_adjustr_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_intrnl_adjustr_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_intrnl_adjustr_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 106,
+        "dq_rule_id": "DP_TXN_106",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Adjuster must not be null\n\nadjutr_bus_key not in ('unknown','not applicable')\n\nintrnl_adjustr_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_intrnl_adjustr_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_intrnl_adjustr_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 107,
+        "dq_rule_id": "DP_TXN_107",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Adjuster must not be null\n\nadjutr_bus_key not in ('unknown','not applicable')\n\nintrnl_adjustr_key not in (-1,-2)",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_intrnl_adjustr_key",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Column",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_intrnl_adjustr_key",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 108,
+        "dq_rule_id": "DP_TXN_108",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss description must not be null for closed BP/HO claims\n\ncause_desc not in ('unknown','not applicable') where lob_cd_bus_key in ('BP','HO')\n\ncause_key not in (-1,-2) where lob_cd_bus_key in ('BP','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ho_loss_descrip_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_bp_ho_loss_descrip_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 109,
+        "dq_rule_id": "DP_TXN_109",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss description must not be null for closed BP/HO claims\n\ncause_desc not in ('unknown','not applicable') where lob_cd_bus_key in ('BP','HO')\n\ncause_key not in (-1,-2) where lob_cd_bus_key in ('BP','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ho_loss_descrip_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_bp_ho_loss_descrip_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 110,
+        "dq_rule_id": "DP_TXN_110",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Loss description must not be null for closed BP/HO claims\n\ncause_desc not in ('unknown','not applicable') where lob_cd_bus_key in ('BP','HO')\n\ncause_key not in (-1,-2) where lob_cd_bus_key in ('BP','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ho_loss_descrip_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Completeness\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_bp_ho_loss_descrip_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 111,
+        "dq_rule_id": "DP_TXN_111",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Voluntary (V) is the only valid Market Type for CA\n\nmkt_type_code_bus_key = 'V' where lob_cd_bus_key = 'CA'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_ca_mkt_type_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_ca_mkt_type_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 112,
+        "dq_rule_id": "DP_TXN_112",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Voluntary (V) is the only valid Market Type for CA\n\nmkt_type_code_bus_key = 'V' where lob_cd_bus_key = 'CA'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_ca_mkt_type_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_ca_mkt_type_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 113,
+        "dq_rule_id": "DP_TXN_113",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Voluntary (V) is the only valid Market Type for CA\n\nmkt_type_code_bus_key = 'V' where lob_cd_bus_key = 'CA'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_ca_mkt_type_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_ca_mkt_type_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 114,
+        "dq_rule_id": "DP_TXN_114",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim types AP and BI are applicable for CA\n\nclaim_type_cd_bus_key in ('AP','BI') where lob_cd_bus_key = 'CA'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_ca_claim_type_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_ca_claim_type_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 115,
+        "dq_rule_id": "DP_TXN_115",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim types AP and BI are applicable for CA\n\nclaim_type_cd_bus_key in ('AP','BI') where lob_cd_bus_key = 'CA'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_ca_claim_type_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_ca_claim_type_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 116,
+        "dq_rule_id": "DP_TXN_116",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim types AP and BI are applicable for CA\n\nclaim_type_cd_bus_key in ('AP','BI') where lob_cd_bus_key = 'CA'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_ca_claim_type_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_ca_claim_type_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 117,
+        "dq_rule_id": "DP_TXN_117",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim types LI and PD are applicable for BP and HO\n\nclaim_type_cd_bus_key in ('LI','PD') where lob_cd_bus_key in ('BP','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ho_claim_type_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_bp_ho_claim_type_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 118,
+        "dq_rule_id": "DP_TXN_118",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim types LI and PD are applicable for BP and HO\n\nclaim_type_cd_bus_key in ('LI','PD') where lob_cd_bus_key in ('BP','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ho_claim_type_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_bp_ho_claim_type_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 119,
+        "dq_rule_id": "DP_TXN_119",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Claim types LI and PD are applicable for BP and HO\n\nclaim_type_cd_bus_key in ('LI','PD') where lob_cd_bus_key in ('BP','HO')",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_bp_ho_claim_type_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_bp_ho_claim_type_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 120,
+        "dq_rule_id": "DP_TXN_120",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "Amount paid must be less than or equal to amount incurred\n\ntot_paymt_amt <= tot_resv_pndg_amt + tot_paymt_amt\n\nor can check this as tot_resv_pndg_amt >= 0",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_tot_resv_pndg_amt_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Accuracy\u00a0",
+        "dq_screen_type": "Business Rule",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_tot_resv_pndg_amt_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 121,
+        "dq_rule_id": "DP_TXN_121",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If carrier is AZGuard, market type must be E&S\n\ncarrier_cd_bus_key = 'PAAZGU10' where mkt_type_code_bus_key = 'E'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_es_carrier_txn",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_transaction",
+        "dq_rule_applicable_attribute": "dq_es_carrier_txn",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 122,
+        "dq_rule_id": "DP_TXN_122",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If carrier is AZGuard, market type must be E&S\n\ncarrier_cd_bus_key = 'PAAZGU10' where mkt_type_code_bus_key = 'E'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_es_carrier_status",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim_status_log",
+        "dq_rule_applicable_attribute": "dq_es_carrier_status",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    },
+    {
+        "dq_rule_master_key": 123,
+        "dq_rule_id": "DP_TXN_123",
+        "data_product_name": "Claims Transaction",
+        "sub_domain_name": "Claims Handling",
+        "dq_rule_description": "If carrier is AZGuard, market type must be E&S\n\ncarrier_cd_bus_key = 'PAAZGU10' where mkt_type_code_bus_key = 'E'",
+        "dq_rule_constraint": {
+            "type": "expect_column_values_to_be_in_set",
+            "kwargs": {
+                "column": "dq_es_carrier_claim",
+                "value_set": [
+                    "1"
+                ]
+            },
+            "meta": {
+                "action": {
+                    "fail_threshold": 0.0,
+                    "warn_threshold": 0.0,
+                    "quarantine": true
+                }
+            }
+        },
+        "dq_rule_dimension": "Consistency\u00a0",
+        "dq_screen_type": "Structure",
+        "dq_rule_applicable_lakehouse": "den_lhw_dpr_001_claims_transaction",
+        "dq_rule_applicable_schema": "claims_transaction",
+        "dq_rule_applicable_object": "fact_claim",
+        "dq_rule_applicable_attribute": "dq_es_carrier_claim",
+        "dq_rule_failure_action": "Warn",
+        "dq_rule_severity_score": "0",
+        "is_current_flag": 1,
+        "row_effective_date": "2025-07-15T13:12:24.057Z",
+        "row_expiration_date": "2099-12-31T23:59:59.000Z"
+    }
+]
