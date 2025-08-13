@@ -9,7 +9,16 @@
                 {
                     "fileName": "claimstrans_curated_inserts",
                     "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "transaction_uwhomes_curated_inserts",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "wclocnam_curated_inserts",
+                    "modelConfigFolderName": "claims_transaction"
                 }
+                
             ]
         }
     ],
@@ -22,6 +31,14 @@
                 },
                 {
                     "fileName": "claimstrans_curated_updates",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "transaction_uwhomes_curated_updates",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "wclocnam_curated_updates",
                     "modelConfigFolderName": "claims_transaction"
                 }
             ]
@@ -37,10 +54,20 @@
                 {
                     "fileName": "claimstrans_curated_deletes",
                     "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "transaction_uwhomes_curated_deletes",
+                    "modelConfigFolderName": "claims_transaction"
+                },
+                {
+                    "fileName": "wclocnam_curated_deletes",
+                    "modelConfigFolderName": "claims_transaction"
                 }
             ]
         }
     ],
+    
+    
     "loadGroupStaging1": [
         {
             "files": [

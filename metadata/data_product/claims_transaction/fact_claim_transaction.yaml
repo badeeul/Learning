@@ -6,7 +6,7 @@ target:
   key_columns:
     - claimant_key
     - claim_trans_type_key
-    - transid
+    - trans_id
     - ins_obj_key
     - cvrg_key
   unknown_record: False
@@ -247,10 +247,10 @@ query:
                   CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CA','HO') THEN c.received
                        ELSE c.recvd
                   END AS claim_recd_date_bus_key,
-                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
-                       ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid)))
+                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)),'-',UPPER(TRIM(c.coveragecategory)))
+                       ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid))) 
                   END AS adjustr_bus_key,
-                  CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+                  CONCAT('EMP-', UPPER(TRIM(c.adjustor)),'-',UPPER(TRIM(c.coveragecategory))) AS intrnl_adjustr_bus_key,
                   CASE WHEN UPPER(TRIM(c.lob)) = 'WC' AND UPPER(TRIM(c.catcode)) IS NOT NULL THEN CONCAT(UPPER(TRIM(c.code)), '-', UPPER(TRIM(c.catcode)))
                        ELSE CONCAT(UPPER(TRIM(c.code)), '-', CAST(c.occid AS STRING))
                   END AS occur_bus_key,
@@ -273,14 +273,15 @@ query:
                   r.claim_trans_type_bus_key,
                   r.updateon AS trans_date_bus_key,
                   'not applicable' AS payee_cd_bus_key,
-                  r.reservesid AS transid,
+                  r.reservesid AS trans_id,
                   r.enteredon AS transaction_entry_date
               FROM 
                   stg_claim_transaction_supporting_data c
                   INNER JOIN reserves_unpivoted r ON 
                       UPPER(TRIM(r.code)) = UPPER(TRIM(c.code)) AND 
                       UPPER(TRIM(r.claim)) = UPPER(TRIM(c.claim)) AND 
-                      r.claimantid = c.claimantid
+                      r.claimantid = c.claimantid AND
+                      r.cvgid = c.cvgid
                   LEFT JOIN uwcoverage_filtered uc ON 
                       CASE WHEN UPPER(TRIM(c.lob)) = 'CA' AND 
                                 UPPER(TRIM(uc.code)) = UPPER(TRIM(c.code)) AND 
@@ -322,10 +323,10 @@ query:
                   CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CA','HO') THEN c.received
                        ELSE c.recvd
                   END AS claim_recd_date_bus_key,
-                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
+                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)),'-',UPPER(TRIM(c.coveragecategory)))
                        ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid))) 
                   END AS adjustr_bus_key,
-                  CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+                  CONCAT('EMP-', UPPER(TRIM(c.adjustor)),'-',UPPER(TRIM(c.coveragecategory))) AS intrnl_adjustr_bus_key,
                   CASE WHEN UPPER(TRIM(c.lob)) = 'WC' AND UPPER(TRIM(c.catcode)) IS NOT NULL THEN CONCAT(UPPER(TRIM(c.code)), '-', UPPER(TRIM(c.catcode)))
                        ELSE CONCAT(UPPER(TRIM(c.code)), '-', CAST(c.occid AS STRING))
                   END AS occur_bus_key,
@@ -349,16 +350,17 @@ query:
                   p.chkdate AS trans_date_bus_key,
                   CASE WHEN UPPER(TRIM(p.payee)) = 'INSURED' THEN 'Insured' 
                        WHEN UPPER(TRIM(p.payee)) = 'CLAIMANT' THEN 'Claimant'
-                       ELSE COALESCE(UPPER(TRIM(p.checkto)), UPPER(TRIM(p.payee)))  
+                       ELSE COALESCE(UPPER(TRIM(p.checkto)), UPPER(TRIM(p.payee)))
                   END AS payee_cd_bus_key,
-                  p.transid AS transid,
+                  p.transid AS trans_id,
                   p.enteredon AS transaction_entry_date
               FROM 
                   stg_claim_transaction_supporting_data c
                   INNER JOIN payments_temp p ON 
                       UPPER(TRIM(p.code)) = UPPER(TRIM(c.code)) AND 
                       UPPER(TRIM(p.claim)) = UPPER(TRIM(c.claim)) AND 
-                      p.claimantid = c.claimantid
+                      p.claimantid = c.claimantid AND
+                      p.cvgid = c.cvgid
                   LEFT JOIN uwcoverage_filtered uc ON 
                       CASE WHEN UPPER(TRIM(c.lob)) = 'CA' AND 
                                 UPPER(TRIM(uc.code)) = UPPER(TRIM(c.code)) AND 
@@ -400,10 +402,10 @@ query:
                   CASE WHEN UPPER(TRIM(c.lob)) IN ('BP','CA','HO') THEN c.received
                        ELSE c.recvd
                   END AS claim_recd_date_bus_key,
-                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
+                  CASE WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)),'-',UPPER(TRIM(c.coveragecategory)))
                        ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid))) 
                   END AS adjustr_bus_key,
-                  CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+                  CONCAT('EMP-', UPPER(TRIM(c.adjustor)),'-',UPPER(TRIM(c.coveragecategory))) AS intrnl_adjustr_bus_key,
                   CASE WHEN UPPER(TRIM(c.lob)) = 'WC' AND UPPER(TRIM(c.catcode)) IS NOT NULL THEN CONCAT(UPPER(TRIM(c.code)), '-', UPPER(TRIM(c.catcode)))
                        ELSE CONCAT(UPPER(TRIM(c.code)), '-', CAST(c.occid AS STRING))
                   END AS occur_bus_key,
@@ -426,14 +428,15 @@ query:
                   p.reserve_reversal_type AS claim_trans_type_bus_key,
                   p.chkdate AS trans_date_bus_key,
                   'not applicable' AS payee_cd_bus_key,
-                  p.transid AS transid,
+                  p.transid AS trans_id,
                   p.enteredon AS transaction_entry_date
               FROM 
                   stg_claim_transaction_supporting_data c
                   INNER JOIN payments_temp p ON 
                       UPPER(TRIM(p.code)) = UPPER(TRIM(c.code)) AND 
                       UPPER(TRIM(p.claim)) = UPPER(TRIM(c.claim)) AND 
-                      p.claimantid = c.claimantid
+                      p.claimantid = c.claimantid AND
+                      p.cvgid = c.cvgid
                   LEFT JOIN uwcoverage_filtered uc ON 
                       CASE WHEN UPPER(TRIM(c.lob)) = 'CA' AND 
                                 UPPER(TRIM(uc.code)) = UPPER(TRIM(c.code)) AND 
@@ -474,7 +477,7 @@ query:
               COALESCE(d_payee.payee_key, -1) AS payee_key,
               COALESCE(trans_enteredon.date_key, -1)AS transaction_entry_date_key,
               fd.amt AS amt,
-              fd.transid AS transid,
+              fd.trans_id AS trans_id,
               CASE 
                 WHEN d_date_loss.date > CURRENT_DATE() THEN 0
                 ELSE 1
@@ -533,11 +536,11 @@ query:
                 ELSE 1
               END AS dq_bp_ca_ho_pol_num_txn,
               CASE 
-                WHEN d_claim_trans_type.claim_trans_type_bus_key =  'Payment' AND d_payee.payee_key in (-1,-2) THEN 0
+                WHEN d_claim_trans_type.claim_trans_type_bus_key =  'Payment' AND COALESCE(d_payee.payee_key, -1) IN (-1,-2) THEN 0
                 ELSE 1
               END AS dq_pmt_payee_txn,
               CASE 
-                WHEN d_lob.lob_cd_bus_key in ('DB','WC') AND d_ins_obj.ins_obj_key in (-1) THEN 0
+                WHEN d_lob.lob_cd_bus_key in ('DB','WC') AND COALESCE(d_ins_obj.ins_obj_key, -1) IN (-1) THEN 0
                 ELSE 1
               END AS dq_db_wc_ins_obj_txn,
               CASE 
@@ -549,7 +552,7 @@ query:
                 ELSE 1
               END AS dq_mkt_type_key,
               CASE 
-                WHEN d_lob.lob_cd_bus_key in ('DB','WC','HO') AND d_aslob.aslob_key in (-1,-2) THEN 0
+                WHEN d_lob.lob_cd_bus_key in ('DB','WC','HO') AND COALESCE(d_aslob.aslob_key, -1) IN (-1,-2) THEN 0
                 ELSE 1
               END AS dq_db_ho_wc_aslob_txn,
               CASE 
@@ -581,7 +584,7 @@ query:
                 ELSE 1
               END AS dq_dist_chnl_key,
               CASE 
-                WHEN d_lob.lob_cd_bus_key in ('BP','CA','HO') AND d_ins_obj.ins_obj_key in (-1,-2) THEN 0
+                WHEN d_lob.lob_cd_bus_key in ('BP','CA','HO') AND COALESCE(d_ins_obj.ins_obj_key, -1) IN (-1,-2) THEN 0
                 ELSE 1
               END AS dq_bp_ca_ho_ins_obj_txn,
               CASE 
@@ -593,7 +596,7 @@ query:
                 ELSE 1
               END AS dq_intrnl_adjustr_key,
               CASE 
-                WHEN d_lob.lob_cd_bus_key in ('BP','HO') AND d_cause_of_loss.cause_key in (-1,-2) THEN 0
+                WHEN d_lob.lob_cd_bus_key in ('BP','HO') AND COALESCE(d_cause_of_loss.cause_key, -1) IN (-1,-2) THEN 0
                 ELSE 1
               END AS dq_bp_ho_loss_descrip_txn,
               CASE 

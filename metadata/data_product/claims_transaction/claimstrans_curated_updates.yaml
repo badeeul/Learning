@@ -16,9 +16,8 @@ source:
     table: dbo_claimstrans_ct
 
 query:
-  - name: cte_cdc_updates
+  - name: cte_claimstrans_updates_rn
     sql: |
-      with cteUpdates as (
         select 
             tc.claimstrans_id
           , tc.wcclaimid
@@ -46,12 +45,40 @@ query:
                   
           , false as cdc_deleted   
           , ROW_NUMBER() OVER (PARTITION BY claimstrans_id ORDER BY `__seqval` DESC) as rn
+          
         from claimstrans_cdc tc
         where `__operation` = 4
-      )
-      select *
-      from cteUpdates
-      where rn = 1
-    drop:
-      - rn
+
+  - name: cte_claimstrans_updates
+    sql: |
+        select 
+            claimstrans_id
+          , wcclaimid
+          , claimantid
+          , cvgid
+          , transtype
+          , enteredon
+          , enteredby
+          , effdate
+          , currentvalue
+          , priorvalue
+          , payment_id
+               
+          , dl_rowhash
+          , dl_partitionkey
+          , dl_iscurrent
+          , dl_recordstartdateutc
+          , dl_recordenddateutc
+          , dl_createddateutc
+          , dl_lastmodifiedutc
+          , dl_sourcefilepath
+          , dl_sourcefilename
+          , dl_eltid
+          , dl_runid 
+                  
+          , cdc_deleted   
+          
+        from cte_claimstrans_updates_rn
+        where rn = 1
+
     description: "Gathers UPDATED records from claimstrans_cdc."

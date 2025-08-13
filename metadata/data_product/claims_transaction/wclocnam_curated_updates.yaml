@@ -1,0 +1,156 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: claims_transaction_curated
+  table: wclocnam_curated
+  load_strategy: merge
+  key_columns:
+    - code
+    - type
+    - locnum 
+    - revnum
+    - enteredon
+    - cdc_deleted
+  unknown_record: False
+  identity: False
+
+source:
+  - name: wclocnam_cdc
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction_cdc
+    table: dbo_wclocnam_ct
+
+query:
+  - name: cte_wclocnam_updates_rn
+    sql: |
+        select 
+            tc.code,
+           tc.type,
+           tc.locnum,
+           tc.revnum,
+           tc.lowdate,
+           tc.highdate,
+           tc.text,
+           tc.uselocnum,
+           tc.address1,
+           tc.address2,
+           tc.city,
+           tc.state,
+           tc.zipcode,
+           tc.county,
+           tc.ssn,
+           tc.title,
+           tc.parttime,
+           tc.fulltime,
+           tc.sttin,
+           tc.biztype,
+           tc.biztypex,
+           tc.enteredon,
+           tc.enteredby,
+           tc.updateon,
+           tc.updateby,
+           tc.renewoflocnum,
+           tc.locytdprem,
+           tc.locstfees,
+           tc.classcode,
+           tc.exposure,
+           tc.rate,
+           tc.sttintype,
+           tc.firstname,
+           tc.lastname,
+           tc.middlename,
+           tc.loctypenum,
+           tc.latitude,
+           tc.longitude,
+           tc.geostatus,
+           tc.geoage,
+           tc.dob,
+           tc.gender,
+           tc.maritalstatus,
+           tc.plindustry,
+           tc.occupation
+                  
+          , tc.dl_rowhash
+          , tc.dl_partitionkey
+          , tc.dl_iscurrent
+          , tc.dl_recordstartdateutc
+          , tc.dl_recordenddateutc
+          , tc.dl_createddateutc
+          , tc.dl_lastmodifiedutc
+          , tc.dl_sourcefilepath
+          , tc.dl_sourcefilename
+          , tc.dl_eltid
+          , tc.dl_runid 
+                  
+          , false as cdc_deleted   
+          , ROW_NUMBER() OVER (PARTITION BY code,type,locnum,revnum,enteredon ORDER BY `__seqval` DESC) as rn
+
+        from wclocnam_cdc tc
+        where `__operation` = 4
+  
+  - name: cte_wclocnam_updates
+    sql: |
+        select 
+            code
+          , type
+          , locnum
+          , revnum
+          , lowdate
+          , highdate
+          , text
+          , uselocnum
+          , address1
+          , address2
+          , city
+          , state
+          , zipcode
+          , county
+          , ssn
+          , title
+          , parttime
+          , fulltime
+          , sttin
+          , biztype
+          , biztypex
+          , enteredon
+          , enteredby
+          , updateon
+          , updateby
+          , renewoflocnum
+          , locytdprem
+          , locstfees
+          , classcode
+          , exposure
+          , rate
+          , sttintype
+          , firstname
+          , lastname
+          , middlename
+          , loctypenum
+          , latitude
+          , longitude
+          , geostatus
+          , geoage
+          , dob
+          , gender
+          , maritalstatus
+          , plindustry
+          , occupation
+                  
+          , dl_rowhash
+          , dl_partitionkey
+          , dl_iscurrent
+          , dl_recordstartdateutc
+          , dl_recordenddateutc
+          , dl_createddateutc
+          , dl_lastmodifiedutc
+          , dl_sourcefilepath
+          , dl_sourcefilename
+          , dl_eltid
+          , dl_runid 
+                  
+          , cdc_deleted   
+
+        from cte_wclocnam_updates_rn
+        where rn = 1
+
+    description: "Gathers UPDATED records from wclocnam_cdc."

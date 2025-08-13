@@ -16,9 +16,8 @@ source:
     table: dbo_transaction_uwcoverage_ct
 
 query:
-  - name: cte_cdc_updates
+  - name: cte_uwcoverage_updates_rn
     sql: |
-      with cteUpdates as (
         select 
             tc.transaction_uwcoverage_id
           , tc.code
@@ -66,12 +65,61 @@ query:
                   
           , false as cdc_deleted   
           , ROW_NUMBER() OVER (PARTITION BY transaction_uwcoverage_id ORDER BY `__seqval` DESC) as rn
+
         from transaction_uwcoverage_cdc tc
         where `__operation` = 4
-      )
-      select *
-      from cteUpdates
-      where rn = 1
+
+  - name: cte_uwcoverage_updates
+    sql: |
+        select 
+            transaction_uwcoverage_id
+          , code
+          , trancnt
+          , recordtype
+          , uwcoverageid
+          , coverageid
+          , buildingid
+          , vehicleid
+          , premium
+          , fees
+          , deletedon
+          , state
+          , lcm
+          , effective
+          , enddate
+          , commonname
+          , itemid
+          , before
+          , after
+          , ratingkey
+          , enteredby
+          , enteredon
+          , gigpremium
+          , hasproperties
+          , renewal_source_id
+          , transaction_source_id
+          , overridden
+          , overriddenby
+          , overriddenon
+          , linkuwcoverageid
+          , manualpremium
+               
+          , dl_rowhash
+          , dl_partitionkey
+          , dl_iscurrent
+          , dl_recordstartdateutc
+          , dl_recordenddateutc
+          , dl_createddateutc
+          , dl_lastmodifiedutc
+          , dl_sourcefilepath
+          , dl_sourcefilename
+          , dl_eltid
+          , dl_runid 
+                  
+          , cdc_deleted   
+
+        from cte_uwcoverage_updates_rn
+        where rn = 1
     drop:
       - rn
     description: "Gathers UPDATED records from transaction_uwcoverage_cdc."

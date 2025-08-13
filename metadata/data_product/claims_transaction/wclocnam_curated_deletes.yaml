@@ -1,0 +1,96 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: claims_transaction_curated
+  table: wclocnam_curated
+  load_strategy: merge
+  key_columns:
+    - code
+    - type
+    - locnum 
+    - revnum
+    - enteredon
+    - cdc_deleted
+  unknown_record: False
+  identity: False
+
+source:
+  - name: wclocnam_cdc
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction_cdc
+    table: dbo_wclocnam_ct
+
+query:
+  - name: cte_wclocnam_deletes
+    sql: |
+      with cteDeletes as (
+        select
+            tc.code,
+            tc.type,
+            tc.locnum,
+            tc.revnum,
+            tc.lowdate,
+            tc.highdate,
+            tc.text,
+            tc.uselocnum,
+            tc.address1,
+            tc.address2,
+            tc.city,
+            tc.state,
+            tc.zipcode,
+            tc.county,
+            tc.ssn,
+            tc.title,
+            tc.parttime,
+            tc.fulltime,
+            tc.sttin,
+            tc.biztype,
+            tc.biztypex,
+            tc.enteredon,
+            tc.enteredby,
+            tc.updateon,
+            tc.updateby,
+            tc.renewoflocnum,
+            tc.locytdprem,
+            tc.locstfees,
+            tc.classcode,
+            tc.exposure,
+            tc.rate,
+            tc.sttintype,
+            tc.firstname,
+            tc.lastname,
+            tc.middlename,
+            tc.loctypenum,
+            tc.latitude,
+            tc.longitude,
+            tc.geostatus,
+            tc.geoage,
+            tc.dob,
+            tc.gender,
+            tc.maritalstatus,
+            tc.plindustry,
+            tc.occupation
+                  
+          , tc.dl_rowhash
+          , tc.dl_partitionkey
+          , false as dl_iscurrent
+          , tc.dl_recordstartdateutc
+          , current_timestamp as dl_recordenddateutc
+          , tc.dl_createddateutc
+          , tc.dl_lastmodifiedutc
+          , tc.dl_sourcefilepath
+          , tc.dl_sourcefilename
+          , tc.dl_eltid
+          , tc.dl_runid
+                  
+          , true as cdc_deleted
+          , ROW_NUMBER() OVER (PARTITION BY code,type,locnum,revnum,enteredon ORDER BY `__seqval` DESC) as rn
+
+        from wclocnam_cdc tc
+        where `__operation` = 1
+      )
+      select *
+      from cteDeletes
+      where rn = 1
+    drop:
+      - rn
+    description: "Gathers DELETED records from wclocnam_cdc."

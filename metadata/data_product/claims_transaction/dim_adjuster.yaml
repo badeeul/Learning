@@ -44,33 +44,33 @@ query:
   - name: dim_adjuster
     sql: |
       SELECT DISTINCT 
-        concat('EMP-', e.empcode) as adjustr_bus_key,
+        CONCAT('EMP-', e.empcode,'-',UPPER(TRIM(r.coveragecategory))) as adjustr_bus_key,
         e.name as adjustr_nm,
         e.empcode as adjustr_cd,
         e.emptype as adjustr_type_cd,
         l.descrip as adjustr_type_desc,
         0 as adjustr_tpa_flg,
-        r.enteredby as reserve_entry_userid,
-        r.coveragecategory as reserve_limit_lob,
+        r.userid as reserve_entry_userid,
+        r.coveragecategory as reserve_limit_cvrg_ctgry,
         r.totallimit as reserve_limit_amt
 
       FROM claimant c
       INNER JOIN employee e ON UPPER(TRIM(c.adjustor)) = UPPER(TRIM(e.empcode)) AND e.dl_iscurrent = 1
       INNER JOIN lookups l ON UPPER(TRIM(e.emptype)) = UPPER(TRIM(l.vals)) and UPPER(TRIM(l.keyfield)) = 'EMPTYPE' AND l.dl_iscurrent = 1
-      INNER JOIN reservelimits r ON CAST(r.userid as STRING) = e.empcode AND r.dl_iscurrent = 1
+      INNER JOIN reservelimits r ON r.userid = e.userid AND r.dl_iscurrent = 1
       WHERE c.dl_iscurrent = 1
 
       UNION ALL
 
       SELECT DISTINCT 
-        concat('TPA-', p.provider) as adjustr_bus_key,
-        concat(TRIM(p.name), '(', TRIM(p.county), ')') as adjustr_nm,
+        CONCAT('TPA-', p.provider) as adjustr_bus_key,
+        CONCAT(TRIM(p.name), '(', TRIM(p.county), ')') as adjustr_nm,
         p.provider as adjustr_cd,
         pt.provtype as adjustr_type_cd,
         pt.provtypdes as adjustr_type_desc,
         1 as adjustr_tpa_flg,
         0 as reserve_entry_userid,
-        'NA' as reserve_limit_lob,
+        'NA' as reserve_limit_cvrg_ctgry,
         0 as reserve_limit_amt
       FROM claimant c
       INNER JOIN provider p ON UPPER(TRIM(c.tpataxid)) = UPPER(TRIM(p.provider)) AND p.dl_iscurrent = 1

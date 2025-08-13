@@ -34,6 +34,8 @@ query:
           ,i.state as mail_state
           ,i.zipcode as mail_zip
           ,i.name as insd_nm
+          ,i.crmid as crmid
+          ,i.typepol as typepol
           ,ROW_NUMBER() OVER (partition by i.code order by i.updateon desc) as RN
       FROM curated_insured i
       LEFT JOIN curated_counties c 
@@ -53,6 +55,8 @@ query:
           , mail_state
           , mail_zip
           , insd_nm
+          , crmid
+          , typepol
       from cteRN
       where RN = 1
     description: "This query selects insured details including policy number, address, and name from the curated_insured source table."

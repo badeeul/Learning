@@ -16,36 +16,70 @@ source:
     table: dbo_claimstrans_ct
 
 query:
-  - name: cte_cdc_inserts
+  - name: cte_claimstrans_inserts_rn
     sql: |
-      select 
+        select 
             tc.claimstrans_id
-        , tc.wcclaimid
-        , tc.claimantid
-        , tc.cvgid
-        , tc.transtype
-        , tc.enteredon
-        , tc.enteredby
-        , tc.effdate
-        , tc.currentvalue
-        , tc.priorvalue
-        , tc.payment_id
-                
-        , tc.dl_rowhash
-        , tc.dl_partitionkey
-        , tc.dl_iscurrent
-        , tc.dl_recordstartdateutc
-        , tc.dl_recordenddateutc
-        , tc.dl_createddateutc
-        , tc.dl_lastmodifiedutc
-        , tc.dl_sourcefilepath
-        , tc.dl_sourcefilename
-        , tc.dl_eltid
-        , tc.dl_runid
-                
-        , false as cdc_deleted
+          , tc.wcclaimid
+          , tc.claimantid
+          , tc.cvgid
+          , tc.transtype
+          , tc.enteredon
+          , tc.enteredby
+          , tc.effdate
+          , tc.currentvalue
+          , tc.priorvalue
+          , tc.payment_id
+                  
+          , tc.dl_rowhash
+          , tc.dl_partitionkey
+          , tc.dl_iscurrent
+          , tc.dl_recordstartdateutc
+          , tc.dl_recordenddateutc
+          , tc.dl_createddateutc
+          , tc.dl_lastmodifiedutc
+          , tc.dl_sourcefilepath
+          , tc.dl_sourcefilename
+          , tc.dl_eltid
+          , tc.dl_runid
+                  
+          , false as cdc_deleted
+          , ROW_NUMBER() OVER (PARTITION BY claimstrans_id ORDER BY `__seqval` DESC) as rn
 
-      from claimstrans_cdc tc
-      where `__operation` = 2
+        from claimstrans_cdc tc
+        where `__operation` = 2
+
+  - name: cte_claimstrans_inserts
+    sql: |
+        select 
+            claimstrans_id
+          , wcclaimid
+          , claimantid
+          , cvgid
+          , transtype
+          , enteredon
+          , enteredby
+          , effdate
+          , currentvalue
+          , priorvalue
+          , payment_id
+               
+          , dl_rowhash
+          , dl_partitionkey
+          , dl_iscurrent
+          , dl_recordstartdateutc
+          , dl_recordenddateutc
+          , dl_createddateutc
+          , dl_lastmodifiedutc
+          , dl_sourcefilepath
+          , dl_sourcefilename
+          , dl_eltid
+          , dl_runid
+                  
+          , cdc_deleted
+
+        from cte_claimstrans_inserts_rn
+        where rn = 1
+
     description: "Gathers INSERTED records from claimstrans_cdc."
 

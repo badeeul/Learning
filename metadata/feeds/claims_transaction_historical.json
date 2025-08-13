@@ -16,8 +16,15 @@
                 {
                     "fileName": "claimstrans",
                     "sourceConfigFolderName": "iis_transaction_historical"
+                },
+                {
+                    "fileName": "transaction_uwhomes",
+                    "sourceConfigFolderName": "iis_transaction_historical"
+                },
+                {
+                    "fileName": "wclocnam",
+                    "sourceConfigFolderName": "iis_transaction_historical"
                 }
-
             ]
         }
     ]

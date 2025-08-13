@@ -45,13 +45,13 @@
                 { "fileName": "provtype", "sourceConfigFolderName": "iis_transaction" },
                 { "fileName": "reserves", "sourceConfigFolderName": "iis_transaction" },
                 { "fileName": "reservelimits", "sourceConfigFolderName": "iis_transaction" },
-                { "fileName": "transaction_uwhomes", "sourceConfigFolderName": "iis_transaction" },
                 { "fileName": "uwbuildings", "sourceConfigFolderName": "iis_transaction" },
                 { "fileName": "uwvehicles", "sourceConfigFolderName": "iis_transaction" },
                 { "fileName": "wcclaim", "sourceConfigFolderName": "iis_transaction" },
-                { "fileName": "wclocnam", "sourceConfigFolderName": "iis_transaction" },
                 { "fileName": "wcpmttyp", "sourceConfigFolderName": "iis_transaction" },
-                { "fileName": "dbo_transaction_uwcoverage_ct", "sourceConfigFolderName": "iis_transaction" }
+                { "fileName": "dbo_transaction_uwcoverage_ct", "sourceConfigFolderName": "iis_transaction" },
+                { "fileName": "dbo_transaction_uwhomes_ct", "sourceConfigFolderName": "iis_transaction" },
+                { "fileName": "dbo_wclocnam_ct", "sourceConfigFolderName": "iis_transaction" }
             ]
         }    
     ]

@@ -97,6 +97,23 @@ query:
       GROUP BY 
         fct.claimant_key
 
+  - name: latest_enteredon
+    sql: |
+      SELECT 
+        fct.claimant_key,
+        MAX(dd.date) AS last_enteredon_date
+      FROM 
+        fact_claim_transaction fct
+        JOIN dim_claim_trans_type dctt 
+            ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
+            AND dctt.dl_is_current_flag = 1
+        JOIN dim_date dd 
+            ON fct.transaction_entry_date_key = dd.date_key
+      WHERE 
+        dctt.claim_trans_type_bus_key IN ('RMM', 'RLL', 'REE')
+      GROUP BY 
+        fct.claimant_key
+
   - name: latest_loss_reserves
     sql: |
       SELECT 
@@ -166,10 +183,6 @@ query:
         JOIN dim_claim_trans_type dctt 
             ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
             AND dctt.dl_is_current_flag = 1
-        JOIN latest_loss_payments llp 
-            ON fct.claimant_key = llp.claimant_key
-        JOIN dim_date dd 
-            ON fct.trans_date_key = dd.date_key AND dd.date = llp.last_loss_payment_date
       WHERE 
         dctt.claim_trans_type_bus_key LIKE 'D%' 
         OR dctt.claim_trans_type_bus_key LIKE 'I%' 
@@ -188,10 +201,6 @@ query:
         JOIN dim_claim_trans_type dctt 
             ON fct.claim_trans_type_key = dctt.claim_trans_type_key 
             AND dctt.dl_is_current_flag = 1
-        JOIN latest_payments lp 
-            ON fct.claimant_key = lp.claimant_key
-        JOIN dim_date dd 
-            ON fct.trans_date_key = dd.date_key AND dd.date = lp.last_payment_date
       WHERE 
         dctt.claim_trans_type_bus_key LIKE 'E%' 
         OR dctt.claim_trans_type_bus_key LIKE 'X%'
@@ -231,10 +240,10 @@ query:
         DATEDIFF(current_date, llr.last_loss_reserve_date) AS `Days Since last Loss Reserve`,
         lp.last_payment_date AS `Last Payment Date`,
         llp.last_loss_payment_date AS `Last Loss Payment Date`,
-        fc.tot_paymt_amt AS `Last Incurred amount`,
+        COALESCE(fc.tot_paymt_amt,0) + COALESCE(fc.tot_resv_pndg_amt, 0) AS `Last Incurred amount`,
         COALESCE(lpa.loss_paid_amount, 0) AS `Loss Paid Amount`,
         COALESCE(epa.expense_paid_amount, 0) AS `Expense Paid Amount`,
-        (fc.tot_paymt_amt - COALESCE(lpa.loss_paid_amount, 0) - COALESCE(epa.expense_paid_amount, 0)) AS `O/S Amount`,
+        ((COALESCE(fc.tot_paymt_amt,0) + COALESCE(fc.tot_resv_pndg_amt, 0)) - COALESCE(lpa.loss_paid_amount, 0) - COALESCE(epa.expense_paid_amount, 0)) AS `O/S Amount`,
         CASE WHEN da.adjustr_tpa_flg = 1 THEN 'Y' ELSE 'N' END AS `TPA (Y/N)`,
         dc.tpa_claim_num AS `TPA Claim Num`,
         da.adjustr_nm AS `Adjuster Name`,
@@ -244,10 +253,10 @@ query:
         dc.closure_reviewer AS `Closure Reviewer`,
         dc.void_or_transfer AS `Void or Transfer`,
         cvrg.coverage_desc AS `Coverage Category`,
-        'Not Available' AS `Entered On`,
+        COALESCE(CAST(le.last_enteredon_date AS STRING), 'Unknown') AS `Entered On`,
         da.adjustr_bus_key AS `User ID`,
-        'Not Available' AS `coveragecategory/LOB`,
-        'Not Available' AS `Total Limit`
+        da.reserve_limit_cvrg_ctgry AS `CoverageCategory/LOB`,
+        COALESCE(da.reserve_limit_amt, 0) AS `Total Limit`
       FROM 
         fact_claim fc
         JOIN dim_claimant dc 
@@ -286,6 +295,8 @@ query:
             ON fc.claimant_key = lpa.claimant_key
         LEFT JOIN expense_paid_amounts epa 
             ON fc.claimant_key = epa.claimant_key
+        LEFT JOIN latest_enteredon le
+            ON fc.claimant_key = le.claimant_key
       WHERE 
         dl.lob_cd_bus_key IN ('BP', 'CA', 'HO')
         AND dc.void_or_transfer IS NULL

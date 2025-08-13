@@ -37,8 +37,8 @@ source:
 
   - name: wclocnam
     lakehouse: den_lhw_scu_001_claims_transaction_curated
-    schema: iis_transaction
-    table: wclocnam
+    schema: claims_transaction_curated 
+    table: wclocnam_curated
 
   - name: counties
     lakehouse: den_lhw_scu_001_claims_transaction_curated
@@ -75,7 +75,7 @@ query:
       SELECT *
       FROM (
         SELECT 
-          ROW_NUMBER() OVER (PARTITION BY state, city ORDER BY state, city) AS rn1,
+          ROW_NUMBER() OVER (PARTITION BY state, city, zipcode ORDER BY state, city, name, zipcode) AS rn1,
           name,
           city,
           state,
@@ -116,7 +116,7 @@ query:
             THEN o.locationoflosscity
             ELSE wl_city.city
           END AS occur_loc_city,
-          o.LocationOfLossZipCode AS occur_loc_zip,
+          o.locationoflosszipcode AS occur_loc_zip,
           CASE 
             WHEN UPPER(TRIM(i.lob)) IN ('BP','HO','CA','MS') AND o.locationoflosslocnum <> '' 
             THEN wl_lat.latitude
@@ -170,16 +170,16 @@ query:
          DISTINCT cte.*,
           counties.name AS county,
           ROW_NUMBER() OVER (
-            PARTITION BY policycode, occurencenumber 
-            ORDER BY occid
+            PARTITION BY policycode, occurencenumber
+            ORDER BY occid, occur_loc_lat DESC
           ) AS rn
         FROM cte
         LEFT JOIN get_first_county AS counties ON counties.state = cte.occur_loc_state 
-          AND counties.city = cte.occur_loc_city AND counties.zipcode = left(cte.occur_loc_zip,5)
+          AND counties.city = cte.occur_loc_city AND (LEFT(counties.zipcode, 5) = LEFT(cte.occur_loc_zip, 5) OR LEN(LEFT(cte.occur_loc_zip, 5)) < 5)
         WHERE occid IS NOT NULL
           AND occurencenumber <> '**'
       )
-      SELECT 
+      SELECT DISTINCT
         occid AS occur_bus_key,
         occurencenumber AS occur_num,
         occur_loc_num,

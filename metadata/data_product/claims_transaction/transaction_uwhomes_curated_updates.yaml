@@ -1,0 +1,253 @@
+target:
+  lakehouse: den_lhw_scu_001_claims_transaction_curated
+  schema: claims_transaction_curated
+  table: transaction_uwhomes_curated
+  load_strategy: merge
+  key_columns:
+    - transaction_uwhomes_id
+    - cdc_deleted
+  unknown_record: False
+  identity: False
+
+source:
+  - name: transaction_uwhomes_cdc
+    lakehouse: den_lhw_scu_001_claims_transaction_curated
+    schema: iis_transaction_cdc
+    table: dbo_transaction_uwhomes_ct
+
+query:
+  - name: cte_uwhomes_updates_rn
+    sql: |
+        select
+            tc.transaction_uwhomes_id,
+            tc.code,
+            tc.trancnt,
+            tc.territory,
+            tc.loctypenum,
+            tc.valuation,
+            tc.mortgages,
+            tc.occupancytype,
+            tc.twomonths,
+            tc.homesharing,
+            tc.homesharingtype,
+            tc.nightsrented,
+            tc.rowortownhome,
+            tc.yearbuilt,
+            tc.builderwarranty,
+            tc.heattype,
+            tc.secondaryfuel,
+            tc.solidfuel,
+            tc.solidfuelcount,
+            tc.solidfueldevices,
+            tc.rooftype,
+            tc.secondaryrooftype,
+            tc.roofpitch,
+            tc.construction,
+            tc.propertyslope,
+            tc.exteriorwallsgreaterthan,
+            tc.yearroofingupgrade,
+            tc.yearheatingupgrade,
+            tc.yearplumbingupgrade,
+            tc.yearwiringupgrade,
+            tc.yearexteriorpaintupgrade,
+            tc.electricalservice,
+            tc.purchasedate,
+            tc.squarefootage,
+            tc.numfamilies,
+            tc.numdwellingsinfiredivision,
+            tc.inspected,
+            tc.bcegtype,
+            tc.bceg,
+            tc.protectionclass,
+            tc.firestation,
+            tc.watersource,
+            tc.burglaralarm,
+            tc.firealarm,
+            tc.sprinklered,
+            tc.watersensor,
+            tc.smokers,
+            tc.pools,
+            tc.divingboards,
+            tc.trampoline,
+            tc.pets,
+            tc.dogs,
+            tc.dogtype,
+            tc.exoticpets,
+            tc.otherexoticpets,
+            tc.bitingpets,
+            tc.fireplaces,
+            tc.drones,
+            tc.dwellingtype,
+            tc.deductible_all,
+            tc.deductible_theft,
+            tc.deductible_wind,
+            tc.valuationid,
+            tc.xmldata,
+            tc.before,
+            tc.after,
+            tc.enteredon,
+            tc.enteredby,
+            tc.updateon,
+            tc.updateby,
+            tc.replacementcost,
+            tc.itv,
+            tc.oiltanks,
+            tc.distancetocoast,
+            tc.distancetowater,
+            tc.winddeductibleappliesto,
+            tc.roofimpactratingclass,
+            tc.loghome,
+            tc.tubewiring,
+            tc.tubepercent,
+            tc.gasshutoff,
+            tc.numstories,
+            tc.foundationtype,
+            tc.underconstruction,
+            tc.dwellingunoccupied,
+            tc.nummonthsunoccupied,
+            tc.finishedbasement,
+            tc.stablok,
+            tc.builtfoundationup,
+            tc.dogtypecount,
+            tc.assistancedogs,
+            tc.forecloseornointent,
+            tc.gated,
+            tc.solarpanels,
+            tc.numsolarpanels,
+            tc.solarpanelbattery
+                  
+          , tc.dl_rowhash
+          , tc.dl_partitionkey
+          , tc.dl_iscurrent
+          , tc.dl_recordstartdateutc
+          , tc.dl_recordenddateutc
+          , tc.dl_createddateutc
+          , tc.dl_lastmodifiedutc
+          , tc.dl_sourcefilepath
+          , tc.dl_sourcefilename
+          , tc.dl_eltid
+          , tc.dl_runid 
+                  
+          , false as cdc_deleted   
+          , ROW_NUMBER() OVER (PARTITION BY  transaction_uwhomes_id ORDER BY `__seqval` DESC) as rn
+
+        from  transaction_uwhomes_cdc tc
+        where `__operation` = 4
+
+  - name: cte_uwhomes_updates
+    sql: |
+      select 
+            transaction_uwhomes_id,
+            code,
+            trancnt,
+            territory,
+            loctypenum,
+            valuation,
+            mortgages,
+            occupancytype,
+            twomonths,
+            homesharing,
+            homesharingtype,
+            nightsrented,
+            rowortownhome,
+            yearbuilt,
+            builderwarranty,
+            heattype,
+            secondaryfuel,
+            solidfuel,
+            solidfuelcount,
+            solidfueldevices,
+            rooftype,
+            secondaryrooftype,
+            roofpitch,
+            construction,
+            propertyslope,
+            exteriorwallsgreaterthan,
+            yearroofingupgrade,
+            yearheatingupgrade,
+            yearplumbingupgrade,
+            yearwiringupgrade,
+            yearexteriorpaintupgrade,
+            electricalservice,
+            purchasedate,
+            squarefootage,
+            numfamilies,
+            numdwellingsinfiredivision,
+            inspected,
+            bcegtype,
+            bceg,
+            protectionclass,
+            firestation,
+            watersource,
+            burglaralarm,
+            firealarm,
+            sprinklered,
+            watersensor,
+            smokers,
+            pools,
+            divingboards,
+            trampoline,
+            pets,
+            dogs,
+            dogtype,
+            exoticpets,
+            otherexoticpets,
+            bitingpets,
+            fireplaces,
+            drones,
+            dwellingtype,
+            deductible_all,
+            deductible_theft,
+            deductible_wind,
+            valuationid,
+            xmldata,
+            before,
+            after,
+            enteredon,
+            enteredby,
+            updateon,
+            updateby,
+            replacementcost,
+            itv,
+            oiltanks,
+            distancetocoast,
+            distancetowater,
+            winddeductibleappliesto,
+            roofimpactratingclass,
+            loghome,
+            tubewiring,
+            tubepercent,
+            gasshutoff,
+            numstories,
+            foundationtype,
+            underconstruction,
+            dwellingunoccupied,
+            nummonthsunoccupied,
+            finishedbasement,
+            stablok,
+            builtfoundationup,
+            dogtypecount,
+            assistancedogs,
+            forecloseornointent,
+            gated,
+            solarpanels,
+            numsolarpanels,
+            solarpanelbattery
+               
+          , dl_rowhash
+          , dl_partitionkey
+          , dl_iscurrent
+          , dl_recordstartdateutc
+          , dl_recordenddateutc
+          , dl_createddateutc
+          , dl_lastmodifiedutc
+          , dl_sourcefilepath
+          , dl_sourcefilename
+          , dl_eltid
+          , dl_runid 
+                  
+          , cdc_deleted         
+      from cte_uwhomes_updates_rn
+      where rn = 1
+
+    description: "Gathers UPDATED records from  transaction_uwhomes_cdc."

@@ -22,8 +22,8 @@ source:
 
   - name: curated_transaction_uwhomes
     lakehouse: den_lhw_scu_001_claims_transaction_curated
-    schema: iis_transaction
-    table: transaction_uwhomes
+    schema: claims_transaction_curated 
+    table: transaction_uwhomes_curated
 
   - name: curated_lookups
     lakehouse: den_lhw_scu_001_claims_transaction_curated

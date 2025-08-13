@@ -193,10 +193,11 @@ query:
           ELSE b.coveragecategory 
         END AS claim_type_cd_bus_key,
         CASE 
-          WHEN NVL(b.tpataxid,'') = '' THEN CONCAT('EMP-', b.adjustor)
+          WHEN NVL(b.tpataxid,'') = '' THEN CONCAT('EMP-', b.adjustor, '-', b.coveragecategory)
+          WHEN NVL(b.tpataxid,'') != '' THEN CONCAT('TPA-', b.tpataxid)
           ELSE CONCAT('TPA-', b.tpataxid)
         END AS adjustr_bus_key,
-        CONCAT('EMP-', b.adjustor) AS intrnl_adjustr_bus_key,
+        CONCAT('EMP-', b.adjustor, '-', b.coveragecategory) AS intrnl_adjustr_bus_key,
         CASE 
           WHEN b.lob IN ('WC') AND b.catcode IS NOT NULL THEN CONCAT(b.policy_num, '-', b.catcode)
           ELSE CONCAT(b.policy_num, '-', CAST(b.occid AS STRING))
@@ -333,7 +334,7 @@ query:
                 WHEN l.lob_cd_bus_key = 'CA' AND mt.mkt_type_cd_bus_key != 'V' THEN 0
                 ELSE 1
               END AS dq_ca_mkt_type_status        , CASE 
-                WHEN l.lob_cd_bus_key in ('BP','HO') AND cl.cause_key in (-1,-2) THEN 0
+                WHEN l.lob_cd_bus_key in ('BP','HO') AND COALESCE(cl.cause_key, -1) IN (-1,-2) THEN 0
                 ELSE 1
               END AS dq_bp_ho_loss_descrip_status
         , CASE 

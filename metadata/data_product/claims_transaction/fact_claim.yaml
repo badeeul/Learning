@@ -58,8 +58,8 @@ source:
 
   - name: transaction_uwhomes
     lakehouse: den_lhw_scu_001_claims_transaction_curated
-    schema: iis_transaction
-    table: transaction_uwhomes
+    schema: claims_transaction_curated 
+    table: transaction_uwhomes_curated
 
   - name: reserves
     lakehouse: den_lhw_scu_001_claims_transaction_curated
@@ -218,10 +218,10 @@ query:
           ELSE UPPER(TRIM(w.coveragecategory)) 
         END AS claim_type_cd_bus_key,
         CASE 
-          WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)))
+          WHEN COALESCE(UPPER(TRIM(c.tpataxid)),'') = '' THEN CONCAT('EMP-', UPPER(TRIM(c.adjustor)), '-', UPPER(TRIM(w.coveragecategory)))
           ELSE CONCAT('TPA-', UPPER(TRIM(c.tpataxid))) 
         END AS adjustr_bus_key,
-        CONCAT('EMP-', UPPER(TRIM(c.adjustor))) AS intrnl_adjustr_bus_key,
+        CONCAT('EMP-', UPPER(TRIM(c.adjustor)), '-', UPPER(TRIM(w.coveragecategory))) AS intrnl_adjustr_bus_key,
         CASE 
           WHEN w.lob = 'WC' AND cc.code IS NOT NULL THEN CONCAT(w.code, '-', cc.catcode)
           ELSE CONCAT(w.code, '-', CAST(w.occid AS STRING))
@@ -334,7 +334,7 @@ query:
           ELSE 1
         END AS dq_bp_ca_ho_pol_num_claim,
         CASE 
-          WHEN d_lob.lob_cd_bus_key in ('BP','HO') AND d_cause_of_loss.cause_key in (-1,-2) THEN 0
+          WHEN d_lob.lob_cd_bus_key in ('BP','HO') AND COALESCE(d_cause_of_loss.cause_key, -1) IN (-1,-2) THEN 0
           ELSE 1
         END AS dq_bp_ho_loss_descrip_claim,
         CASE 

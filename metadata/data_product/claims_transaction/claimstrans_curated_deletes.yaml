@@ -16,36 +16,43 @@ source:
     table: dbo_claimstrans_ct
 
 query:
-  - name: cte_cdc_deletes
+  - name: cte_claimstrans_deletes
     sql: |
-      select
-          tc.claimstrans_id
-        , tc.wcclaimid
-        , tc.claimantid
-        , tc.cvgid
-        , tc.transtype
-        , tc.enteredon
-        , tc.enteredby
-        , tc.effdate
-        , tc.currentvalue
-        , tc.priorvalue
-        , tc.payment_id
-                
-        , tc.dl_rowhash
-        , tc.dl_partitionkey
-        , false as dl_iscurrent
-        , tc.dl_recordstartdateutc
-        , current_timestamp as dl_recordenddateutc
-        , tc.dl_createddateutc
-        , tc.dl_lastmodifiedutc
-        , tc.dl_sourcefilepath
-        , tc.dl_sourcefilename
-        , tc.dl_eltid
-        , tc.dl_runid
-                
-        , true as cdc_deleted
+      with cteDeletes as (
+        select
+            tc.claimstrans_id
+          , tc.wcclaimid
+          , tc.claimantid
+          , tc.cvgid
+          , tc.transtype
+          , tc.enteredon
+          , tc.enteredby
+          , tc.effdate
+          , tc.currentvalue
+          , tc.priorvalue
+          , tc.payment_id
+                  
+          , tc.dl_rowhash
+          , tc.dl_partitionkey
+          , false as dl_iscurrent
+          , tc.dl_recordstartdateutc
+          , current_timestamp as dl_recordenddateutc
+          , tc.dl_createddateutc
+          , tc.dl_lastmodifiedutc
+          , tc.dl_sourcefilepath
+          , tc.dl_sourcefilename
+          , tc.dl_eltid
+          , tc.dl_runid
+                  
+          , true as cdc_deleted
+          , ROW_NUMBER() OVER (PARTITION BY claimstrans_id ORDER BY `__seqval` DESC) as rn
 
-      from claimstrans_cdc tc
-
-      where `__operation` = 1
+        from claimstrans_cdc tc
+        where `__operation` = 1
+      )
+      select *
+      from cteDeletes
+      where rn = 1
+    drop:
+      - rn
     description: "Gathers DELETED records from claimstrans_cdc."
